@@ -1,0 +1,28 @@
+{
+	"folders": [
+		{
+			"path": "ClientApp",
+		},
+		{
+			"path": "Leaderboard",
+		},
+		{
+			"path": "Leaderboard.Tests",
+		}
+	],
+	"settings": {
+		"beautify.language": {
+			"html": [
+				"htm",
+				"html",
+				"aspnetcorerazor"
+			]
+		}
+	},
+	"extensions": {
+		"recommendations": [
+			"gruntfuggly.todo-tree",
+			"hookyqr.beautify"
+		]
+	}
+}
