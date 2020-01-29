@@ -37,6 +37,12 @@
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development"
             },
+            "serverReadyAction": {
+                "action": "debugWithChrome",
+                "pattern": "^\\s*Now listening on:\\s+(http://\\S+)",
+                "uriFormat": "%s",
+                "webRoot": "${workspaceFolder}/wwwroot"
+            },
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"
             }

@@ -14,22 +14,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="3.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.1" />
   </ItemGroup>
-
-  <!-- build frontend files -->
-  <!-- <Target Name="NpmBuild" BeforeTargets="CopyFiles">
-    <Exec WorkingDirectory="../ClientApp" Command="npm run build" />
-  </Target> -->
-
-  <!-- copy frontend files -->
-  <Target Name="CopyFiles" BeforeTargets="Build">
-    <ItemGroup>
-      <Files Include="../ClientApp/build/**" />
-    </ItemGroup>
-    <RemoveDir Directories="./wwwroot/pack" />  
-    <Copy SourceFiles="@(Files)" DestinationFiles="@(Files->'./wwwroot/pack/%(RecursiveDir)%(Filename)%(Extension)')" />
-  </Target>
-
 </Project>

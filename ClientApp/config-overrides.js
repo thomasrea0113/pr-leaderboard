@@ -3,14 +3,9 @@ const path = require('path');
 
 module.exports = function override(config, env) {
     config.entry = {
-        home: './src/pages/Home.js',
+        home: './src/pages/home.js',
+        // site: './src/site.js'
     };
-
-    config.plugins.push(...[
-      new webpack.DefinePlugin({
-        'process.env.NODE_ENV': JSON.stringify('development')
-      })
-    ]);
 
     return config;
 }

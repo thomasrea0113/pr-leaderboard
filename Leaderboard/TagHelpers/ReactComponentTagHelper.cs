@@ -1,8 +1,12 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.AspNetCore.SpaServices.StaticFiles;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 
@@ -10,43 +14,54 @@ namespace Leaderboard.TagHelpers
 {
     public class ReactComponentTagHelper : TagHelper
     {
-        const string packPath = "/pack/static/js";
+        public string Src { get; set; }
+        public string ElementId { get; set; }
+        public object Props { get; set; } = new {};
 
-        private readonly IDirectoryContents _packedFiles;
-        private readonly Regex regex = new Regex("", RegexOptions.IgnoreCase);
-        public ReactComponentTagHelper(IWebHostEnvironment env)
+        private readonly List<IFileInfo> _packedFiles;
+        private readonly string _spaDir;
+        private readonly bool _isDevelopment;
+
+        public ReactComponentTagHelper(IWebHostEnvironment env, ISpaStaticFileProvider spaFiles)
         {
-            _packedFiles = env.WebRootFileProvider.GetDirectoryContents(packPath);
+            _isDevelopment = env.EnvironmentName == "Development";
+            if (!_isDevelopment)
+            {
+                _spaDir = spaFiles.FileProvider.GetFileInfo("./").PhysicalPath;
+                _packedFiles = RecursiveGetDirectoryContents(spaFiles.FileProvider).ToList();
+            }
         }
 
-        public string Component { get; set; }
-        public string ElementId { get; set; }
-
-        public void AppendScript(TagHelperContent element, string pattern, bool inline = false)
+        private IEnumerable<IFileInfo> RecursiveGetDirectoryContents(IFileProvider provider)
         {
-            var componentRegex = new Regex(pattern, RegexOptions.IgnoreCase);
-            var file = _packedFiles.Single(f => componentRegex.IsMatch(f.Name));
-            if (inline)
-            {
-                var content = new StreamReader(file.CreateReadStream()).ReadToEnd();
-                element.AppendHtml($"<script>\n{content}\n</script>\n");
-            }
-            else
-            {
-                var webPath = Path.Join(packPath, file.Name).Replace("\\", "/");
-                element.AppendFormat("<script src='{0}'></script>\n", webPath);
-            }
+            foreach(var file in provider.GetDirectoryContents("./"))
+                if (!file.IsDirectory)
+                    yield return file;
+                else {
+                    var providerTypeInstance = (IFileProvider)Activator.CreateInstance(provider.GetType(), file.PhysicalPath);
+                    foreach (var file2 in RecursiveGetDirectoryContents(providerTypeInstance))
+                        yield return file2;
+                }
         }
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            AppendScript(output.PreElement, $"^runtime~{Component}\\.[a-f0-9]{{8}}\\.js$", true);
-            AppendScript(output.PreElement, $"^{2}\\.[a-f0-9]{{8}}\\.chunk\\.js$");
-            AppendScript(output.PreElement, $"^{Component}\\.[a-f0-9]{{8}}\\.chunk\\.js$");
+            if (!_isDevelopment)
+            {
+                // TODO implement getting the chunk hash for each build using _packedFiles
+                throw new NotImplementedException();
+            }
+            else{
+                
+                output.PreElement.AppendHtml($@"<script>
+    var props = {JsonSerializer.Serialize(Props, Props.GetType())};
+    var rootId = '{ElementId}';
+</script>");
+            }
 
             output.TagMode = TagMode.StartTagAndEndTag;
+            output.Attributes.Add("src", Src);
             output.TagName = "script";
-            output.Content.AppendHtml($"ReactDOM.render(React.createElement({Component}.default), document.getElementById('{ElementId}'));");
         }
     }
 }

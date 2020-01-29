@@ -1,9 +1,8 @@
-import React, { Component } from 'expose-loader?React!react'; // eslint-disable-line import/no-webpack-loader-syntax
+import React, { Component } from 'expose-loader?React!react';
+import ReactDOM from 'react-dom';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import './css/custom.css'
-
-require('expose-loader?ReactDOM!react-dom'); // eslint-disable-line import/no-webpack-loader-syntax
 
 export default class HomeComponent extends Component {
   static displayName = "Home";
@@ -30,4 +29,6 @@ export default class HomeComponent extends Component {
   }
 }
 
-require('expose-loader?Home!./home'); // eslint-disable-line import/no-webpack-loader-syntax
+ReactDOM.render(<HomeComponent />, document.getElementById('root'));
+
+// ReactDOM.render(<HomeComponent props={props} />, document.getElementById(rootId));

@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "ajv": "^6.9.1",
+    "aspnet-webpack": "^3.0.0",
     "copy-webpack-plugin": "^5.1.1",
     "cross-env": "^5.2.0",
     "eslint": "^5.12.0",
@@ -33,8 +34,8 @@
     "extends": "react-app"
   },
   "scripts": {
-    "start": "rimraf ../Leaderboard/wwwroot/pack && react-app-rewired start",
-    "build": "react-app-rewired build",
+    "start": "react-app-rewired start",
+    "build": "rimraf ../Leaderboard/wwwroot/pack && react-app-rewired build",
     "test": "cross-env CI=true react-app-rewired test --env=jsdom --env=jsdom",
     "lint": "eslint ./src/"
   },
