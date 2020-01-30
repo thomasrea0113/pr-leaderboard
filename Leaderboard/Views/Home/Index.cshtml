@@ -2,12 +2,16 @@
 ViewData["Title"] = "Home Page";
 }
 
+@section css {
+    <react-component src="/static/css/home.chunk.css" />
+}
+
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
     <div id="root"></div>
 </div>
 
-@section scripts {
-    <react-component src="/static/js/home.chunk.js" element-id="root" />
+@section js {
+    <react-component src="/static/js/home.chunk.js" props="@Model" element-id="root" />
 }

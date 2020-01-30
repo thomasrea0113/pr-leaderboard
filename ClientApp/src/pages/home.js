@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import './css/custom.css'
 
-export default class HomeComponent extends Component {
+export class HomeComponent extends Component {
   static displayName = "Home";
 
   render () {
@@ -27,3 +27,5 @@ export default class HomeComponent extends Component {
     );
   }
 }
+
+export default HomeComponent;

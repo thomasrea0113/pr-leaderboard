@@ -7,13 +7,23 @@ module.exports = function override(config, env) {
         home: './src/pages/home.js'
     };
 
-    // config.output.library = 'App'
-    // config.output.libraryTarget = 'assign'
-
     config.externals = {
         react: 'React',
         'react-dom': 'ReactDOM'
     }
+
+    // disable code splitting for easier integration into the core app
+    config.optimization.splitChunks = {
+        cacheGroups: {
+           default: false
+        }
+    }
+
+    config.output.libraryTarget = 'var';
+    config.output.libraryExport = '';
+    config.output.library = 'Components'
+
+    config.mode = 'development';
 
     config.plugins.push(...[
         new HtmlWebpackPlugin({

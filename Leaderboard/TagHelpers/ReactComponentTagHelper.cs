@@ -16,7 +16,8 @@ namespace Leaderboard.TagHelpers
     {
         public string Src { get; set; }
         public string ElementId { get; set; }
-        public object Props { get; set; } = new {};
+        public object Props { get; set; }
+        public object Model { get; set; }
 
         private readonly List<IFileInfo> _packedFiles;
         private readonly string _spaDir;
@@ -25,11 +26,13 @@ namespace Leaderboard.TagHelpers
         public ReactComponentTagHelper(IWebHostEnvironment env, ISpaStaticFileProvider spaFiles)
         {
             _isDevelopment = env.EnvironmentName == "Development";
-            if (!_isDevelopment)
-            {
-                _spaDir = spaFiles.FileProvider.GetFileInfo("./").PhysicalPath;
-                _packedFiles = RecursiveGetDirectoryContents(spaFiles.FileProvider).ToList();
-            }
+            // if (!_isDevelopment)
+            // {
+                var provider = spaFiles.FileProvider
+                    ?? throw new ArgumentNullException("Application is running is a production configuration, so the react development server will not be used. However, the build directory does not exist. Did you run 'npm run build' first?");
+                _spaDir = provider.GetFileInfo("./").PhysicalPath;
+                _packedFiles = RecursiveGetDirectoryContents(provider).ToList();
+            // }
         }
 
         private IEnumerable<IFileInfo> RecursiveGetDirectoryContents(IFileProvider provider)
@@ -44,24 +47,73 @@ namespace Leaderboard.TagHelpers
                 }
         }
 
+        private IFileInfo GetPackedFile(string path)
+        {
+            var dir = (Path.TrimEndingDirectorySeparator(_spaDir) + Path.GetDirectoryName(path)).Replace("\\", "\\\\");
+            var fileName = Path.GetFileNameWithoutExtension(path);
+            var ext = Path.GetExtension(path);
+
+            // bundles should always match the <component-name>.chunk.<ext> pattern.
+            var parts = fileName.Split('.').ToList();
+            var chunkIndex = parts.LastIndexOf("chunk");
+
+            string matchPattern;
+
+            if (chunkIndex != -1)
+                matchPattern = $"^{dir}\\\\{String.Join(',', parts.Take(chunkIndex))}.[0-9a-f]{{8}}.chunk{ext}$";
+            else
+                matchPattern = $"^{dir}\\\\{fileName}.[0-9a-f]{{8}}{ext}$";
+
+            var hashMatch = new Regex(matchPattern);
+            return _packedFiles
+                .Single(f => hashMatch.IsMatch(f.PhysicalPath));
+        }
+
+        private string GetHashedPath(string path)
+            => GetPackedFile(path).PhysicalPath
+                .Replace(_spaDir, "/")
+                .Replace("\\", "/");
+
+        private string GetRuntimeChunk(string path)
+        {
+            var dir = Path.GetDirectoryName(path);
+            var fileName = Path.GetFileName(path);
+            var ext = Path.GetExtension(path);
+
+            var parts = fileName.Split('.').ToList();
+            var fileNameNoChunk = String.Join('.', parts.Take(parts.LastIndexOf("chunk")));
+            return $"{dir}\\runtime~{fileNameNoChunk}{ext}";
+        }
+
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            if (!_isDevelopment)
-            {
-                // TODO implement getting the chunk hash for each build using _packedFiles
-                throw new NotImplementedException();
-            }
-            else{
-                
-                output.PreElement.AppendHtml($@"<script>
-    var props = {JsonSerializer.Serialize(Props, Props.GetType())};
-    var rootId = '{ElementId}';
-</script>");
-            }
+            var hashPath = GetHashedPath(Src);
 
-            output.TagMode = TagMode.StartTagAndEndTag;
-            output.Attributes.Add("src", Src);
-            output.TagName = "script";
+            if (Path.GetExtension(Src) == ".js")
+            {
+                // need to also inline the runtime
+                var file = GetPackedFile(GetRuntimeChunk(Src));
+                var content = new StreamReader(file.CreateReadStream()).ReadToEnd();
+                output.PreElement.AppendHtml($"\n<script>{content}</script>");
+                output.PreElement.AppendHtml($"\n<script src=\"{hashPath}\"></script>\n");
+
+                var props = Props ?? Model ?? new {};
+
+                output.TagMode = TagMode.StartTagAndEndTag;
+                output.TagName = "script";
+                output.Content.AppendHtml($@"
+    ReactDOM.render(React.createElement(Components.HomeComponent, {JsonSerializer.Serialize(props, props.GetType())}), document.getElementById('{ElementId}'));
+");
+            
+            }
+            else
+            {
+                output.TagMode = TagMode.StartTagOnly;
+                output.TagName = "link";
+                output.Attributes.Add("rel", "stylesheet");
+                output.Attributes.Add("type", "text/css");
+                output.Attributes.Add("href", hashPath);
+            }
         }
     }
 }
