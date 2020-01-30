@@ -1,0 +1,11 @@
+@section css {
+    <% for( let i = 0; i < htmlWebpackPlugin.files.css.length; i++ ) { %>
+    <link rel="stylesheet" type="text/css" href="<%= htmlWebpackPlugin.files.css[i] %>">
+    <% } %>
+}
+
+@section js {
+    <% for( let i = 0; i < htmlWebpackPlugin.files.js.length; i++ ) { %>
+    <script src="<%= htmlWebpackPlugin.files.js[i] %>"></script>
+    <% } %>
+}

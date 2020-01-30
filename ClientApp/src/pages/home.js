@@ -1,5 +1,4 @@
-import React, { Component } from 'expose-loader?React!react';
-import ReactDOM from 'react-dom';
+import React, { Component } from 'react';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import './css/custom.css'
@@ -28,7 +27,3 @@ export default class HomeComponent extends Component {
     );
   }
 }
-
-ReactDOM.render(<HomeComponent />, document.getElementById('root'));
-
-// ReactDOM.render(<HomeComponent props={props} />, document.getElementById(rootId));
