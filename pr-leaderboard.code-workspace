@@ -21,8 +21,7 @@
 	},
 	"extensions": {
 		"recommendations": [
-			"gruntfuggly.todo-tree",
-			"hookyqr.beautify"
+			"gruntfuggly.todo-tree"
 		]
 	}
 }

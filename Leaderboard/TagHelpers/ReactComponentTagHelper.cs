@@ -21,8 +21,6 @@ namespace Leaderboard.TagHelpers
 
         private readonly List<IFileInfo> _packedFiles;
         private readonly string _spaDir;
-        private readonly bool _isDevelopment;
-
         public ReactComponentTagHelper(IWebHostEnvironment env, ISpaStaticFileProvider spaFiles)
         {
             var provider = spaFiles.FileProvider
