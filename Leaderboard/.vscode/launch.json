@@ -20,7 +20,7 @@
            "url": "http://localhost:5000",
            "webRoot": "${workspaceFolder}/../ClientApp/src",
            "pathMapping": {
-               "/pack/static/js/": "${workspaceFolder}/../ClientApp/src/",
+               "/static/js": "${workspaceFolder}/../ClientApp/src",
            }
        },
         {
@@ -37,16 +37,11 @@
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development"
             },
-            "serverReadyAction": {
-                "action": "debugWithChrome",
-                "pattern": "^\\s*Now listening on:\\s+(http://\\S+)",
-                "uriFormat": "%s",
-                "webRoot": "${workspaceFolder}/wwwroot"
-            },
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"
             }
-        }
+        },
+
         
     ]
 }

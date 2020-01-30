@@ -37,7 +37,7 @@
   },
   "scripts": {
     "start": "react-app-rewired start",
-    "build": "rimraf ../Leaderboard/wwwroot/pack && react-app-rewired build",
+    "build": "rimraf ./build && react-app-rewired build",
     "test": "cross-env CI=true react-app-rewired test --env=jsdom --env=jsdom",
     "lint": "eslint ./src/"
   },

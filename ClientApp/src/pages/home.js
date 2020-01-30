@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 
 import 'bootstrap/dist/css/bootstrap.css';
-import './css/custom.css'
+import '../css/custom.css'
 
 export class HomeComponent extends Component {
   static displayName = "Home";
 
   render () {
+    var l2 = 'test';
     return (
       <div>
         <h1>Hello, world!</h1>
