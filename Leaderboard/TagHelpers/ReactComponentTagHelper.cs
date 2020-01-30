@@ -25,14 +25,10 @@ namespace Leaderboard.TagHelpers
 
         public ReactComponentTagHelper(IWebHostEnvironment env, ISpaStaticFileProvider spaFiles)
         {
-            _isDevelopment = env.EnvironmentName == "Development";
-            // if (!_isDevelopment)
-            // {
-                var provider = spaFiles.FileProvider
+            var provider = spaFiles.FileProvider
                     ?? throw new ArgumentNullException("Application is running is a production configuration, so the react development server will not be used. However, the build directory does not exist. Did you run 'npm run build' first?");
-                _spaDir = provider.GetFileInfo("./").PhysicalPath;
-                _packedFiles = RecursiveGetDirectoryContents(provider).ToList();
-            // }
+            _spaDir = provider.GetFileInfo("./").PhysicalPath;
+            _packedFiles = RecursiveGetDirectoryContents(provider).ToList();
         }
 
         private IEnumerable<IFileInfo> RecursiveGetDirectoryContents(IFileProvider provider)
