@@ -24,14 +24,8 @@ module.exports = {
         rules: [
             {
                 test: /\.tsx$/,
-                loader: 'ts-loader',
+                loader: ['source-map-loader', 'babel-loader', 'ts-loader'],
                 exclude: /node_modules/,
-            },
-            {
-                enforce: 'pre',
-                test: /\.js$/,
-                exclude: /node_modules/,
-                loader: 'source-map-loader',
             },
             {
                 test: /\.s[ac]ss$/,
