@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
 
 import 'bootstrap/dist/css/bootstrap.css';
-import '../css/custom.css';
+import '../scss/custom.scss';
 
+// eslint-disable-next-line react/prefer-stateless-function
 export class HomeComponent extends Component {
-    static displayName = 'Home';
+    static get displayName() {
+        return 'Home';
+    }
 
     render() {
-        var l2: string = 'test';
-        console.log(l2);
         return (
             <div>
                 <h1>Hello, world!</h1>

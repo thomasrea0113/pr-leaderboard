@@ -4,7 +4,6 @@ module.exports = {
         es6: true,
     },
     extends: [
-        'estlint:recommended',
         'airbnb',
         'prettier',
         'prettier/@typescript-eslint',
@@ -28,24 +27,29 @@ module.exports = {
         sourceType: 'module',
     },
     plugins: ['import', 'react', '@typescript-eslint', 'prettier'],
+    ignorePatterns: ['*.ejs', 'node_modules/'],
     rules: {
         'prettier/prettier': 'error',
-        'react/jsx-filename-extension': {
-            extensions: ['.tsx'],
-        },
+        'react/jsx-filename-extension': [
+            2,
+            {
+                extensions: ['.tsx'],
+            },
+        ],
         'import/no-unresolved': [2, { commonjs: true, amd: true }],
         'import/named': 2,
         'import/namespace': 2,
         'import/default': 2,
         'import/export': 2,
-        'import/extensions': ['.js', '.json', '.jsx', '.ts', '.tsx', 'css'],
+        'import/extensions': [
+            2,
+            {
+                extensions: ['.js', '.json', '.jsx', '.ts', '.tsx', 'css'],
+            },
+        ],
+        'react/static-property-placement': ['error', 'static getter'],
     },
     settings: {
         'import/extensions': ['.tsx'],
-        // 'import/resolver': {
-        //     webpack: {
-        //         config: 'webpack.config.js',
-        //     },
-        // },
     },
 };
