@@ -76,12 +76,14 @@ namespace Leaderboard.TagHelpers
         {
             var hashPath = GetHashedPath(Src);
 
+            var moduleName = Path.GetFileNameWithoutExtension(Src);
+
             var props = Props ?? Model ?? new { };
             output.PreElement.AppendHtml($"<script src=\"{hashPath}\"></script>");
 
             output.TagMode = TagMode.StartTagAndEndTag;
             output.TagName = "script";
-            output.Content.AppendHtml($@"ReactDOM.render(React.createElement(Components.HomeComponent, {JsonSerializer.Serialize(props, props.GetType())}), document.getElementById('{ElementId}'));");
+            output.Content.AppendHtml($@"ReactDOM.render(React.createElement(Components.{moduleName}, {JsonSerializer.Serialize(props, props.GetType())}), document.getElementById('{ElementId}'));");
         }
     }
 }

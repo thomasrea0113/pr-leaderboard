@@ -7,7 +7,7 @@ module.exports = {
     mode: 'development',
     entry: {
         home: ['./src/pages/Home.tsx'],
-        site: ['./src/site.tsx'],
+        site: ['./src/Site.tsx'],
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
