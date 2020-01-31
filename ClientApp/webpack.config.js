@@ -72,12 +72,5 @@ module.exports = {
         new MiniCssExtractPlugin({
             filename: 'css/[name].[hash].css',
         }),
-        new HtmlWebpackPlugin({
-            title: 'Home',
-            inject: false,
-            template: '!!ejs-loader!src/index.ejs',
-            filename: 'templates/home.html',
-            chunks: ['home'],
-        }),
     ],
 };
