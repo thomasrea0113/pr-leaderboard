@@ -16,20 +16,24 @@ namespace Leaderboard.TagHelpers
     {
         public string Src { get; set; }
 
-        private readonly List<IFileInfo> _packedFiles;
+        protected readonly Dictionary<string, string> _packedFiles;
         private readonly string _spaDir;
-        private readonly bool _IsDevelopment;
 
         public ReactBundleTagHelper(IWebHostEnvironment env, ISpaStaticFileProvider spaFiles)
         {
-            _IsDevelopment = env.EnvironmentName == "Development";
-            // if (!_IsDevelopment)
-            // {
             var provider = spaFiles.FileProvider
                     ?? throw new ArgumentNullException("Application is running is a production configuration, so the react development server will not be used. However, the build directory does not exist. Did you run 'npm run build' first?");
             _spaDir = provider.GetFileInfo("./").PhysicalPath;
-            _packedFiles = RecursiveGetDirectoryContents(provider).ToList();
-            // }
+            var files = RecursiveGetDirectoryContents(provider).ToList();
+
+            var hashRegex = new Regex("\\.[0-9a-f]{20}(?=\\.[^\\.]+$)");
+
+            _packedFiles = files.Select(f => {
+                var path = f.PhysicalPath.Replace(_spaDir, "/");
+                if (Path.DirectorySeparatorChar == '\\')
+                    path = path.Replace('\\', '/');
+                return path;
+            }).ToDictionary(f => hashRegex.Replace(f, ""), f => f);
         }
 
         private IEnumerable<IFileInfo> RecursiveGetDirectoryContents(IFileProvider provider)
@@ -45,47 +49,18 @@ namespace Leaderboard.TagHelpers
                 }
         }
 
-        private IFileInfo GetPackedFile(string path)
-        {
-            var dir = (Path.TrimEndingDirectorySeparator(_spaDir) + Path.GetDirectoryName(path)).Replace("\\", "\\\\");
-            var fileName = Path.GetFileNameWithoutExtension(path);
-            var ext = Path.GetExtension(path);
-
-            // bundles should always match the <component-name>.chunk.<ext> pattern.
-            var parts = fileName.Split('.').ToList();
-            var chunkIndex = parts.LastIndexOf("chunk");
-
-            string matchPattern;
-
-            if (chunkIndex != -1)
-                matchPattern = $"^{dir}\\\\{String.Join(',', parts.Take(chunkIndex))}.[0-9a-f]+.chunk{ext}$";
-            else
-                matchPattern = $"^{dir}\\\\{fileName}.[0-9a-f]+{ext}$";
-
-            var hashMatch = new Regex(matchPattern);
-            return _packedFiles
-                .Single(f => hashMatch.IsMatch(f.PhysicalPath));
-        }
-
-        private string GetHashedPath(string path)
-            => GetPackedFile(path).PhysicalPath
-                .Replace(_spaDir, "/")
-                .Replace("\\", "/");
-
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             var isJs = Path.GetExtension(Src) == ".js";
 
-            // if (!_IsDevelopment)
-            // {
-            Src = GetHashedPath(Src);
-            // }
+            if (!_packedFiles.TryGetValue(Src, out var hashSrc))
+                throw new ArgumentException($"source {Src} does not exist in the pack directory");
 
             if (isJs)
             {
                 output.TagMode = TagMode.StartTagAndEndTag;
                 output.TagName = "script";
-                output.Attributes.Add("src", Src);
+                output.Attributes.Add("src", hashSrc);
             }
             else
             {
@@ -93,7 +68,7 @@ namespace Leaderboard.TagHelpers
                 output.TagName = "link";
                 output.Attributes.Add("rel", "stylesheet");
                 output.Attributes.Add("type", "text/css");
-                output.Attributes.Add("href", Src);
+                output.Attributes.Add("href", hashSrc);
             }
         }
     }
