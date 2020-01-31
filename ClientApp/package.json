@@ -59,8 +59,7 @@
         "webpack-cli": "^3.3.10"
     },
     "scripts": {
-        "start": "react-app-rewired start",
-        "build": "npm run lint && rimraf ./dist && webpack",
+        "build": "npm run lint && rimraf ./dist/* && webpack",
         "test": "jest",
         "lint": "eslint --ext .tsx ./src/"
     },

@@ -1,5 +1,14 @@
 {
     "version": "2.0.0",
+    "inputs": [
+        {
+            "id": "BuildClient",
+            "description": "Do you want to also build the client application?",
+            "type": "pickString",
+            "options": ["true", "false"],
+            "default": "false",
+        }
+    ], 
     "tasks": [
         {
             "label": "build",
@@ -9,7 +18,8 @@
                 "build",
                 "${workspaceFolder}/Leaderboard.csproj",
                 "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
+                "/consoleloggerparameters:NoSummary",
+                "/p:BuildClient=${input:BuildClient}"
             ],
             "problemMatcher": "$msCompile"
         },
