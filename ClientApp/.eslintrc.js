@@ -28,7 +28,6 @@ module.exports = {
         sourceType: 'module',
     },
     plugins: ['jest', 'import', 'react', '@typescript-eslint', 'prettier'],
-    ignorePatterns: ['*.ejs', 'node_modules/'],
     rules: {
         'prettier/prettier': 'error',
         'react/jsx-filename-extension': [
