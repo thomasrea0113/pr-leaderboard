@@ -3,6 +3,9 @@
 # dependencies
 /node_modules
 
+# jest ignores
+__snapshots__
+
 # testing
 /coverage
 

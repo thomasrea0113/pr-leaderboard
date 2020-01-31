@@ -5,11 +5,11 @@ import '../scss/custom.scss';
 
 // eslint-disable-next-line react/prefer-stateless-function
 export class HomeComponent extends Component {
-    static get displayName() {
+    public static get displayName(): string {
         return 'Home';
     }
 
-    render() {
+    public render(): JSX.Element {
         return (
             <div>
                 <h1>Hello, world!</h1>

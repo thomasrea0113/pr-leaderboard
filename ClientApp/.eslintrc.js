@@ -13,6 +13,7 @@ module.exports = {
         'plugin:import/errors',
         'plugin:import/warnings',
         'plugin:import/typescript',
+        'plugin:@typescript-eslint/recommended',
     ],
     globals: {
         Atomics: 'readonly',
@@ -26,7 +27,7 @@ module.exports = {
         ecmaVersion: 2018,
         sourceType: 'module',
     },
-    plugins: ['import', 'react', '@typescript-eslint', 'prettier'],
+    plugins: ['jest', 'import', 'react', '@typescript-eslint', 'prettier'],
     ignorePatterns: ['*.ejs', 'node_modules/'],
     rules: {
         'prettier/prettier': 'error',
@@ -48,6 +49,15 @@ module.exports = {
             },
         ],
         'react/static-property-placement': ['error', 'static getter'],
+
+        'jest/no-disabled-tests': 'warn',
+        'jest/no-focused-tests': 'error',
+        'jest/no-identical-title': 'error',
+        'jest/prefer-to-have-length': 'warn',
+        'jest/valid-expect': 'error',
+    },
+    env: {
+        'jest/globals': true,
     },
     settings: {
         'import/extensions': ['.tsx'],
