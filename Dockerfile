@@ -12,12 +12,10 @@ ARG BUST=45
 COPY ./ClientApp/package.json .
 RUN BUST=${BUST} npm install
 
-COPY ./ClientApp .
+# copy all workspace files to the /app directory
+COPY . ../
 
 WORKDIR /app/Leaderboard
-
-COPY ./Leaderboard .
-COPY ./Leaderboard.Tests ../Leaderboard.Tests
 
 RUN dotnet build /p:BuildClient=true
 

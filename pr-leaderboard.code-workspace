@@ -11,13 +11,30 @@
 		},
 		{
 			"path": "Containers"
+		},
+		{
+			"path": ".devcontainer"
 		}
 	],
 	"settings": {
 		"jest.disabledWorkspaceFolders": [
 			"Leaderboard",
 			"Leaderboard.Tests",
-			"Containers"
+			"Containers",
+			".devcontainer"
+		],
+		// This is only useful when debugging in the provided container. For whatever reason,
+		// the setting doesn't work when provider in .devcontainer/devcontainer.json
+		"sqltools.connections": [
+			{
+				"database": "postgres",
+				"dialect": "PostgreSQL",
+				"name": "db",
+				"password": "postgres",
+				"port": 5432,
+				"server": "db",
+				"username": "postgres"
+			}
 		]
 	},
 	"extensions": {
