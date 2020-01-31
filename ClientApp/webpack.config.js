@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
@@ -16,7 +17,7 @@ module.exports = {
         libraryTarget: 'var',
         libraryExport: 'default',
     },
-    devtool: 'source-map',
+    devtool: false,
     resolve: {
         extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
     },
@@ -24,8 +25,14 @@ module.exports = {
         rules: [
             {
                 test: /\.tsx$/,
-                loader: ['source-map-loader', 'babel-loader', 'ts-loader'],
+                loader: ['babel-loader', 'ts-loader'],
                 exclude: /node_modules/,
+            },
+            {
+                test: /\.js/,
+                exclude: /node_modules/,
+                enforce: 'pre',
+                loader: ['source-map-loader'],
             },
             {
                 test: /\.s[ac]ss$/,
@@ -59,6 +66,9 @@ module.exports = {
         ],
     },
     plugins: [
+        new webpack.SourceMapDevToolPlugin({
+            filename: 'js/[name].[hash].js.map',
+        }),
         new MiniCssExtractPlugin({
             filename: 'css/[name].[hash].css',
         }),
