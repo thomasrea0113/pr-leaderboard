@@ -11,13 +11,10 @@
 		}
 	],
 	"settings": {
-		"beautify.language": {
-			"html": [
-				"htm",
-				"html",
-				"aspnetcorerazor"
-			]
-		}
+		"jest.disabledWorkspaceFolders": [
+			"Leaderboard",
+			"Leaderboard.Tests"
+		]
 	},
 	"extensions": {
 		"recommendations": [
