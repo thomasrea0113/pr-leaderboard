@@ -23,10 +23,17 @@ services:
     # Uncomment if you want to expose any additional ports. The snippet below exposes port 3000.
     # ports:
     #   - 3000:3000
+
+    expose:
+        - '5000'
+        - '5001'
     
     volumes:
       # Update this to wherever you want VS Code to mount the folder of your project
       - ../:/app:cached
+
+    networks:
+        - default
 
       # Uncomment the next line to use Docker from inside the container. See https://aka.ms/vscode-remote/samples/docker-in-docker-compose for details.
       # - /var/run/docker.sock:/var/run/docker.sock 

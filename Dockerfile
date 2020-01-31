@@ -17,6 +17,6 @@ COPY . ../
 
 WORKDIR /app/Leaderboard
 
-RUN dotnet build /p:BuildClient=true
+# RUN dotnet build /p:BuildClient=true
 
 CMD [ "sh", "-c", "dotnet run 0.0.0.0:5000" ]
