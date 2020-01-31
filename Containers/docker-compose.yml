@@ -1,0 +1,26 @@
+version: "3.7"
+
+services:
+  db:
+    image: db
+    build: db
+    networks:
+      - backend
+
+  web:
+    image: web
+    build: ../
+    networks:
+      - backend
+    expose:
+      - 5000
+    volumes:
+      - npm-cache:/root/.npm
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  npm-cache:
+    external: false

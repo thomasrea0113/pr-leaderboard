@@ -1,19 +1,23 @@
 {
 	"folders": [
 		{
-			"path": "ClientApp",
+			"path": "ClientApp"
 		},
 		{
-			"path": "Leaderboard",
+			"path": "Leaderboard"
 		},
 		{
-			"path": "Leaderboard.Tests",
+			"path": "Leaderboard.Tests"
+		},
+		{
+			"path": "Containers"
 		}
 	],
 	"settings": {
 		"jest.disabledWorkspaceFolders": [
 			"Leaderboard",
-			"Leaderboard.Tests"
+			"Leaderboard.Tests",
+			"Containers"
 		]
 	},
 	"extensions": {
