@@ -22,7 +22,7 @@ namespace Leaderboard.TagHelpers
         public ReactBundleTagHelper(IWebHostEnvironment env, ISpaStaticFileProvider spaFiles)
         {
             var provider = spaFiles.FileProvider
-                    ?? throw new ArgumentNullException("Application is running is a production configuration, so the react development server will not be used. However, the build directory does not exist. Did you run 'npm run build' first?");
+                    ?? throw new ArgumentNullException($"The SPA directory does not exist. Did you run 'npm run build' first?");
             _spaDir = provider.GetFileInfo("./").PhysicalPath;
             var files = RecursiveGetDirectoryContents(provider).ToList();
 
