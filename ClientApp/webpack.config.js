@@ -67,7 +67,7 @@ module.exports = {
     },
     plugins: [
         new webpack.SourceMapDevToolPlugin({
-            filename: 'js/[name].[hash].js.map',
+            filename: '[file].map',
         }),
         new MiniCssExtractPlugin({
             filename: 'css/[name].[hash].css',
