@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <!-- build frontend files -->
-  <Target Name="NpmBuild" BeforeTargets="Build">
+  <!-- <Target Name="NpmBuild" BeforeTargets="Build">
     <Exec WorkingDirectory="../ClientApp" Command="npm run build" />
-  </Target>
+  </Target> -->
 </Project>

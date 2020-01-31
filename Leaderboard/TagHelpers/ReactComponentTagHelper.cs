@@ -21,12 +21,18 @@ namespace Leaderboard.TagHelpers
 
         private readonly List<IFileInfo> _packedFiles;
         private readonly string _spaDir;
+        private readonly bool _IsDevelopment;
+
         public ReactComponentTagHelper(IWebHostEnvironment env, ISpaStaticFileProvider spaFiles)
         {
-            var provider = spaFiles.FileProvider
-                    ?? throw new ArgumentNullException("Application is running is a production configuration, so the react development server will not be used. However, the build directory does not exist. Did you run 'npm run build' first?");
-            _spaDir = provider.GetFileInfo("./").PhysicalPath;
-            _packedFiles = RecursiveGetDirectoryContents(provider).ToList();
+            _IsDevelopment = env.EnvironmentName == "Development";
+            if (!_IsDevelopment)
+            {
+                var provider = spaFiles.FileProvider
+                        ?? throw new ArgumentNullException("Application is running is a production configuration, so the react development server will not be used. However, the build directory does not exist. Did you run 'npm run build' first?");
+                _spaDir = provider.GetFileInfo("./").PhysicalPath;
+                _packedFiles = RecursiveGetDirectoryContents(provider).ToList();
+            }
         }
 
         private IEnumerable<IFileInfo> RecursiveGetDirectoryContents(IFileProvider provider)
@@ -81,32 +87,51 @@ namespace Leaderboard.TagHelpers
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            var hashPath = GetHashedPath(Src);
+            var isJs = Path.GetExtension(Src) == ".js";
 
-            if (Path.GetExtension(Src) == ".js")
+            if(!_IsDevelopment)
             {
-                // need to also inline the runtime
-                var file = GetPackedFile(GetRuntimeChunk(Src));
-                var content = new StreamReader(file.CreateReadStream()).ReadToEnd();
-                output.PreElement.AppendHtml($"\n<script>{content}</script>");
-                output.PreElement.AppendHtml($"\n<script src=\"{hashPath}\"></script>\n");
+                var hashPath = GetHashedPath(Src);
+                if (isJs)
+                {
+                    // need to also inline the runtime
+                    var file = GetPackedFile(GetRuntimeChunk(Src));
+                    var content = new StreamReader(file.CreateReadStream()).ReadToEnd();
+                    output.PreElement.AppendHtml($"\n<script>{content}</script>");
+                    output.PreElement.AppendHtml($"\n<script src=\"{hashPath}\"></script>\n");
 
-                var props = Props ?? Model ?? new {};
+                    var props = Props ?? Model ?? new {};
 
-                output.TagMode = TagMode.StartTagAndEndTag;
-                output.TagName = "script";
-                output.Content.AppendHtml($@"
-    ReactDOM.render(React.createElement(Components.HomeComponent, {JsonSerializer.Serialize(props, props.GetType())}), document.getElementById('{ElementId}'));
-");
-            
+                    output.TagMode = TagMode.StartTagAndEndTag;
+                    output.TagName = "script";
+                    output.Content.AppendHtml($@"
+        ReactDOM.render(React.createElement(Components.HomeComponent, {JsonSerializer.Serialize(props, props.GetType())}), document.getElementById('{ElementId}'));
+    ");
+                
+                }
+                else
+                {
+                    output.TagMode = TagMode.StartTagOnly;
+                    output.TagName = "link";
+                    output.Attributes.Add("rel", "stylesheet");
+                    output.Attributes.Add("type", "text/css");
+                    output.Attributes.Add("href", hashPath);
+                }
             }
-            else
-            {
-                output.TagMode = TagMode.StartTagOnly;
-                output.TagName = "link";
-                output.Attributes.Add("rel", "stylesheet");
-                output.Attributes.Add("type", "text/css");
-                output.Attributes.Add("href", hashPath);
+            else {
+                if (isJs)
+                {
+                    output.TagMode = TagMode.StartTagAndEndTag;
+                    output.TagName = "script";
+                    output.Attributes.Add("src", Src);
+                } else
+                {
+                    output.TagMode = TagMode.StartTagOnly;
+                    output.TagName = "link";
+                    output.Attributes.Add("rel", "stylesheet");
+                    output.Attributes.Add("type", "text/css");
+                    output.Attributes.Add("href", Src);
+                }
             }
         }
     }

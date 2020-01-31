@@ -74,6 +74,13 @@ namespace Leaderboard
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });
+
+            // app.UseSpa(spa => {
+            //     spa.Options.SourcePath = "../ClientApp";
+            //     spa.Options.DefaultPage = "/404";
+
+            //     spa.UseReactDevelopmentServer("start");
+            // });
         }
     }
 }
