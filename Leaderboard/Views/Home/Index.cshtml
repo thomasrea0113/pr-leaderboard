@@ -3,7 +3,7 @@ ViewData["Title"] = "Home Page";
 }
 
 @section css {
-    <react-component src="/static/css/home.chunk.css" />
+    <react-bundle src="/css/home.css" />
 }
 
 <div class="text-center">
@@ -13,5 +13,5 @@ ViewData["Title"] = "Home Page";
 </div>
 
 @section js {
-    <react-component src="/static/js/home.chunk.js" props="@Model" element-id="root" />
+    <react-component src="/js/home.js" props="@Model" element-id="root" />
 }

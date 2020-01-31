@@ -1,20 +1,20 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path');
-const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
     mode: 'development',
     entry: {
-        home: ['./src/pages/Home.tsx', 'webpack-hot-middleware/client'],
-        vendor: ['react', 'react-dom'],
+        home: ['./src/pages/Home.tsx'],
+        site: ['./src/site.tsx'],
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'js/[name].bundle.js',
-        library: 'Components',
+        filename: 'js/[name].[hash].js',
+        library: ['Components', '[name]'],
         libraryTarget: 'var',
-        libraryExport: '',
+        libraryExport: 'default',
     },
     devtool: 'source-map',
     resolve: {
@@ -69,6 +69,5 @@ module.exports = {
             filename: 'templates/home.html',
             chunks: ['home'],
         }),
-        new webpack.HotModuleReplacementPlugin(),
     ],
 };

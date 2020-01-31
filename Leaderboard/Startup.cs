@@ -38,7 +38,7 @@ namespace Leaderboard
            services.AddRazorPages();
 
            services.AddSpaStaticFiles(cnf => {
-               cnf.RootPath = "../ClientApp/build";
+               cnf.RootPath = "../ClientApp/dist";
            });
 
            services.AddScoped<IServiceCollection>(i => services);

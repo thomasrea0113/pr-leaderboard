@@ -4,7 +4,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import '../scss/custom.scss';
 
 // eslint-disable-next-line react/prefer-stateless-function
-export class HomeComponent extends Component {
+export default class HomeComponent extends Component {
     public static get displayName(): string {
         return 'Home';
     }
@@ -64,5 +64,3 @@ export class HomeComponent extends Component {
         );
     }
 }
-
-export default HomeComponent;

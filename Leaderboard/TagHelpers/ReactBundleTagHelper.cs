@@ -12,24 +12,24 @@ using Microsoft.Extensions.FileProviders;
 
 namespace Leaderboard.TagHelpers
 {
-    public class ReactComponentTagHelper : TagHelper
+    public class ReactBundleTagHelper : TagHelper
     {
         public string Src { get; set; }
-        public string ElementId { get; set; }
-        public object Props { get; set; }
-        public object Model { get; set; }
 
         private readonly List<IFileInfo> _packedFiles;
         private readonly string _spaDir;
         private readonly bool _IsDevelopment;
 
-        public ReactComponentTagHelper(IWebHostEnvironment env, ISpaStaticFileProvider spaFiles)
+        public ReactBundleTagHelper(IWebHostEnvironment env, ISpaStaticFileProvider spaFiles)
         {
             _IsDevelopment = env.EnvironmentName == "Development";
+            // if (!_IsDevelopment)
+            // {
             var provider = spaFiles.FileProvider
                     ?? throw new ArgumentNullException("Application is running is a production configuration, so the react development server will not be used. However, the build directory does not exist. Did you run 'npm run build' first?");
             _spaDir = provider.GetFileInfo("./").PhysicalPath;
             _packedFiles = RecursiveGetDirectoryContents(provider).ToList();
+            // }
         }
 
         private IEnumerable<IFileInfo> RecursiveGetDirectoryContents(IFileProvider provider)
@@ -74,14 +74,27 @@ namespace Leaderboard.TagHelpers
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            var hashPath = GetHashedPath(Src);
+            var isJs = Path.GetExtension(Src) == ".js";
 
-            var props = Props ?? Model ?? new { };
-            output.PreElement.AppendHtml($"<script src=\"{hashPath}\"></script>");
+            // if (!_IsDevelopment)
+            // {
+            Src = GetHashedPath(Src);
+            // }
 
-            output.TagMode = TagMode.StartTagAndEndTag;
-            output.TagName = "script";
-            output.Content.AppendHtml($@"ReactDOM.render(React.createElement(Components.HomeComponent, {JsonSerializer.Serialize(props, props.GetType())}), document.getElementById('{ElementId}'));");
+            if (isJs)
+            {
+                output.TagMode = TagMode.StartTagAndEndTag;
+                output.TagName = "script";
+                output.Attributes.Add("src", Src);
+            }
+            else
+            {
+                output.TagMode = TagMode.StartTagOnly;
+                output.TagName = "link";
+                output.Attributes.Add("rel", "stylesheet");
+                output.Attributes.Add("type", "text/css");
+                output.Attributes.Add("href", Src);
+            }
         }
     }
 }
