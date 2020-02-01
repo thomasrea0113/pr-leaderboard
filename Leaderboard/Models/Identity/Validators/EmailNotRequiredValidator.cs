@@ -10,8 +10,8 @@ namespace Leaderboard.Models.Identity.Validators
     {
         public EmailExistsIdentityError(string email)
         {
-            this.Code = "EmailExists";
-            this.Description = $"the email {email} already exists in the database";
+            this.Code = "DuplicateEmail";
+            this.Description = $"Email '{email}' is already taken.";
         }
     }
 

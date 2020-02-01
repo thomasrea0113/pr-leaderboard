@@ -37,8 +37,8 @@ namespace Leaderboard.Tests.TestSetup
                 });
             })
             .ConfigureAppConfiguration(c =>
-                // without overriding base path, we'd still be point to the
-                // TaskManager app bin directory, not TaskManager.Tests
+                // without overriding base path, we'd still be pointing to the Leaderboard
+                // bin directory, not the Leaderboard.Tests bin directory
                 c.SetBasePath(System.IO.Directory.GetCurrentDirectory())
                     .AddJsonFile("appsettings.unittest.json"));
         }
