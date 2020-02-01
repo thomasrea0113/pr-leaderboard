@@ -9,11 +9,11 @@ namespace Leaderboard.Models.Relationships
     {
         [CompositeKey]
         public Guid UserId { get; set; }
-        public UserProfileModel User { get; set; }
+        public virtual UserProfileModel User { get; set; }
 
 
         [CompositeKey]
         public string LeaderboardId { get; set; }
-        public LeaderboardModel Leaderboard { get; set; }
+        public virtual LeaderboardModel Leaderboard { get; set; }
     }
 }

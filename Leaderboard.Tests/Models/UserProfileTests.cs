@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Leaderboard.Managers;
+using Leaderboard.Models.Identity;
 using Leaderboard.Tests.TestSetup.Fixtures;
 using Microsoft.AspNetCore.Identity;
 using Xunit;
@@ -16,7 +18,7 @@ namespace Leaderboard.Tests.Models
             { "user4", "user4.email@test.com" },
         };
 
-        public async IAsyncEnumerable<ValueTuple<IdentityResult, IdentityUser<Guid>>> CreateUsersAsync(UserManager<IdentityUser<Guid>> manager, Dictionary<string, string> users)
+        public async IAsyncEnumerable<ValueTuple<IdentityResult, UserProfileModel>> CreateUsersAsync(UserProfileManager manager, Dictionary<string, string> users)
         {
             foreach ((var userName, var email) in users)
             {
@@ -27,17 +29,27 @@ namespace Leaderboard.Tests.Models
                     user.Email = email;
                 }
 
-                yield return (await manager.CreateAsync(user), user);
+                var result = await manager.CreateAsync(user);
+
+                var profile = await manager.GetOrCreateProfileAsync(user);
+
+                // all new users, so all new profiles
+                Assert.True(profile.Item1);
+
+                yield return (result, profile.Item2);
             }
         }
 
 
         [Theory, DefaultData("Users")]
-        public async Task TestCreateUsers(UserManager<IdentityUser<Guid>> manager)
+        public async Task TestCreateUsers(UserProfileManager manager)
         {
             await foreach ((var result, var user) in CreateUsersAsync(manager, _users))
             {
                 Assert.Empty(result.Errors);
+                Assert.NotNull(user);
+                Assert.True(user.IsActive);
+                Assert.NotNull(user.User);
             }
         }
     }

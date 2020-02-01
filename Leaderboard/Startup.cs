@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Leaderboard.Models.Identity.Validators;
 using System;
+using Leaderboard.Managers;
 
 namespace Leaderboard
 {
@@ -24,8 +25,11 @@ namespace Leaderboard
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseNpgsql(
-                    Configuration.GetConnectionString("DefaultConnection")));
+                options
+                    // lazy loading prevents us from having to expliclity load all of our related models
+                    .UseLazyLoadingProxies()
+                    .UseNpgsql(
+                        Configuration.GetConnectionString("DefaultConnection")));
 
             // adding the default user models
             services.AddIdentity<IdentityUser<Guid>, IdentityRole<Guid>>(options => {
@@ -40,6 +44,8 @@ namespace Leaderboard
                 .AddDefaultUI()
                 .AddDefaultTokenProviders()
                 .AddUserValidator<EmailNotRequiredValidator>();
+
+            services.AddScoped<UserProfileManager>();
 
             services.AddControllersWithViews();
            services.AddRazorPages();

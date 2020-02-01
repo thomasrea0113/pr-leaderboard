@@ -18,9 +18,9 @@ namespace Leaderboard.Models.Identity
 
         [Key]
         public Guid UserId { get; set; }
-        public IdentityUser<Guid> User { get; set; }
+        public virtual IdentityUser<Guid> User { get; set; }
 
-        public List<UserLeaderboard> UserLeaderboards { get; set; }
+        public virtual ICollection<UserLeaderboard> UserLeaderboards { get; set; } = new List<UserLeaderboard>();
 
         [DefaultValue(true)]
         public bool IsActive { get; set; }

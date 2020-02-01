@@ -14,7 +14,7 @@ namespace Leaderboard.Models
         public Guid Id { get; set; }
 
         public string Name { get; set; }
-        public List<UserLeaderboard> UserLeaderboards { get; set; }
+        public virtual ICollection<UserLeaderboard> UserLeaderboards { get; set; } = new List<UserLeaderboard>();
 
     }
 }

@@ -26,7 +26,7 @@ namespace Leaderboard.Tests.Models.Identity.Validators
         }
 
         [Theory, DefaultData]
-        public async Task TestExistingEmail(UserManager<IdentityUser<Guid>> manager)
+        public async Task TestExistingEmail(UserProfileManager manager)
         {
             var email = "test.user@test.com";
 

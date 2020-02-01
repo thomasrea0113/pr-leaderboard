@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using System;
+using Microsoft.Extensions.Hosting;
 
 namespace Leaderboard.Tests.TestSetup
 {
@@ -33,7 +34,9 @@ namespace Leaderboard.Tests.TestSetup
                 // readd the context as an in-memory database
                 services.AddDbContext<ApplicationDbContext>(cnf =>
                 {
-                    cnf.UseInMemoryDatabase(_dbName);
+                    // lazy loading prevents us from having to expliclity load all of our related models
+                    cnf.UseLazyLoadingProxies()
+                        .UseInMemoryDatabase(_dbName);
                 });
             })
             .ConfigureAppConfiguration(c =>
