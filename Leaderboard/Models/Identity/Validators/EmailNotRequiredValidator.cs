@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -18,9 +19,9 @@ namespace Leaderboard.Models.Identity.Validators
     /// Allows the user email field to be left blank. However, if it is supplied,
     /// it must be unique in the database
     /// </summary>
-    public class EmailNotRequiredValidator : IUserValidator<IdentityUser>
+    public class EmailNotRequiredValidator : IUserValidator<IdentityUser<Guid>>
     {
-        public async Task<IdentityResult> ValidateAsync(UserManager<IdentityUser> manager, IdentityUser user)
+        public async Task<IdentityResult> ValidateAsync(UserManager<IdentityUser<Guid>> manager, IdentityUser<Guid> user)
         {
             var emailExists = await manager.Users.AnyAsync(u => u.Email == user.Email);
 

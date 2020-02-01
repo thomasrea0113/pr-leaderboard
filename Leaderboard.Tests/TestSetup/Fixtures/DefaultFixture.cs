@@ -8,9 +8,9 @@ namespace Leaderboard.Tests.TestSetup.Fixtures
 {
     public class DefaultFixture : Fixture
     {
-        public DefaultFixture()
+        public DefaultFixture(string dbName = default)
         {
-            var overrides = new WebOverrideFactory();
+            var overrides = new WebOverrideFactory(dbName);
 
             this.Customize(WebApplicationSpecimenBuilder.Create(overrides).ToCustomization());
 

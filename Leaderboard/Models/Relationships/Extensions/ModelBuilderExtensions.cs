@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Leaderboard.Models.Features;
 using Microsoft.EntityFrameworkCore;
 
 namespace Leaderboard.Models.Relationships.Extensions
@@ -55,8 +57,10 @@ namespace Leaderboard.Models.Relationships.Extensions
 
         private static IEnumerable<ValueTuple<Type, string, string>> GetRelationshipProperties(Type relationshipType)
         {
-            var mt1 = relationshipType.GenericTypeArguments[0];
-            var mt2 = relationshipType.GenericTypeArguments[1];
+            // each relationship class must directly inherit the AbstractRelationship type
+            var typeParameters = relationshipType.BaseType.GenericTypeArguments;
+            var mt1 = typeParameters[0];
+            var mt2 = typeParameters[1];
 
             yield return GetRelationshipProperties(relationshipType, mt1, mt2);
             yield return GetRelationshipProperties(relationshipType, mt2, mt1);
@@ -99,8 +103,29 @@ namespace Leaderboard.Models.Relationships.Extensions
 
             var abstractRelationshipType = typeof(AbstractRelationship<,>);
             foreach(var relationshipType in assembly.GetTypes()
-                .Where(t => IsAssignableToGenericType(t, abstractRelationshipType)))
+                .Where(t => !t.IsAbstract && t.BaseType == abstractRelationshipType))
                 modelBuilder.AddRelationship(relationshipType);
+        }
+
+        public static void AddCompositeKey(this ModelBuilder modelBuilder, Type modelType)
+        {
+            var keys = modelType.GetProperties()
+                .Select(p => new {Prop = p, Attr = p.GetCustomAttribute<CompositeKeyAttribute>(false)})
+                .Where(ca => ca.Attr != null)
+                .Select(ca => ca.Prop.Name);
+
+            if (keys.Any())
+                modelBuilder.Entity(modelType).HasKey(keys.ToArray());
+        }
+
+        public static void AddCompositeKeys(this ModelBuilder modelBuilder, Assembly assembly = default)
+        {
+            if (assembly == default)
+                assembly = Assembly.GetExecutingAssembly();
+
+            // all the properties have to be inspected, so it's quicker to enumerate all the defined types
+            foreach(var type in assembly.GetTypes())
+                modelBuilder.AddCompositeKey(type);
         }
     }
 }

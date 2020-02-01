@@ -5,14 +5,26 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using System;
 
 namespace Leaderboard.Tests.TestSetup
 {
+    /// <summary>
+    /// A web application factory that provides an InMemory database for testing. The constructor
+    /// takes an options DB Name, so that tests can share data if necessary
+    /// </summary>
     public class WebOverrideFactory : WebApplicationFactory<Startup>
     {
+        private readonly string _dbName;
+
+        public WebOverrideFactory(string dbName = default)
+        {
+            _dbName = dbName ?? Guid.NewGuid().ToString();
+        }
+
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            var dbContextType = typeof(ApplicationDbContext);
+            var dbContextType = typeof(DbContextOptions<ApplicationDbContext>);
             builder.ConfigureServices(services =>
             {
                 // remove the existing db context (should be only one)
@@ -21,7 +33,7 @@ namespace Leaderboard.Tests.TestSetup
                 // readd the context as an in-memory database
                 services.AddDbContext<ApplicationDbContext>(cnf =>
                 {
-                    cnf.UseInMemoryDatabase("test-db");
+                    cnf.UseInMemoryDatabase(_dbName);
                 });
             })
             .ConfigureAppConfiguration(c =>

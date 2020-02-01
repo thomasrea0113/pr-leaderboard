@@ -1,3 +1,4 @@
+using Leaderboard.Models.Features;
 using Leaderboard.Models.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

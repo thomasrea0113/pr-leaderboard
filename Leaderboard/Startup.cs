@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Leaderboard.Models.Identity.Validators;
+using System;
 
 namespace Leaderboard
 {
@@ -27,11 +28,11 @@ namespace Leaderboard
                     Configuration.GetConnectionString("DefaultConnection")));
 
             // adding the default user models
-            services.AddDefaultIdentity<IdentityUser>(options => {
+            services.AddIdentity<IdentityUser<Guid>, IdentityRole<Guid>>(options => {
                 options.SignIn.RequireConfirmedAccount = true;
 
                 // disabling here so that we can handle email ourselves
-                options.User.RequireUniqueEmail = true;
+                options.User.RequireUniqueEmail = false;
 
                 options.SignIn.RequireConfirmedEmail = false;
             })

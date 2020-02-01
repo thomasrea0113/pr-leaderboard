@@ -6,12 +6,15 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Leaderboard.Models.Features;
 using Leaderboard.Models.Relationships.Extensions;
+using Leaderboard.Models.Identity;
+using Microsoft.AspNetCore.Identity;
 
 namespace Leaderboard.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<IdentityUser<Guid>, IdentityRole<Guid>, Guid>
     {
         public DbSet<LeaderboardModel> leaderboards { get; set; }
+        public DbSet<UserProfileModel> UserProfiles { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -20,7 +23,9 @@ namespace Leaderboard.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
             modelBuilder.AddAllRelationships();
+            modelBuilder.AddCompositeKeys();
         }
 
         private Func<EntityEntry, bool> hasFeature = ee => {
