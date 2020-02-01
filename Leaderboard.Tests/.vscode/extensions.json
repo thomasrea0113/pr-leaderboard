@@ -1,6 +1,7 @@
 {
     "recommendations": [
         "formulahendry.dotnet-test-explorer",
-        "ms-vscode.csharp"
+        "k--kato.docomment",
+        "jchannon.csharpextensions"
     ]
 }
