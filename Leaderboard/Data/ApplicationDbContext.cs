@@ -9,6 +9,7 @@ using Leaderboard.Models.Identity;
 using System.Linq;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Leaderboard.Models.Features;
+using Leaderboard.Models.Relationships.Extensions;
 
 namespace Leaderboard.Data
 {
@@ -19,6 +20,11 @@ namespace Leaderboard.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.AddAllRelationships();
         }
 
         private Func<EntityEntry, bool> hasFeature = ee => {
