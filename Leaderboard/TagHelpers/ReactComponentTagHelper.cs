@@ -26,20 +26,20 @@ namespace Leaderboard.TagHelpers
             if (Path.GetExtension(Src) != ".js")
                 throw new ArgumentException($"source {Src} must be a javascript spa bundle");
 
-            if (!_packedFiles.TryGetValue(Src, out var hashSrc))
-                throw new ArgumentException($"source {Src} does not exist in the pack directory");
-
-            var moduleName = Path.GetFileNameWithoutExtension(Src);
+            var assetPath = _webpackStats.GetAssetPath(Src);
+            var asset = _allAssets.SingleOrDefault(a => a.Path == assetPath);
+            if (asset == default)
+                throw new ArgumentException($"source {assetPath} does not exist in the pack directory");
             
             var props = "[]";
             if (Props != null)
                 props = JsonSerializer.Serialize(Props, Props.GetType());
 
-            output.PreElement.AppendHtml($"<script src=\"{hashSrc}\"></script>");
+            output.PreElement.AppendHtml($"<script src=\"{assetPath}\"></script>");
 
             output.TagMode = TagMode.StartTagAndEndTag;
             output.TagName = "script";
-            output.Content.AppendHtml($@"ReactDOM.render(React.createElement(Components.{moduleName}, {props}), document.getElementById('{ElementId}'));");
+            output.Content.AppendHtml($@"ReactDOM.render(React.createElement(Components.{asset.Name}, {props}), document.getElementById('{ElementId}'));");
         }
     }
 }

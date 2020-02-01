@@ -12,55 +12,73 @@ using Microsoft.Extensions.FileProviders;
 
 namespace Leaderboard.TagHelpers
 {
+    public class WebpackStats {
+        public string publicPath { get; set; }
+        public string Hash { get; set; }
+        public Dictionary<string, string[]> AssetsByChunkName { get; set; }
+
+        public string GetAssetPath(string pathPattern)
+            => pathPattern.Replace("[hash]", Hash, true, null);
+            // TODO implement chunk support
+    }
+
+    public class Asset {
+        public string Name { get; private set; }
+        public string Path { get; private set; }
+
+        public ValueTuple<string, string> deconstruct() => (Name, Path);
+        public static implicit operator Asset(ValueTuple<string, string> tuple)
+            => new Asset {
+                Name = tuple.Item1,
+                Path = tuple.Item2
+            };
+    }
+
     public class ReactBundleTagHelper : TagHelper
     {
         public string Src { get; set; }
 
-        protected readonly Dictionary<string, string> _packedFiles;
-        private readonly string _spaDir;
+        protected readonly WebpackStats _webpackStats;
+        protected readonly List<Asset> _allAssets;
 
         public ReactBundleTagHelper(IWebHostEnvironment env, ISpaStaticFileProvider spaFiles)
         {
             var provider = spaFiles.FileProvider
                     ?? throw new ArgumentNullException($"The SPA directory does not exist. Did you run 'npm run build' first?");
-            _spaDir = provider.GetFileInfo("./").PhysicalPath;
-            var files = RecursiveGetDirectoryContents(provider).ToList();
+            
+            var statsFile = provider.GetFileInfo("stats.json");
 
-            var hashRegex = new Regex("\\.[0-9a-f]{20}(?=\\.[^\\.]+$)");
+            if (!statsFile.Exists)
+                throw new InvalidOperationException("stats.json does not exist at the root of the spa static files directory. Is the webpack-stats-plugin plugin properly configured?");
+            
+            var statsFileContents = new StreamReader(statsFile.CreateReadStream()).ReadToEnd();
+            _webpackStats = (WebpackStats)JsonSerializer.Deserialize(statsFileContents,
+                typeof(WebpackStats),
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+            );
 
-            _packedFiles = files.Select(f => {
-                var path = f.PhysicalPath.Replace(_spaDir, "/");
-                if (Path.DirectorySeparatorChar == '\\')
-                    path = path.Replace('\\', '/');
-                return path;
-            }).ToDictionary(f => hashRegex.Replace(f, ""), f => f);
+            // flatten the chunks to one list of Assets
+            // TODO handle public path
+            _allAssets = _webpackStats.AssetsByChunkName
+                .SelectMany(a => a.Value.Select(a2 => (Asset)(a.Key, a2)))
+                .ToList();
         }
 
-        private IEnumerable<IFileInfo> RecursiveGetDirectoryContents(IFileProvider provider)
-        {
-            foreach (var file in provider.GetDirectoryContents("./"))
-                if (!file.IsDirectory)
-                    yield return file;
-                else
-                {
-                    var providerTypeInstance = (IFileProvider)Activator.CreateInstance(provider.GetType(), file.PhysicalPath);
-                    foreach (var file2 in RecursiveGetDirectoryContents(providerTypeInstance))
-                        yield return file2;
-                }
-        }
+
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             var isJs = Path.GetExtension(Src) == ".js";
 
-            if (!_packedFiles.TryGetValue(Src, out var hashSrc))
-                throw new ArgumentException($"source {Src} does not exist in the pack directory");
+            var assetPath = _webpackStats.GetAssetPath(Src);
+            if (!_allAssets.Any(ap => ap.Path == assetPath))
+                throw new ArgumentException($"source {assetPath} does not exist in the pack directory.");
 
             if (isJs)
             {
                 output.TagMode = TagMode.StartTagAndEndTag;
                 output.TagName = "script";
-                output.Attributes.Add("src", hashSrc);
+                output.Attributes.Add("src", assetPath);
             }
             else
             {
@@ -68,7 +86,7 @@ namespace Leaderboard.TagHelpers
                 output.TagName = "link";
                 output.Attributes.Add("rel", "stylesheet");
                 output.Attributes.Add("type", "text/css");
-                output.Attributes.Add("href", hashSrc);
+                output.Attributes.Add("href", assetPath);
             }
         }
     }

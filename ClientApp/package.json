@@ -55,7 +55,8 @@
         "ts-loader": "^6.2.1",
         "typescript": "^3.5.3",
         "webpack": "^4.41.5",
-        "webpack-cli": "^3.3.10"
+        "webpack-cli": "^3.3.10",
+        "webpack-stats-plugin": "^0.3.1"
     },
     "scripts": {
         "build": "npm run lint && rimraf ./dist/* && webpack",

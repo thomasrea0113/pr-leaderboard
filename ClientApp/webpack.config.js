@@ -2,6 +2,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const { StatsWriterPlugin } = require('webpack-stats-plugin');
 
 module.exports = {
     mode: 'development',
@@ -70,6 +71,14 @@ module.exports = {
         }),
         new MiniCssExtractPlugin({
             filename: 'css/[name].[hash].css',
+        }),
+        new StatsWriterPlugin({
+            stats: {
+                all: false,
+                assets: true,
+                hash: true,
+                publicPath: true,
+            },
         }),
     ],
 };

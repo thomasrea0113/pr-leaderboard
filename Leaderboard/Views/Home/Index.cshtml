@@ -3,7 +3,7 @@ ViewData["Title"] = "Home Page";
 }
 
 @section css {
-    <react-bundle src="/css/home.css" />
+    <react-bundle src="css/home.[hash].css" />
 }
 
 <div class="text-center">
@@ -13,5 +13,5 @@ ViewData["Title"] = "Home Page";
 </div>
 
 @section js {
-    <react-component src="/js/home.js" props="@Model" element-id="root" />
+    <react-component src="js/home.[hash].js" props="@Model" element-id="root" />
 }
