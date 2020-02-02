@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Leaderboard.Data;
 using Leaderboard.Models.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -13,40 +15,40 @@ namespace Leaderboard.Managers
 {
     public class UserProfileManager : UserManager<IdentityUser<Guid>>
     {
-        private readonly ApplicationDbContext _dbCtx;
+        private ApplicationDbContext _ctx { get; }
 
         public UserProfileManager(IUserStore<IdentityUser<Guid>> store,
             IOptions<IdentityOptions> optionsAccessor,
             IPasswordHasher<IdentityUser<Guid>> passwordHasher,
             IEnumerable<IUserValidator<IdentityUser<Guid>>> userValidators,
             IEnumerable<IPasswordValidator<IdentityUser<Guid>>> passwordValidators,
-            ILookupNormalizer keyNormalizer,
-            IdentityErrorDescriber errors,
-            IServiceProvider services,
-            ILogger<UserManager<IdentityUser<Guid>>> logger) : base(store, optionsAccessor,
-                passwordHasher, userValidators, passwordValidators, keyNormalizer,
-                errors, services, logger)
+            ILookupNormalizer keyNormalizer, IdentityErrorDescriber errors,
+            IServiceProvider services, ILogger<UserManager<IdentityUser<Guid>>> logger) :
+                base(store, optionsAccessor, passwordHasher, userValidators,
+                passwordValidators, keyNormalizer, errors, services, logger)
         {
-            _dbCtx = services.GetRequiredService<ApplicationDbContext>();
+            _ctx = services.GetRequiredService<ApplicationDbContext>();
         }
 
-        /// <summary>
-        /// Get or creates the user's profile. Returns a tuple indicating if the user profile was created or retrieved
-        /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
-        public async Task<ValueTuple<bool, UserProfileModel>> GetOrCreateProfileAsync(IdentityUser<Guid> user)
-            => await GetOrCreateProfileAsync(user.Id);
-
-        public async Task<ValueTuple<bool, UserProfileModel>> GetOrCreateProfileAsync(Guid userId)
+        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            var profile = await _dbCtx.UserProfiles.FindAsync(userId);
-            if (profile == default)
-            {
-                var result = await _dbCtx.UserProfiles.AddAsync( new UserProfileModel { UserId = userId });
-                return (true, result.Entity);
-            }
-            else return (false, profile);
+            return await _ctx.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task<IdentityResult> AddProfileAsync(UserProfileModel profile)
+        {
+            if (profile.User == default)
+                throw new ArgumentNullException(nameof(profile.User));
+
+            var result = await CreateAsync(profile.User);
+
+            profile.UserId = profile.User.Id;
+
+            // TODO catch exception and append identity result. Find away to catch
+            // validation errors
+            var profileEntity = await _ctx.UserProfiles.AddAsync(profile);
+
+            return result;
         }
     }
 }

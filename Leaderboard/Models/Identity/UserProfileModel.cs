@@ -23,7 +23,7 @@ namespace Leaderboard.Models.Identity
         public virtual ICollection<UserLeaderboard> UserLeaderboards { get; set; } = new List<UserLeaderboard>();
 
         [DefaultValue(true)]
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = true;
 
 
         // TODO make sure associated user exists

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using AutoFixture;
 using AutoFixture.Kernel;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -6,62 +8,51 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Leaderboard.Tests.TestSetup.Fixtures
 {
+    public class AsUsernameAttribute : Attribute { }
+
     public class DefaultFixture : Fixture
     {
         public DefaultFixture(string dbName = default)
         {
-            // var overrides = new WebOverrideFactory(dbName);
-
-            // this.Customize(WebApplicationSpecimenBuilder.Create(overrides).ToCustomization());
-
-            // this.Inject<WebApplicationFactory<Startup>>(overrides);
-
-            // this.Register(() => overrides.CreateClient());
+            Customizations.Add(new StringFormatSpecimentBuilder<AsUsernameAttribute>("User{0}"));
         }
     }
 
-    /// <summary>
-    /// Convenient creator functions so that the TStartup generic argument is
-    /// inferred, rather than having to provide it explicility on the constructor
-    /// </summary>
-    public static class WebApplicationSpecimenBuilder
+    public class StringFormatSpecimentBuilder<TAttribute> : ISpecimenBuilder
+        where TAttribute : Attribute
     {
-        public static WebApplicationSpecimenBuilder<TStartup> Create<TStartup>(WebApplicationFactory<TStartup> factory) where TStartup : class
-            => new WebApplicationSpecimenBuilder<TStartup>(factory);
-    }
+        private readonly string _format;
 
-    /// <summary>
-    /// Funnels all AutoData objects through the Test Servers service collection
-    /// </summary>
-    /// <typeparam name="TStartup"></typeparam>
-    public class WebApplicationSpecimenBuilder<TStartup> : ISpecimenBuilder, IDisposable
-        where TStartup : class
-    {
-        private WebApplicationFactory<TStartup> _factory { get; }
-        private IServiceScope _scope { get; }
-
-        public WebApplicationSpecimenBuilder(WebApplicationFactory<TStartup> factory)
+        public StringFormatSpecimentBuilder(string _format)
         {
-            _factory = factory;
-            var services = _factory.Services;
-            _scope = _factory.Services.CreateScope();
+            if (!_format.Contains("{0}"))
+                throw new ArgumentException();
+
+            this._format = _format;
         }
-        
+
+        private string CreateFixture(ISpecimenContext context)
+            => String.Format(_format, context.Create<string>());
+
         public object Create(object request, ISpecimenContext context)
         {
             if (request is Type t)
             {
-                var service = _scope.ServiceProvider.GetService(t);
-                if (service == null)
-                    return new NoSpecimen();
-                return service;
+                if (t == typeof(string))
+                {
+                    if (t.CustomAttributes.OfType<TAttribute>().Any())
+                        return CreateFixture(context);
+                }
+                else if (typeof(IEnumerable<string>).IsAssignableFrom(t))
+                {
+                    return new string[] {
+                        CreateFixture(context),
+                        CreateFixture(context),
+                        CreateFixture(context)
+                    };
+                }
             }
             return new NoSpecimen();
-        }
-
-        public void Dispose()
-        {
-            _scope.Dispose();
         }
     }
 }

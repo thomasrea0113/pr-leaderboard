@@ -6,6 +6,7 @@ using Leaderboard.Models.Identity;
 using Leaderboard.Tests.TestSetup;
 using Leaderboard.Tests.TestSetup.Fixtures;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -24,7 +25,7 @@ namespace Leaderboard.Tests.Models
         {
         }
 
-        public async IAsyncEnumerable<ValueTuple<IdentityResult, UserProfileModel>> CreateUsersAsync(UserProfileManager manager, Dictionary<string, string> users)
+        public async IAsyncEnumerable<UserProfileModel> AddUsersAsync(UserProfileManager manager, Dictionary<string, string> users)
         {
             foreach ((var userName, var email) in users)
             {
@@ -35,14 +36,15 @@ namespace Leaderboard.Tests.Models
                     user.Email = email;
                 }
 
-                var result = await manager.CreateAsync(user);
+                var profileModel = new UserProfileModel() {
+                    User = user
+                };
 
-                var profile = await manager.GetOrCreateProfileAsync(user);
+                var result = await manager.AddProfileAsync(profileModel);
 
-                // all new users, so all new profiles
-                Assert.True(profile.Item1);
+                Assert.Empty(result.Errors);
 
-                yield return (result, profile.Item2);
+                yield return profileModel;
             }
         }
 
@@ -52,13 +54,14 @@ namespace Leaderboard.Tests.Models
         {
             var manager = scope.ServiceProvider.GetRequiredService<UserProfileManager>();
 
-            await foreach ((var result, var user) in CreateUsersAsync(manager, _users))
+            await foreach (var profile in AddUsersAsync(manager, _users))
             {
-                Assert.Empty(result.Errors);
-                Assert.NotNull(user);
-                Assert.True(user.IsActive);
-                Assert.NotNull(user.User);
+                Assert.NotNull(profile.User);
+                Assert.Equal(profile.UserId, profile.User.Id);
+                Assert.True(profile.IsActive);
             }
+
+            await manager.SaveChangesAsync();
         });
     }
 }
