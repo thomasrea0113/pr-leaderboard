@@ -10,13 +10,13 @@ namespace Leaderboard.Tests.TestSetup.Fixtures
     {
         public DefaultFixture(string dbName = default)
         {
-            var overrides = new WebOverrideFactory(dbName);
+            // var overrides = new WebOverrideFactory(dbName);
 
-            this.Customize(WebApplicationSpecimenBuilder.Create(overrides).ToCustomization());
+            // this.Customize(WebApplicationSpecimenBuilder.Create(overrides).ToCustomization());
 
-            this.Inject<WebApplicationFactory<Startup>>(overrides);
+            // this.Inject<WebApplicationFactory<Startup>>(overrides);
 
-            this.Register(() => overrides.CreateClient());
+            // this.Register(() => overrides.CreateClient());
         }
     }
 

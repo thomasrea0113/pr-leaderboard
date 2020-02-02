@@ -16,13 +16,6 @@ namespace Leaderboard.Tests.TestSetup
     /// </summary>
     public class WebOverrideFactory : WebApplicationFactory<Startup>
     {
-        private readonly string _dbName;
-
-        public WebOverrideFactory(string dbName = default)
-        {
-            _dbName = dbName ?? Guid.NewGuid().ToString();
-        }
-
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             var dbContextType = typeof(DbContextOptions<ApplicationDbContext>);
@@ -36,7 +29,7 @@ namespace Leaderboard.Tests.TestSetup
                 {
                     // lazy loading prevents us from having to expliclity load all of our related models
                     cnf.UseLazyLoadingProxies()
-                        .UseInMemoryDatabase(_dbName);
+                        .UseInMemoryDatabase("test-db");
                 });
             })
             .ConfigureAppConfiguration(c =>

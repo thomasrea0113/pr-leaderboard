@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Leaderboard.Managers;
 using Leaderboard.Models.Identity;
+using Leaderboard.Tests.TestSetup;
 using Leaderboard.Tests.TestSetup.Fixtures;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Leaderboard.Tests.Models
 {
-    public class UserProfileTests
+    public class UserProfileTests : BaseTestClass
     {
         private readonly Dictionary<string, string> _users = new Dictionary<string, string>() {
             { "user1", "user1.email@test.com" },
@@ -17,6 +19,10 @@ namespace Leaderboard.Tests.Models
             { "user3-no-email", default },
             { "user4", "user4.email@test.com" },
         };
+
+        public UserProfileTests(WebOverrideFactory factory) : base(factory)
+        {
+        }
 
         public async IAsyncEnumerable<ValueTuple<IdentityResult, UserProfileModel>> CreateUsersAsync(UserProfileManager manager, Dictionary<string, string> users)
         {
@@ -41,15 +47,20 @@ namespace Leaderboard.Tests.Models
         }
 
 
-        [Theory, DefaultData("Users")]
-        public async Task TestCreateUsers(UserProfileManager manager)
+        [Fact]
+        public async Task TestCreateUsers()
         {
-            await foreach ((var result, var user) in CreateUsersAsync(manager, _users))
+            using (var scope = _factory.Services.CreateScope())
             {
-                Assert.Empty(result.Errors);
-                Assert.NotNull(user);
-                Assert.True(user.IsActive);
-                Assert.NotNull(user.User);
+                var manager = scope.ServiceProvider.GetRequiredService<UserProfileManager>();
+
+                await foreach ((var result, var user) in CreateUsersAsync(manager, _users))
+                {
+                    Assert.Empty(result.Errors);
+                    Assert.NotNull(user);
+                    Assert.True(user.IsActive);
+                    Assert.NotNull(user.User);
+                }
             }
         }
     }
