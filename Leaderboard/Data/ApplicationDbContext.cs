@@ -26,6 +26,7 @@ namespace Leaderboard.Data
             base.OnModelCreating(modelBuilder);
             modelBuilder.AddAllRelationships();
             modelBuilder.AddCompositeKeys();
+            modelBuilder.AddDefaultValues();
         }
 
         private Func<EntityEntry, bool> hasFeature = ee => {

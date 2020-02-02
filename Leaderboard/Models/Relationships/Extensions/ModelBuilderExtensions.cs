@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
@@ -41,7 +42,7 @@ namespace Leaderboard.Models.Relationships.Extensions
 
             if (relationshipCollectionPropertyName == default)
                 throw new ArgumentException($"model of type {mt1.FullName} does not have a property of type {relationshipType}");
-        
+
             var mt2IdPropertyName = _modelRegex.Replace(mt2.Name, "Id");
 
             if (!mt2IdPropertyName.EndsWith("Id"))
@@ -51,7 +52,7 @@ namespace Leaderboard.Models.Relationships.Extensions
 
             if (mt2IdName == default)
                 throw new ArgumentException($"type {relationshipType.FullName} does not have a public property named {mt2IdPropertyName}");
-        
+
             return (mt1, relationshipCollectionPropertyName, mt2IdName);
         }
 
@@ -83,11 +84,6 @@ namespace Leaderboard.Models.Relationships.Extensions
                     .HasOne(mt)
                     .WithMany(rcp)
                     .HasForeignKey(fkp);
-
-            // modelBuilder.Entity<UserLeaderboard>()
-            //     .HasOne(pt => pt.Leaderboard)
-            //     .WithMany(p => p.UserLeaderboards)
-            //     .HasForeignKey(pt => pt.UserId);
         }
 
         /// <summary>
@@ -102,7 +98,7 @@ namespace Leaderboard.Models.Relationships.Extensions
                 assembly = Assembly.GetExecutingAssembly();
 
             var abstractRelationshipType = typeof(AbstractRelationship<,>);
-            foreach(var relationshipType in assembly.GetTypes()
+            foreach (var relationshipType in assembly.GetTypes()
                 .Where(t => !t.IsAbstract && t.BaseType == abstractRelationshipType))
                 modelBuilder.AddRelationship(relationshipType);
         }
@@ -110,7 +106,7 @@ namespace Leaderboard.Models.Relationships.Extensions
         public static void AddCompositeKey(this ModelBuilder modelBuilder, Type modelType)
         {
             var keys = modelType.GetProperties()
-                .Select(p => new {Prop = p, Attr = p.GetCustomAttribute<CompositeKeyAttribute>(false)})
+                .Select(p => new { Prop = p, Attr = p.GetCustomAttribute<CompositeKeyAttribute>(false) })
                 .Where(ca => ca.Attr != null)
                 .Select(ca => ca.Prop.Name);
 
@@ -124,8 +120,37 @@ namespace Leaderboard.Models.Relationships.Extensions
                 assembly = Assembly.GetExecutingAssembly();
 
             // all the properties have to be inspected, so it's quicker to enumerate all the defined types
-            foreach(var type in assembly.GetTypes())
+            foreach (var type in assembly.GetTypes())
                 modelBuilder.AddCompositeKey(type);
         }
+
+        public static void AddDefaultValues(this ModelBuilder modelBuilder, Type type)
+        {
+            var defaults = type.GetProperties()
+                .Select(p => new
+                {
+                    Prop = p.Name,
+                    Val = p.GetCustomAttribute<DefaultValueAttribute>(false)?.Value
+                })
+                .Where(dv => dv.Val != null);
+
+            if (defaults.Any())
+            {
+                var entity = modelBuilder.Entity(type);
+                foreach (var dv in defaults)
+                    entity.Property(dv.Prop).HasDefaultValue(dv.Val);
+            }
+        }
+
+        public static void AddDefaultValues(this ModelBuilder modelBuilder, Assembly assembly = default)
+        {
+            if (assembly == default)
+                assembly = Assembly.GetExecutingAssembly();
+
+            foreach (var type in assembly.GetTypes())
+                modelBuilder.AddDefaultValues(type);
+        }
+
+
     }
 }
