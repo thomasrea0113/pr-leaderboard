@@ -8,9 +8,9 @@ namespace Leaderboard.Tests.Models.Relationships
     public class AbstractRelationshipTests
     {
         [Theory, DefaultData]
-        public void TestRelationship(UserLeaderboard relationship)
+        public void TestRelationship()
         {
-
+            
         }
     }
 }
