@@ -23,10 +23,13 @@ namespace Leaderboard.Models.Identity.Validators
     {
         public async Task<IdentityResult> ValidateAsync(UserManager<IdentityUser<Guid>> manager, IdentityUser<Guid> user)
         {
-            var emailExists = await manager.Users.AnyAsync(u => u.Email == user.Email);
+            if (user.Email != default)
+            {
+                var emailExists = await manager.Users.AnyAsync(u => u.Email == user.Email);
 
-            if (emailExists)
-                return IdentityResult.Failed(new EmailExistsIdentityError(user.Email));
+                if (emailExists)
+                    return IdentityResult.Failed(new EmailExistsIdentityError(user.Email));
+            }
 
             return IdentityResult.Success;
         }
