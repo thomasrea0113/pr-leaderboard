@@ -8,12 +8,12 @@ namespace Leaderboard.Models.Relationships
     public class UserLeaderboard : AbstractRelationship<UserProfileModel, LeaderboardModel>
     {
         [CompositeKey]
-        public Guid UserId { get; set; }
+        public Guid UserProfileId { get; set; }
         public virtual UserProfileModel User { get; set; }
 
 
         [CompositeKey]
-        public string LeaderboardId { get; set; }
+        public Guid LeaderboardId { get; set; }
         public virtual LeaderboardModel Leaderboard { get; set; }
     }
 }

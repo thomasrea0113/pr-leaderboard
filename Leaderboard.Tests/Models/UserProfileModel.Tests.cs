@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using AutoFixture.Xunit2;
 using Leaderboard.Managers;
 using Leaderboard.Models.Identity;
 using Leaderboard.Tests.TestSetup;
@@ -14,12 +16,6 @@ namespace Leaderboard.Tests.Models
 {
     public class UserProfileModelTests : BaseTestClass
     {
-        private readonly Dictionary<string, string> _users = new Dictionary<string, string>() {
-            { "user1", "user1.email@test.com" },
-            { "user2", "user2.email@test.com" },
-            { "user3-no-email", default },
-            { "user4", "user4.email@test.com" },
-        };
 
         public UserProfileModelTests(WebOverrideFactory factory) : base(factory)
         {
@@ -49,12 +45,17 @@ namespace Leaderboard.Tests.Models
         }
 
 
-        [Fact]
-        public async Task TestCreateUsers() => await WithScopeAsync(async scope =>
+        [Theory, AutoData]
+        public async Task TestCreateUsers(Dictionary<string, string> userNames) => await WithScopeAsync(async scope =>
         {
             var manager = scope.ServiceProvider.GetRequiredService<UserProfileManager>();
 
-            await foreach (var profile in AddUsersAsync(manager, _users))
+            var withEmails = userNames.ToDictionary(str => str.Key, str => $"{str.Value}@test.com");
+
+            // unsetting one of the emails to make sure it can be created
+            withEmails[userNames.Keys.ElementAt(1)] = null;
+
+            await foreach (var profile in AddUsersAsync(manager, withEmails))
             {
                 Assert.NotNull(profile.User);
                 Assert.Equal(profile.UserId, profile.User.Id);

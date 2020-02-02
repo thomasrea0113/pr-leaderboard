@@ -8,6 +8,9 @@ using Leaderboard.Models.Features;
 using Leaderboard.Models.Relationships.Extensions;
 using Leaderboard.Models.Identity;
 using Microsoft.AspNetCore.Identity;
+using Leaderboard.Models.Relationships;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace Leaderboard.Data
 {
@@ -15,6 +18,12 @@ namespace Leaderboard.Data
     {
         public DbSet<LeaderboardModel> leaderboards { get; set; }
         public DbSet<UserProfileModel> UserProfiles { get; set; }
+
+        #region relationship tables
+
+        public DbSet<UserLeaderboard> UserLeaderboards { get; set; }
+
+        #endregion
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -24,9 +33,9 @@ namespace Leaderboard.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.AddAllRelationships();
-            modelBuilder.AddCompositeKeys();
-            modelBuilder.AddDefaultValues();
+            modelBuilder.AddAllRelationships(this);
+            modelBuilder.AddCompositeKeys(this);
+            modelBuilder.AddDefaultValues(this);
         }
 
         private Func<EntityEntry, bool> hasFeature = ee => {
@@ -35,6 +44,9 @@ namespace Leaderboard.Data
         };
 
         public override int SaveChanges()
+            => throw new NotImplementedException("Please use the SaveChangesAsync method.");
+
+        public override async Task<int> SaveChangesAsync(CancellationToken ct = default)
         {
             this.ChangeTracker.DetectChanges();
 
@@ -84,7 +96,7 @@ namespace Leaderboard.Data
                 }
             }
 
-            return base.SaveChanges();
+            return await base.SaveChangesAsync();
         }
     }
 }

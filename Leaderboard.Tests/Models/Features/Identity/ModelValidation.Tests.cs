@@ -1,7 +1,9 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoFixture.Xunit2;
 using Leaderboard.Managers;
+using Leaderboard.Models.Identity;
 using Leaderboard.Models.Identity.Validators;
 using Leaderboard.Tests.TestSetup;
 using Leaderboard.Tests.TestSetup.Fixtures;
@@ -12,51 +14,66 @@ using Xunit;
 
 namespace Leaderboard.Tests.Models.Identity.Validators
 {
-    public class EmailNotRequiredValidatorTests : BaseTestClass
+    public class ModelValidationTests : BaseTestClass
     {
-        private readonly EmailNotRequiredValidator _validator = new EmailNotRequiredValidator();
-        private readonly Type _validatorType = typeof(EmailNotRequiredValidator);
-        private readonly Type _EmailExistsIdentityErrorType = typeof(EmailExistsIdentityError);
-
-        public EmailNotRequiredValidatorTests(WebOverrideFactory factory) : base(factory)
+        public ModelValidationTests(WebOverrideFactory factory) : base(factory)
         {
         }
 
-        [Fact]
-        public async Task TestBlankEmail() => await WithScopeAsync(async scope =>
-        {
-            var manager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser<Guid>>>();
+        [Theory, AutoData]
+        public async Task TestInvalidEmail(string userName) => await WithScopeAsync(async scope => {
+            var manager = scope.ServiceProvider.GetRequiredService<UserProfileManager>();
 
-            // can create the first user with email;
-            var result = await manager.CreateAsync(new IdentityUser<Guid>("user0"));
-            Assert.True(result.Succeeded);
+            var profile = new UserProfileModel {
+                User = new IdentityUser<Guid>(userName) {
+                    Email = "EHREHRHEdsdsdf92848****020394923949~!!"
+                }
+            };
+
+            // should throw an exception
+            var result = await manager.AddProfileAsync(profile);
+
+            Assert.Empty(result.Errors);
         });
 
-        [Fact]
-        public async Task TestExistingEmail() => await WithScopeAsync(async scope =>
+        [Theory, AutoData]
+        public async Task TestBlankEmail(string userName) => await WithScopeAsync(async scope =>
         {
             var manager = scope.ServiceProvider.GetRequiredService<UserProfileManager>();
 
-            var email = "test.user@test.com";
+            var result = await manager.AddProfileAsync(new UserProfileModel {
+                User = new IdentityUser<Guid>(userName)
+            });
 
-            var count = await manager.Users.CountAsync();
+            Assert.True(result.Succeeded);
+        });
 
-            Assert.Contains(manager.UserValidators, u => u.GetType() == _validatorType);
+        [Theory, AutoData]
+        public async Task TestExistingEmail(string[] userNames, string emailStr) => await WithScopeAsync(async scope =>
+        {
+            var manager = scope.ServiceProvider.GetRequiredService<UserProfileManager>();
+            var describer = scope.ServiceProvider.GetRequiredService<IdentityErrorDescriber>();
+
+            var email = $"{emailStr}@test.com";
+
+            Assert.Contains(manager.UserValidators, u => u.GetType() == typeof(EmailNotRequiredValidator));
 
             // can create the first user with email;
-            var result = await manager.CreateAsync(new IdentityUser<Guid>("user6")
-            {
-                Email = email
+            var result = await manager.AddProfileAsync(new UserProfileModel {
+                User = new IdentityUser<Guid>(userNames[0]) {
+                    Email = email
+                }
             });
-            Assert.True(result.Succeeded);
+            Assert.Empty(result.Errors);
 
-            result = await manager.CreateAsync(new IdentityUser<Guid>("user7")
-            {
-                Email = email
+            result = await manager.AddProfileAsync(new UserProfileModel {
+                User = new IdentityUser<Guid>(userNames[1]) {
+                    Email = email
+                }
             });
 
             // email is a duplicate, so should contain the duplicate email identity error
-            Assert.Contains(result.Errors, e => e.GetType() == _EmailExistsIdentityErrorType);
+            Assert.Contains(result.Errors, e => e.Description == describer.DuplicateEmail(email).Description);
             Assert.False(result.Succeeded);
         });
     }

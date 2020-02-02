@@ -12,9 +12,11 @@ namespace Leaderboard.Models.Relationships.Extensions
 {
     public static class ModelBuilderExtensions
     {
+        #region helpers
+
         private static Regex _modelRegex = new Regex("Model$");
 
-        public static bool IsAssignableToGenericType(Type givenType, Type genericType)
+        public static bool IsAssignableToGenericType(this Type givenType, Type genericType)
         {
             var interfaceTypes = givenType.GetInterfaces();
 
@@ -30,7 +32,7 @@ namespace Leaderboard.Models.Relationships.Extensions
             Type baseType = givenType.BaseType;
             if (baseType == null) return false;
 
-            return IsAssignableToGenericType(baseType, genericType);
+            return baseType.IsAssignableToGenericType(genericType);
         }
 
         private static ValueTuple<Type, string, string> GetRelationshipProperties(
@@ -67,24 +69,18 @@ namespace Leaderboard.Models.Relationships.Extensions
             yield return GetRelationshipProperties(relationshipType, mt2, mt1);
         }
 
-        /// <summary>
-        /// Dynamically adds the tables needed for many-to-many relationships
-        /// </summary>
-        /// <param name="modelBuilder"></param>
-        /// <param name="relationshipType"></param>
-        public static void AddRelationship(this ModelBuilder modelBuilder, Type relationshipType)
+        public static void ForEachEntityType(this DbContext context, Action<Type> action)
         {
-            var abstractRelationshipType = typeof(AbstractRelationship<,>);
-            if (!IsAssignableToGenericType(relationshipType, abstractRelationshipType))
-                throw new ArgumentException($"type {relationshipType.FullName} doesn't inherit from {abstractRelationshipType}");
-
-
-            foreach ((var mt, var rcp, var fkp) in GetRelationshipProperties(relationshipType))
-                modelBuilder.Entity(relationshipType)
-                    .HasOne(mt)
-                    .WithMany(rcp)
-                    .HasForeignKey(fkp);
+            var dbSetType = typeof(DbSet<>);
+            foreach (var type in context.GetType()
+                .GetProperties()
+                .Select(p => p.PropertyType)
+                .Where(t => t.IsAssignableToGenericType(dbSetType))
+                .Select(t => t.GenericTypeArguments[0]))
+                action(type);
         }
+
+        #endregion
 
         /// <summary>
         /// Add all the <see cref="AbstractRelationship{TModel1,TModel2}" /> defined in the
@@ -92,65 +88,55 @@ namespace Leaderboard.Models.Relationships.Extensions
         /// </summary>
         /// <param name="modelBuilder"></param>
         /// <param name="assembly"></param>
-        public static void AddAllRelationships(this ModelBuilder modelBuilder, Assembly assembly = default)
-        {
-            if (assembly == default)
-                assembly = Assembly.GetExecutingAssembly();
-
-            var abstractRelationshipType = typeof(AbstractRelationship<,>);
-            foreach (var relationshipType in assembly.GetTypes()
-                .Where(t => !t.IsAbstract && t.BaseType == abstractRelationshipType))
-                modelBuilder.AddRelationship(relationshipType);
-        }
-
-        public static void AddCompositeKey(this ModelBuilder modelBuilder, Type modelType)
-        {
-            var keys = modelType.GetProperties()
-                .Select(p => new { Prop = p, Attr = p.GetCustomAttribute<CompositeKeyAttribute>(false) })
-                .Where(ca => ca.Attr != null)
-                .Select(ca => ca.Prop.Name);
-
-            if (keys.Any())
-                modelBuilder.Entity(modelType).HasKey(keys.ToArray());
-        }
-
-        public static void AddCompositeKeys(this ModelBuilder modelBuilder, Assembly assembly = default)
-        {
-            if (assembly == default)
-                assembly = Assembly.GetExecutingAssembly();
-
-            // all the properties have to be inspected, so it's quicker to enumerate all the defined types
-            foreach (var type in assembly.GetTypes())
-                modelBuilder.AddCompositeKey(type);
-        }
-
-        public static void AddDefaultValues(this ModelBuilder modelBuilder, Type type)
-        {
-            var defaults = type.GetProperties()
-                .Select(p => new
-                {
-                    Prop = p.Name,
-                    Val = p.GetCustomAttribute<DefaultValueAttribute>(false)?.Value
-                })
-                .Where(dv => dv.Val != null);
-
-            if (defaults.Any())
+        public static void AddAllRelationships(this ModelBuilder modelBuilder, DbContext context)
+            => context.ForEachEntityType(type =>
             {
-                var entity = modelBuilder.Entity(type);
-                foreach (var dv in defaults)
-                    entity.Property(dv.Prop).HasDefaultValue(dv.Val);
-            }
-        }
+                var abstractRelationshipType = typeof(AbstractRelationship<,>);
 
-        public static void AddDefaultValues(this ModelBuilder modelBuilder, Assembly assembly = default)
-        {
-            if (assembly == default)
-                assembly = Assembly.GetExecutingAssembly();
+                if (type.IsAssignableToGenericType(abstractRelationshipType))
+                {
+                    var entity = modelBuilder.Entity(type);
+                    foreach ((var mt, var rcp, var fkp) in GetRelationshipProperties(type))
+                        entity.HasOne(mt)
+                        .WithMany(rcp)
+                        .HasForeignKey(fkp);
+                }
+            });
 
-            foreach (var type in assembly.GetTypes())
-                modelBuilder.AddDefaultValues(type);
-        }
+        public static void AddCompositeKeys(this ModelBuilder modelBuilder, DbContext context)
+            => context.ForEachEntityType(type =>
+            {
+                var keys = type.GetProperties()
+                    .Where(p => p.GetCustomAttribute<CompositeKeyAttribute>(false) != default)
+                    .Select(p => p.Name);
 
+                if (keys.Any())
+                    modelBuilder.Entity(type).HasKey(keys.ToArray());
+            });
 
+        /// <summary>
+        /// Add all the default values from data annotations for all the models in the given
+        /// context
+        /// </summary>
+        /// <param name="modelBuilder"></param>
+        /// <param name="context"></param>
+        public static void AddDefaultValues(this ModelBuilder modelBuilder, DbContext context)
+            => context.ForEachEntityType(type =>
+            {
+                var defaults = type.GetProperties()
+                    .Select(p => new
+                    {
+                        Prop = p.Name,
+                        Val = p.GetCustomAttribute<DefaultValueAttribute>(false)?.Value
+                    })
+                    .Where(dv => dv.Val != null);
+
+                if (defaults.Any())
+                {
+                    var entity = modelBuilder.Entity(type);
+                    foreach (var dv in defaults)
+                        entity.Property(dv.Prop).HasDefaultValue(dv.Val);
+                }
+            });
     }
 }
