@@ -11,7 +11,7 @@ using Xunit;
 
 namespace Leaderboard.Tests.Models
 {
-    public class UserProfileTests : BaseTestClass
+    public class UserProfileModelTests : BaseTestClass
     {
         private readonly Dictionary<string, string> _users = new Dictionary<string, string>() {
             { "user1", "user1.email@test.com" },
@@ -20,7 +20,7 @@ namespace Leaderboard.Tests.Models
             { "user4", "user4.email@test.com" },
         };
 
-        public UserProfileTests(WebOverrideFactory factory) : base(factory)
+        public UserProfileModelTests(WebOverrideFactory factory) : base(factory)
         {
         }
 
@@ -48,20 +48,17 @@ namespace Leaderboard.Tests.Models
 
 
         [Fact]
-        public async Task TestCreateUsers()
+        public async Task TestCreateUsers() => await WithScopeAsync(async scope =>
         {
-            using (var scope = _factory.Services.CreateScope())
-            {
-                var manager = scope.ServiceProvider.GetRequiredService<UserProfileManager>();
+            var manager = scope.ServiceProvider.GetRequiredService<UserProfileManager>();
 
-                await foreach ((var result, var user) in CreateUsersAsync(manager, _users))
-                {
-                    Assert.Empty(result.Errors);
-                    Assert.NotNull(user);
-                    Assert.True(user.IsActive);
-                    Assert.NotNull(user.User);
-                }
+            await foreach ((var result, var user) in CreateUsersAsync(manager, _users))
+            {
+                Assert.Empty(result.Errors);
+                Assert.NotNull(user);
+                Assert.True(user.IsActive);
+                Assert.NotNull(user.User);
             }
-        }
+        });
     }
 }

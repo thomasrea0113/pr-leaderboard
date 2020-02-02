@@ -23,54 +23,47 @@ namespace Leaderboard.Tests.Models.Identity.Validators
         }
 
         [Fact]
-        public async Task TestBlankEmail()
+        public async Task TestBlankEmail() => await WithScopeAsync(async scope =>
         {
-            using (var scope = _factory.Services.CreateScope())
-            {
-                var manager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser<Guid>>>();
+            var manager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser<Guid>>>();
 
-                Assert.Equal(0, await manager.Users.CountAsync());
+            Assert.Equal(0, await manager.Users.CountAsync());
 
-                // can create the first user with email;
-                var result = await manager.CreateAsync(new IdentityUser<Guid>("user0"));
-                Assert.True(result.Succeeded);
-            }
-        }
+            // can create the first user with email;
+            var result = await manager.CreateAsync(new IdentityUser<Guid>("user0"));
+            Assert.True(result.Succeeded);
+        });
 
         [Fact]
-        public async Task TestExistingEmail()
+        public async Task TestExistingEmail() => await WithScopeAsync(async scope =>
         {
-            using (var scope = _factory.Services.CreateScope())
+            var manager = scope.ServiceProvider.GetRequiredService<UserProfileManager>();
+
+            var email = "test.user@test.com";
+
+            var count = await manager.Users.CountAsync();
+
+            Assert.Contains(manager.UserValidators, u => u.GetType() == _validatorType);
+
+            // can create the first user with email;
+            var result = await manager.CreateAsync(new IdentityUser<Guid>("user6")
             {
+                Email = email
+            });
+            Assert.True(result.Succeeded);
 
-                var manager = scope.ServiceProvider.GetRequiredService<UserProfileManager>();
+            Assert.Equal(count + 1, await manager.Users.CountAsync());
 
-                var email = "test.user@test.com";
+            result = await manager.CreateAsync(new IdentityUser<Guid>("user7")
+            {
+                Email = email
+            });
 
-                var count =  await manager.Users.CountAsync();
+            Assert.Equal(count + 1, await manager.Users.CountAsync());
 
-                Assert.Contains(manager.UserValidators, u => u.GetType() == _validatorType);
-
-                // can create the first user with email;
-                var result = await manager.CreateAsync(new IdentityUser<Guid>("user6")
-                {
-                    Email = email
-                });
-                Assert.True(result.Succeeded);
-
-                Assert.Equal(count + 1, await manager.Users.CountAsync());
-
-                result = await manager.CreateAsync(new IdentityUser<Guid>("user7")
-                {
-                    Email = email
-                });
-
-                Assert.Equal(count + 1, await manager.Users.CountAsync());
-
-                // email is a duplicate, so should contain the duplicate email identity error
-                Assert.Contains(result.Errors, e => e.GetType() == _EmailExistsIdentityErrorType);
-                Assert.False(result.Succeeded);
-            }
-        }
+            // email is a duplicate, so should contain the duplicate email identity error
+            Assert.Contains(result.Errors, e => e.GetType() == _EmailExistsIdentityErrorType);
+            Assert.False(result.Succeeded);
+        });
     }
 }
