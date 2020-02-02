@@ -23,28 +23,25 @@ namespace Leaderboard.Tests.Models.Identity.Validators
         [Theory, AutoData]
         public async Task TestInvalidEmail(string userName) => await WithScopeAsync(async scope => {
             var manager = scope.ServiceProvider.GetRequiredService<UserProfileManager>();
+            var describer = scope.ServiceProvider.GetRequiredService<IdentityErrorDescriber>();
 
-            var profile = new UserProfileModel {
-                User = new IdentityUser<Guid>(userName) {
-                    Email = "EHREHRHEdsdsdf92848****020394923949~!!"
-                }
+            var invalidEmail = "EHREHRHEdsdsdf92848****020394923949~!!";
+
+            var user = new IdentityUser<Guid>(userName) {
+                Email = invalidEmail
             };
 
-            // should throw an exception
-            var result = await manager.AddProfileAsync(profile);
+            // first create the user
+            var result = await manager.CreateAsync(user);
 
-            Assert.Empty(result.Errors);
+            Assert.Contains(result.Errors, e => e.Description == describer.InvalidEmail(invalidEmail).Description);
         });
 
         [Theory, AutoData]
         public async Task TestBlankEmail(string userName) => await WithScopeAsync(async scope =>
         {
             var manager = scope.ServiceProvider.GetRequiredService<UserProfileManager>();
-
-            var result = await manager.AddProfileAsync(new UserProfileModel {
-                User = new IdentityUser<Guid>(userName)
-            });
-
+            var result = await manager.CreateAsync(new IdentityUser<Guid>(userName));
             Assert.True(result.Succeeded);
         });
 
@@ -59,18 +56,14 @@ namespace Leaderboard.Tests.Models.Identity.Validators
             Assert.Contains(manager.UserValidators, u => u.GetType() == typeof(EmailNotRequiredValidator));
 
             // can create the first user with email;
-            var result = await manager.AddProfileAsync(new UserProfileModel {
-                User = new IdentityUser<Guid>(userNames[0]) {
+            var result = await manager.CreateAsync(new IdentityUser<Guid>(userNames[0]) {
                     Email = email
-                }
-            });
+                });
             Assert.Empty(result.Errors);
 
-            result = await manager.AddProfileAsync(new UserProfileModel {
-                User = new IdentityUser<Guid>(userNames[1]) {
+            result = await manager.CreateAsync(new IdentityUser<Guid>(userNames[1]) {
                     Email = email
-                }
-            });
+                });
 
             // email is a duplicate, so should contain the duplicate email identity error
             Assert.Contains(result.Errors, e => e.Description == describer.DuplicateEmail(email).Description);

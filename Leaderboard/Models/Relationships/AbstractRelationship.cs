@@ -14,8 +14,8 @@ namespace Leaderboard.Models.Relationships
     /// <typeparam name="TModel1">Model 1 (class name MUST be prepended with 'Model')</typeparam>
     /// <typeparam name="TModel12">Model 2 (class name MUST be prepended with 'Model')</typeparam>
     public abstract class AbstractRelationship<TModel1, TModel12>
-        where TModel1 : class, new()
-        where TModel12 : class, new()
+        where TModel1 : class
+        where TModel12 : class
     {
     }
 }

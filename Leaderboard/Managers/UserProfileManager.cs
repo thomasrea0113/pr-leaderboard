@@ -35,20 +35,14 @@ namespace Leaderboard.Managers
             return await _ctx.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<IdentityResult> AddProfileAsync(UserProfileModel profile)
+        public async Task<UserProfileModel> GetProfileAsync(IdentityUser<Guid> user)
+            => await GetProfileAsync(user.Id);
+
+        public async Task<UserProfileModel> GetProfileAsync(Guid userId)
         {
-            if (profile.User == default)
-                throw new ArgumentNullException(nameof(profile.User));
-
-            var result = await CreateAsync(profile.User);
-
-            profile.UserId = profile.User.Id;
-
-            // TODO catch exception and append identity result. Find away to catch
-            // validation errors
-            var profileEntity = await _ctx.UserProfiles.AddAsync(profile);
-
-            return result;
+            var profile = await _ctx.UserProfiles.FindAsync(userId);
+            await _ctx.Entry(profile).ReloadAsync();
+            return profile;
         }
     }
 }

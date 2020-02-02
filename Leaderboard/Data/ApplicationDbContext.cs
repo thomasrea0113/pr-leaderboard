@@ -40,7 +40,7 @@ namespace Leaderboard.Data
 
         private Func<EntityEntry, bool> hasFeature = ee => {
             var e = ee.Entity;
-            return e is IOnDbSave || e is IOnDbCreate;
+            return e is IOnDbSave || e is IOnDbPreCreateAsync;
         };
 
         public override int SaveChanges()
@@ -50,14 +50,30 @@ namespace Leaderboard.Data
         {
             this.ChangeTracker.DetectChanges();
 
-            var featuredEntries = this.ChangeTracker.Entries().Where(hasFeature);
+            var allEntries = this.ChangeTracker.Entries();
+
+            // need to evaluate the enumerable immediately
+            var users = allEntries.Select(ee => ee.Entity)
+                .Where(e => e is IdentityUser<Guid>)
+                .Select(e => (IdentityUser<Guid>)e).ToArray();
+
+            // TODO getting all the users prevents multiple DB calls, but could
+            // with a large number of users
+            var userProfiles = await UserProfiles.ToListAsync();
+
+            // any time a user is created, make sure a profile for them also exists
+            foreach (var user in users)
+                if (!userProfiles.Any(p => p.UserId == user.Id))
+                    await UserProfiles.AddAsync(new UserProfileModel { UserId = user.Id });
+
+            var featuredEntries = allEntries.Where(hasFeature);
             
             var added = featuredEntries.Where(t => t.State == EntityState.Added);
             foreach (var entry in added)
             {
                 var entity = entry.Entity;
-                if (entry.Entity is IOnDbCreate onCreate)
-                    onCreate.OnCreate(entry.Context, entry.CurrentValues);
+                if (entry.Entity is IOnDbPreCreateAsync onCreate)
+                    await onCreate.OnPreCreateAsync(entry.Context, entry.CurrentValues);
             }
 
             var modified = featuredEntries.Where(t => t.State == EntityState.Modified);

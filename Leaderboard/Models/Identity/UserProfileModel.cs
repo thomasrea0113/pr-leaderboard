@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Threading.Tasks;
 using Leaderboard.Models.Features;
 using Leaderboard.Models.Relationships;
 using Microsoft.AspNetCore.Identity;
@@ -11,9 +12,8 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Leaderboard.Models.Identity
 {
-    public class UserProfileModel : IModelFeatures, IDbActive, IOnDbCreate
+    public class UserProfileModel : IModelFeatures, IDbActive
     {
-    
         public ModelFeatures Features => ModelFeatures.PreventDelete;
 
         [Key]
@@ -25,11 +25,8 @@ namespace Leaderboard.Models.Identity
         [DefaultValue(true)]
         public bool IsActive { get; set; } = true;
 
-
-        // TODO make sure associated user exists
-        public void OnCreate(DbContext ctx, PropertyValues values)
+        public UserProfileModel()
         {
-            throw new NotImplementedException();
         }
     }
 }

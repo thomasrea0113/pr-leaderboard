@@ -1,10 +1,11 @@
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Leaderboard.Models.Features
 {
-    public interface IOnDbCreate
+    public interface IOnDbPreCreateAsync
     {
-        void OnCreate(DbContext ctx, PropertyValues values);
+        Task OnPreCreateAsync(DbContext ctx, PropertyValues values);
     }
 }

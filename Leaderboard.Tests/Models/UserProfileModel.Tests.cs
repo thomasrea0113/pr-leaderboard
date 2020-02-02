@@ -32,15 +32,15 @@ namespace Leaderboard.Tests.Models
                     user.Email = email;
                 }
 
-                var profileModel = new UserProfileModel() {
-                    User = user
-                };
-
-                var result = await manager.AddProfileAsync(profileModel);
+                var result = await manager.CreateAsync(user);
 
                 Assert.Empty(result.Errors);
 
-                yield return profileModel;
+                var profile = await manager.GetProfileAsync(user);
+
+                Assert.NotNull(profile);
+
+                yield return profile;
             }
         }
 
@@ -57,6 +57,7 @@ namespace Leaderboard.Tests.Models
 
             await foreach (var profile in AddUsersAsync(manager, withEmails))
             {
+                // TODO why aren't properties lazy loaded?
                 Assert.NotNull(profile.User);
                 Assert.Equal(profile.UserId, profile.User.Id);
                 Assert.True(profile.IsActive);

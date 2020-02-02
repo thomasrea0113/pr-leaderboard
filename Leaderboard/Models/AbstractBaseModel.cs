@@ -1,13 +1,15 @@
+using System.Threading.Tasks;
 using Leaderboard.Models.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Leaderboard.Models
 {
-    public abstract class AbstractBaseModel : IOnDbCreate, IOnDbSave, IOnDbDelete
+    public abstract class AbstractBaseModel : IOnDbPreCreateAsync, IOnDbSave, IOnDbDelete
     {
-        public virtual void OnCreate(DbContext ctx, PropertyValues values)
+        public virtual Task OnPreCreateAsync(DbContext ctx, PropertyValues values)
         {
+            return Task.CompletedTask;
         }
 
         public virtual void OnDelete(DbContext ctx)

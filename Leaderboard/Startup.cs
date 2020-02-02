@@ -36,7 +36,7 @@ namespace Leaderboard
                 options.SignIn.RequireConfirmedAccount = true;
 
                 // disabling here so that we can handle email ourselves
-                options.User.RequireUniqueEmail = true;
+                options.User.RequireUniqueEmail = false;
 
                 options.SignIn.RequireConfirmedEmail = false;
             })
