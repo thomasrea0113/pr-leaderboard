@@ -9,10 +9,11 @@ using Leaderboard.Models.Relationships;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Leaderboard.Models.Identity
 {
-    public class UserProfileModel : IModelFeatures, IDbActive
+    public class UserProfileModel : IModelFeatures, IDbActive, IDbEntity<UserProfileModel>
     {
         public ModelFeatures Features => ModelFeatures.PreventDelete;
 
@@ -22,11 +23,11 @@ namespace Leaderboard.Models.Identity
 
         public virtual ICollection<UserLeaderboard> UserLeaderboards { get; set; } = new List<UserLeaderboard>();
 
-        [DefaultValue(true)]
         public bool IsActive { get; set; } = true;
 
-        public UserProfileModel()
+        public void OnModelCreating(EntityTypeBuilder<UserProfileModel> builder)
         {
+            builder.Property(p => p.IsActive).HasDefaultValue(true);
         }
     }
 }

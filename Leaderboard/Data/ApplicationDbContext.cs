@@ -5,7 +5,6 @@ using Leaderboard.Models;
 using System.Linq;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Leaderboard.Models.Features;
-using Leaderboard.Models.Relationships.Extensions;
 using Leaderboard.Models.Identity;
 using Microsoft.AspNetCore.Identity;
 using Leaderboard.Models.Relationships;
@@ -33,9 +32,7 @@ namespace Leaderboard.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.AddAllRelationships(this);
-            modelBuilder.AddCompositeKeys(this);
-            modelBuilder.AddDefaultValues(this);
+            this.ConfigureEntities(modelBuilder);
         }
 
         private Func<EntityEntry, bool> hasFeature = ee => {
