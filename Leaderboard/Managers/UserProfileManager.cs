@@ -41,7 +41,11 @@ namespace Leaderboard.Managers
         public async Task<UserProfileModel> GetProfileAsync(Guid userId)
         {
             var profile = await _ctx.UserProfiles.FindAsync(userId);
-            await _ctx.Entry(profile).ReloadAsync();
+
+            // becauze lazy loading requries both entities be aware of the relationship,
+            // it won't work. We have to explicitly load the object here.
+            profile.User = await FindByIdAsync(userId.ToString());
+
             return profile;
         }
     }
