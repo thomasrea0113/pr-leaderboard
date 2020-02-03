@@ -17,6 +17,8 @@ COPY . ../
 
 WORKDIR /app/Leaderboard
 
+RUN dotnet tool restore
+
 # RUN dotnet build /p:BuildClient=true
 
 CMD [ "sh", "-c", "dotnet run 0.0.0.0:5000" ]
