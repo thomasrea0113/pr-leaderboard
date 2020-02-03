@@ -7,8 +7,7 @@ services:
     networks:
       - backend
   db-unit:
-    image: db-unit
-    build: db-unit
+    image: db
     tmpfs: "/var/lib/postgresql/data:rw"
     networks:
       - backend
