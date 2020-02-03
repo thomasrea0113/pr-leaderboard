@@ -49,13 +49,15 @@ namespace Leaderboard.Data
 
             var allEntries = this.ChangeTracker.Entries();
 
-            // need to evaluate the enumerable immediately
-            var users = allEntries.Select(ee => ee.Entity)
+            // All added users. need to evaluate the enumerable immediately
+            var users = allEntries.Where(ee => ee.State == EntityState.Added)
+                .Select(ee => ee.Entity)
                 .Where(e => e is IdentityUser<Guid>)
-                .Select(e => (IdentityUser<Guid>)e).ToArray();
+                .Select(e => (IdentityUser<Guid>)e)
+                .ToArray();
 
             // TODO getting all the users prevents multiple DB calls, but could
-            // with a large number of users
+            // be problematic with a large number of users
             var userProfiles = await UserProfiles.ToListAsync();
 
             // any time a user is created, make sure a profile for them also exists

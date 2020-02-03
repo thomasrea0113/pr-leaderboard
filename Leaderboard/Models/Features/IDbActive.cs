@@ -5,6 +5,6 @@ namespace Leaderboard.Models.Features
     /// </summary>
     public interface IDbActive
     {
-        bool IsActive { get; set; }
+        bool? IsActive { get; set; }
     }
 }

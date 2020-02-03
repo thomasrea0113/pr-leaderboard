@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture.Xunit2;
+using Leaderboard.Data;
 using Leaderboard.Managers;
+using Leaderboard.Models;
 using Leaderboard.Models.Identity;
+using Leaderboard.Models.Relationships;
 using Leaderboard.Tests.TestSetup;
 using Leaderboard.Tests.TestSetup.Fixtures;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -25,23 +29,28 @@ namespace Leaderboard.Tests.Models
         {
             foreach ((var userName, var email) in users)
             {
-                var user = new IdentityUser<Guid>(userName);
-
-                if (email != default)
-                {
-                    user.Email = email;
-                }
-
-                var result = await manager.CreateAsync(user);
-
-                Assert.Empty(result.Errors);
-
-                var profile = await manager.GetProfileAsync(user);
-
-                Assert.NotNull(profile);
-
-                yield return profile;
+                yield return await AddUserAsync(manager, userName, email);
             }
+        }
+
+        public async Task<UserProfileModel> AddUserAsync(UserProfileManager manager, string userName, string email)
+        {
+            var user = new IdentityUser<Guid>(userName);
+
+            if (email != default)
+            {
+                user.Email = email;
+            }
+
+            var result = await manager.CreateAsync(user);
+
+            Assert.Empty(result.Errors);
+
+            var profile = await manager.GetProfileAsync(user);
+
+            Assert.NotNull(profile);
+
+            return profile;
         }
 
 
@@ -64,6 +73,39 @@ namespace Leaderboard.Tests.Models
             }
 
             await manager.SaveChangesAsync();
+        });
+
+
+        [Theory, AutoData]
+        public async Task TestModifyProfile(string userName) => await WithScopeAsync(async scope =>
+        {
+            var manager = scope.ServiceProvider.GetRequiredService<UserProfileManager>();
+            var ctx = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+            var profile = await AddUserAsync(manager, userName, default);
+            Assert.Empty(profile.UserLeaderboards);
+
+            var leaderboard = new LeaderboardModel {
+                Name = "Test leaderboard"
+            };
+
+            profile.UserLeaderboards.Add(new UserLeaderboard {
+                Leaderboard = leaderboard,
+                User = profile
+            });
+
+
+            await manager.SaveChangesAsync();
+
+            await ctx.Entry(profile).ReloadAsync();
+            Assert.Contains(profile.UserLeaderboards, ul => ul.LeaderboardId == leaderboard.Id);
+
+            profile.UserLeaderboards.Add(new UserLeaderboard());
+
+            await ctx.SaveChangesAsync();
+
+            await ctx.Entry(profile).ReloadAsync();
+            Assert.Equal(1, profile.UserLeaderboards.Count);
         });
     }
 }

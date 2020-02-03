@@ -21,16 +21,13 @@ namespace Leaderboard.Tests.TestSetup
             var dbContextType = typeof(DbContextOptions<ApplicationDbContext>);
             builder.ConfigureServices(services =>
             {
-                // remove the existing db context (should be only one)
-                services.Remove(services.Single(s => s.ServiceType == dbContextType));
+                // configure services here
+                var ctx = services.BuildServiceProvider().CreateScope().ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-                // readd the context as an in-memory database
-                services.AddDbContext<ApplicationDbContext>(cnf =>
-                {
-                    // lazy loading prevents us from having to expliclity load all of our related models
-                    cnf.UseLazyLoadingProxies()
-                        .UseInMemoryDatabase("test-db");
-                });
+                // if newer migrations have been created, they will be automatically applied here. The test database
+                // uses a temporarly file system, so it will get wiped out after every time the container shuts down
+                if (ctx.Database.GetPendingMigrations().Any())
+                    ctx.Database.Migrate();
             })
             .ConfigureAppConfiguration(c =>
                 // without overriding base path, we'd still be pointing to the Leaderboard

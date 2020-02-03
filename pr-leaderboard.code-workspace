@@ -27,12 +27,23 @@
 		// the setting doesn't work when provider in .devcontainer/devcontainer.json
 		"sqltools.connections": [
 			{
-				"database": "postgres",
+				"database": "leaderboard",
 				"dialect": "PostgreSQL",
 				"name": "db",
 				"password": "postgres",
 				"port": 5432,
 				"server": "db",
+				"username": "postgres"
+			},
+			{
+				"database": "leaderboard",
+				"dialect": "PostgreSQL",
+				"isActive": true,
+				"isConnected": true,
+				"name": "db-unit",
+				"password": "postgres",
+				"port": 5432,
+				"server": "db-unit",
 				"username": "postgres"
 			}
 		]

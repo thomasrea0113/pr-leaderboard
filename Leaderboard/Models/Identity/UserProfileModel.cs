@@ -25,7 +25,7 @@ namespace Leaderboard.Models.Identity
 
         public virtual ICollection<UserLeaderboard> UserLeaderboards { get; set; } = new List<UserLeaderboard>();
 
-        public bool IsActive { get; set; } = true;
+        public bool? IsActive { get; set; }
 
         public void OnModelCreating(EntityTypeBuilder<UserProfileModel> builder)
         {
