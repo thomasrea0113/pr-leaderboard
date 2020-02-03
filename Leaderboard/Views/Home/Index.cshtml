@@ -3,13 +3,15 @@ ViewData["Title"] = "Home Page";
 }
 
 @section css {
-    <react-bundle src="css/home.[hash].css" />
+
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-    <div id="root"></div>
+<div id="root">
+  <div class="text-center">
+    <div class="spinner-grow text-danger" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+  </div>
 </div>
 
 @section js {

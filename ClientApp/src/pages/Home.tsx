@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
 
-import 'bootstrap/dist/css/bootstrap.css';
-import '../scss/custom.scss';
-
 // eslint-disable-next-line react/prefer-stateless-function
 export default class HomeComponent extends Component {
     public static get displayName(): string {
