@@ -20,6 +20,9 @@ namespace Leaderboard.TagHelpers
         public string GetAssetPath(string pathPattern)
             => pathPattern.Replace("[hash]", Hash, true, null);
             // TODO implement chunk support
+
+        public string GetAssetPublicPath(string pathPattern)
+            => String.Join("/", publicPath, GetAssetPath(pathPattern));
     }
 
     public class Asset {
@@ -64,8 +67,6 @@ namespace Leaderboard.TagHelpers
                 .ToList();
         }
 
-
-
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             var isJs = Path.GetExtension(Src) == ".js";
@@ -74,11 +75,13 @@ namespace Leaderboard.TagHelpers
             if (!_allAssets.Any(ap => ap.Path == assetPath))
                 throw new ArgumentException($"source {assetPath} does not exist in the pack directory.");
 
+            var publicPath = _webpackStats.GetAssetPublicPath(Src);
+
             if (isJs)
             {
                 output.TagMode = TagMode.StartTagAndEndTag;
                 output.TagName = "script";
-                output.Attributes.Add("src", assetPath);
+                output.Attributes.Add("src", publicPath);
             }
             else
             {
@@ -86,7 +89,7 @@ namespace Leaderboard.TagHelpers
                 output.TagName = "link";
                 output.Attributes.Add("rel", "stylesheet");
                 output.Attributes.Add("type", "text/css");
-                output.Attributes.Add("href", assetPath);
+                output.Attributes.Add("href", publicPath);
             }
         }
     }

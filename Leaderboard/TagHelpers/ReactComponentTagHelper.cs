@@ -30,12 +30,14 @@ namespace Leaderboard.TagHelpers
             var asset = _allAssets.SingleOrDefault(a => a.Path == assetPath);
             if (asset == default)
                 throw new ArgumentException($"source {assetPath} does not exist in the pack directory");
+
+            var publicPath = _webpackStats.GetAssetPublicPath(Src);
             
             var props = "[]";
             if (Props != null)
                 props = JsonSerializer.Serialize(Props, Props.GetType());
 
-            output.PreElement.AppendHtml($"<script src=\"{assetPath}\"></script>");
+            output.PreElement.AppendHtml($"<script src=\"{publicPath}\"></script>");
 
             output.TagMode = TagMode.StartTagAndEndTag;
             output.TagName = "script";
