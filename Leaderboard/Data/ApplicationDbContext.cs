@@ -13,7 +13,7 @@ using System.Threading;
 
 namespace Leaderboard.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<IdentityUser<Guid>, IdentityRole<Guid>, Guid>
+    public class ApplicationDbContext : IdentityDbContext
     {
         public DbSet<LeaderboardModel> leaderboards { get; set; }
         public DbSet<UserProfileModel> UserProfiles { get; set; }
@@ -52,8 +52,8 @@ namespace Leaderboard.Data
             // All added users. need to evaluate the enumerable immediately
             var users = allEntries.Where(ee => ee.State == EntityState.Added)
                 .Select(ee => ee.Entity)
-                .Where(e => e is IdentityUser<Guid>)
-                .Select(e => (IdentityUser<Guid>)e)
+                .Where(e => e is IdentityUser)
+                .Select(e => (IdentityUser)e)
                 .ToArray();
 
             // TODO getting all the users prevents multiple DB calls, but could

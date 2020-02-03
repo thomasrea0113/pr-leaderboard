@@ -6,6 +6,9 @@ services:
     build: db
     networks:
       - backend
+  # the unit test db uses the same postgres server image, but mounts a new data dir every time
+  # the container starts. This means that data doesn't persist between container executions.
+  # This is incredibly useful for ensuring fresh tests and managing migrations
   db-unit:
     image: db
     tmpfs: "/var/lib/postgresql/data:rw"

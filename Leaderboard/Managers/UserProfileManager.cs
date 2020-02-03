@@ -13,17 +13,17 @@ using Microsoft.Extensions.Options;
 
 namespace Leaderboard.Managers
 {
-    public class UserProfileManager : UserManager<IdentityUser<Guid>>
+    public class UserProfileManager : UserManager<IdentityUser>
     {
         private ApplicationDbContext _ctx { get; }
 
-        public UserProfileManager(IUserStore<IdentityUser<Guid>> store,
+        public UserProfileManager(IUserStore<IdentityUser> store,
             IOptions<IdentityOptions> optionsAccessor,
-            IPasswordHasher<IdentityUser<Guid>> passwordHasher,
-            IEnumerable<IUserValidator<IdentityUser<Guid>>> userValidators,
-            IEnumerable<IPasswordValidator<IdentityUser<Guid>>> passwordValidators,
+            IPasswordHasher<IdentityUser> passwordHasher,
+            IEnumerable<IUserValidator<IdentityUser>> userValidators,
+            IEnumerable<IPasswordValidator<IdentityUser>> passwordValidators,
             ILookupNormalizer keyNormalizer, IdentityErrorDescriber errors,
-            IServiceProvider services, ILogger<UserManager<IdentityUser<Guid>>> logger) :
+            IServiceProvider services, ILogger<UserManager<IdentityUser>> logger) :
                 base(store, optionsAccessor, passwordHasher, userValidators,
                 passwordValidators, keyNormalizer, errors, services, logger)
         {
@@ -35,10 +35,10 @@ namespace Leaderboard.Managers
             return await _ctx.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<UserProfileModel> GetProfileAsync(IdentityUser<Guid> user)
+        public async Task<UserProfileModel> GetProfileAsync(IdentityUser user)
             => await GetProfileAsync(user.Id);
 
-        public async Task<UserProfileModel> GetProfileAsync(Guid userId)
+        public async Task<UserProfileModel> GetProfileAsync(string userId)
         {
             var profile = await _ctx.UserProfiles.FindAsync(userId);
 

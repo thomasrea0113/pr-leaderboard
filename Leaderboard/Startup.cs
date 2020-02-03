@@ -32,7 +32,7 @@ namespace Leaderboard
                         Configuration.GetConnectionString("DefaultConnection")));
 
             // adding the default user models
-            services.AddIdentity<IdentityUser<Guid>, IdentityRole<Guid>>(options => {
+            services.AddDefaultIdentity<IdentityUser>(options => {
                 options.SignIn.RequireConfirmedAccount = true;
 
                 // disabling here so that we can handle email ourselves

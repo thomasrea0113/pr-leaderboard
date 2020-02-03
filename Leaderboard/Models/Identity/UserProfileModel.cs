@@ -18,10 +18,10 @@ namespace Leaderboard.Models.Identity
         public ModelFeatures Features => ModelFeatures.PreventDelete;
 
         [Key]
-        public Guid UserId { get; set; }
+        public string UserId { get; set; }
 
         // This can't be lazy loaded, because the IdentityUser model doesn't have a Profile property
-        public virtual IdentityUser<Guid> User { get; set; }
+        public virtual IdentityUser User { get; set; }
 
         public virtual ICollection<UserLeaderboard> UserLeaderboards { get; set; } = new List<UserLeaderboard>();
 

@@ -9,11 +9,12 @@ namespace Leaderboard.Models.Relationships
 {
     public class UserLeaderboard : IDbEntity<UserLeaderboard>
     {
-        public Guid UserId { get; set; }
+        public string UserId { get; set; }
         public virtual UserProfileModel User { get; set; }
 
 
-        public Guid LeaderboardId { get; set; }
+        public string LeaderboardId { get; set; }
+
         public virtual LeaderboardModel Leaderboard { get; set; }
 
         public void OnModelCreating(EntityTypeBuilder<UserLeaderboard> builder)
@@ -27,6 +28,10 @@ namespace Leaderboard.Models.Relationships
             builder.HasOne(pt => pt.Leaderboard)
                 .WithMany(t => t.UserLeaderboards)
                 .HasForeignKey(pt => pt.LeaderboardId);
+
+            
+            builder.Property(u => u.UserId).ValueGeneratedNever();
+            builder.Property(u => u.LeaderboardId).ValueGeneratedNever();
 
             // composite key
             builder.HasKey(e => new
