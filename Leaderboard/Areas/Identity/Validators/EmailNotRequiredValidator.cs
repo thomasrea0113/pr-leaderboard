@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace Leaderboard.Models.Identity.Validators
+namespace Leaderboard.Areas.Identity.Validators
 {
     /// <summary>
     /// Allows the user email field to be left blank. However, if it is supplied,
@@ -19,22 +19,22 @@ namespace Leaderboard.Models.Identity.Validators
         {
             var errorDescriber = new IdentityErrorDescriber();
 
-            var failed = IdentityResult.Failed(errorDescriber.InvalidEmail(user.Email));
+            var invalid = IdentityResult.Failed(errorDescriber.InvalidEmail(user.Email));
 
             if (user.Email != default)
             {
                 // username is just whitespace
                 if (String.IsNullOrWhiteSpace(user.Email))
-                    return failed;
+                    return invalid;
 
                 // not a valid email
                 if (!Regex.IsMatch(user.Email, EmailRegexString))
-                    return failed;
+                    return invalid;
 
                 var emailExists = await manager.Users.AnyAsync(u => u.Email == user.Email);
 
                 if (emailExists)
-                    return failed;
+                    return IdentityResult.Failed(errorDescriber.DuplicateEmail(user.Email));
             }
 
             return IdentityResult.Success;

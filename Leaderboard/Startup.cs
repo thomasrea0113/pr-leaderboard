@@ -6,9 +6,9 @@ using Leaderboard.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Leaderboard.Models.Identity.Validators;
 using System;
 using Leaderboard.Managers;
+using Leaderboard.Areas.Identity.Validators;
 
 namespace Leaderboard
 {
@@ -32,7 +32,8 @@ namespace Leaderboard
                         Configuration.GetConnectionString("DefaultConnection")));
 
             // adding the default user models
-            services.AddDefaultIdentity<IdentityUser>(options => {
+            services.AddDefaultIdentity<IdentityUser>(options =>
+            {
                 options.SignIn.RequireConfirmedAccount = true;
 
                 // disabling here so that we can handle email ourselves
@@ -50,13 +51,14 @@ namespace Leaderboard
             services.AddScoped<UserProfileManager>();
 
             services.AddControllersWithViews();
-           services.AddRazorPages();
+            services.AddRazorPages();
 
-           services.AddSpaStaticFiles(cnf => {
-               cnf.RootPath = "../ClientApp/dist";
-           });
+            services.AddSpaStaticFiles(cnf =>
+            {
+                cnf.RootPath = "../ClientApp/dist";
+            });
 
-           services.AddScoped<IServiceCollection>(i => services);
+            services.AddScoped<IServiceCollection>(i => services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Leaderboard.Models.Identity
+namespace Leaderboard.Areas.Profiles.Models
 {
     public class UserProfileModel : IModelFeatures, IDbActive, IDbEntity<UserProfileModel>
     {

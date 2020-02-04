@@ -1,8 +1,6 @@
-using System;
-using System.ComponentModel.DataAnnotations;
+using Leaderboard.Areas.Leaderboards.Models;
+using Leaderboard.Areas.Profiles.Models;
 using Leaderboard.Models.Features;
-using Leaderboard.Models.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Leaderboard.Models.Relationships

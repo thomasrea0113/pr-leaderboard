@@ -7,7 +7,7 @@ using Leaderboard.Models.Relationships;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Leaderboard.Models
+namespace Leaderboard.Areas.Leaderboards.Models
 {
     // TODO implement sluggy on save
     public class LeaderboardModel : IDbEntity<LeaderboardModel>

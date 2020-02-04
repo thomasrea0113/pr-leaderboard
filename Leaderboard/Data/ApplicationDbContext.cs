@@ -1,15 +1,15 @@
 ﻿using System;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Leaderboard.Models;
 using System.Linq;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Leaderboard.Models.Features;
-using Leaderboard.Models.Identity;
 using Microsoft.AspNetCore.Identity;
 using Leaderboard.Models.Relationships;
 using System.Threading.Tasks;
 using System.Threading;
+using Leaderboard.Areas.Leaderboards.Models;
+using Leaderboard.Areas.Profiles.Models;
 
 namespace Leaderboard.Data
 {

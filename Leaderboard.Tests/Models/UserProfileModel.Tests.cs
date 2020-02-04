@@ -3,16 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture.Xunit2;
+using Leaderboard.Areas.Leaderboards.Models;
+using Leaderboard.Areas.Profiles.Models;
 using Leaderboard.Data;
 using Leaderboard.Managers;
-using Leaderboard.Models;
-using Leaderboard.Models.Identity;
 using Leaderboard.Models.Relationships;
 using Leaderboard.Tests.TestSetup;
-using Leaderboard.Tests.TestSetup.Fixtures;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
