@@ -78,6 +78,31 @@ namespace Leaderboard.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Tags",
+                columns: table => new
+                {
+                    Id = table.Column<string>(nullable: false),
+                    Name = table.Column<string>(nullable: false),
+                    IsActive = table.Column<bool>(nullable: true, defaultValue: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tags", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UnitsOfMeasure",
+                columns: table => new
+                {
+                    Unit = table.Column<string>(nullable: false),
+                    IsActive = table.Column<bool>(nullable: true, defaultValue: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UnitsOfMeasure", x => x.Unit);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -203,6 +228,40 @@ namespace Leaderboard.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Scores",
+                columns: table => new
+                {
+                    BoardId = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Scores", x => x.BoardId);
+                    table.ForeignKey(
+                        name: "FK_Scores_leaderboards_BoardId",
+                        column: x => x.BoardId,
+                        principalTable: "leaderboards",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RelatedTags",
+                columns: table => new
+                {
+                    TagId = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RelatedTags", x => x.TagId);
+                    table.ForeignKey(
+                        name: "FK_RelatedTags_Tags_TagId",
+                        column: x => x.TagId,
+                        principalTable: "Tags",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserLeaderboards",
                 columns: table => new
                 {
@@ -270,6 +329,12 @@ namespace Leaderboard.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Tags_Name",
+                table: "Tags",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserLeaderboards_LeaderboardId",
                 table: "UserLeaderboards",
                 column: "LeaderboardId");
@@ -301,10 +366,22 @@ namespace Leaderboard.Migrations
                 name: "AutoHistory");
 
             migrationBuilder.DropTable(
+                name: "RelatedTags");
+
+            migrationBuilder.DropTable(
+                name: "Scores");
+
+            migrationBuilder.DropTable(
+                name: "UnitsOfMeasure");
+
+            migrationBuilder.DropTable(
                 name: "UserLeaderboards");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Tags");
 
             migrationBuilder.DropTable(
                 name: "leaderboards");

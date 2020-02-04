@@ -41,6 +41,31 @@ namespace Leaderboard.Migrations
                     b.ToTable("leaderboards");
                 });
 
+            modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.ScoreModel", b =>
+                {
+                    b.Property<string>("BoardId")
+                        .HasColumnType("text");
+
+                    b.HasKey("BoardId");
+
+                    b.ToTable("Scores");
+                });
+
+            modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.UnitOfMeasureModel", b =>
+                {
+                    b.Property<string>("Unit")
+                        .HasColumnType("text");
+
+                    b.Property<bool?>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.HasKey("Unit");
+
+                    b.ToTable("UnitsOfMeasure");
+                });
+
             modelBuilder.Entity("Leaderboard.Areas.Profiles.Models.UserProfileModel", b =>
                 {
                     b.Property<string>("UserId")
@@ -61,6 +86,16 @@ namespace Leaderboard.Migrations
                     b.ToTable("UserProfiles");
                 });
 
+            modelBuilder.Entity("Leaderboard.Models.Relationships.RelatedTag", b =>
+                {
+                    b.Property<string>("TagId")
+                        .HasColumnType("text");
+
+                    b.HasKey("TagId");
+
+                    b.ToTable("RelatedTags");
+                });
+
             modelBuilder.Entity("Leaderboard.Models.Relationships.UserLeaderboard", b =>
                 {
                     b.Property<string>("UserId")
@@ -74,6 +109,28 @@ namespace Leaderboard.Migrations
                     b.HasIndex("LeaderboardId");
 
                     b.ToTable("UserLeaderboards");
+                });
+
+            modelBuilder.Entity("Leaderboard.Models.TagModel", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<bool?>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Tags");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -305,11 +362,29 @@ namespace Leaderboard.Migrations
                     b.ToTable("AutoHistory");
                 });
 
+            modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.ScoreModel", b =>
+                {
+                    b.HasOne("Leaderboard.Areas.Leaderboards.Models.LeaderboardModel", "Board")
+                        .WithMany("Scores")
+                        .HasForeignKey("BoardId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Leaderboard.Areas.Profiles.Models.UserProfileModel", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId1");
+                });
+
+            modelBuilder.Entity("Leaderboard.Models.Relationships.RelatedTag", b =>
+                {
+                    b.HasOne("Leaderboard.Models.TagModel", "Tag")
+                        .WithMany("RelatedTags")
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Leaderboard.Models.Relationships.UserLeaderboard", b =>

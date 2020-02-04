@@ -21,6 +21,8 @@ namespace Leaderboard.Areas.Leaderboards.Models
         
         public bool? IsActive { get; set; }
 
+        public virtual ICollection<ScoreModel> Scores { get; set; }
+
         public void OnModelCreating(EntityTypeBuilder<LeaderboardModel> builder)
         {
             // ensuring Name is unique

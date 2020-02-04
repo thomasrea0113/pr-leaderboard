@@ -3,6 +3,7 @@ using Arch.EntityFrameworkCore.UnitOfWork;
 using AutoFixture.Xunit2;
 using Leaderboard.Areas.Leaderboards.Models;
 using Leaderboard.Tests.TestSetup;
+using Leaderboard.Tests.TestSetup.Fixtures;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -14,34 +15,30 @@ namespace Leaderboard.Tests.Models.Features
         {
         }
         
-        [Theory, AutoData]
-        public async Task TestModifyAndDelete(string leaderboardName)
+        [Theory, DefaultData]
+        public async Task TestModifyAndDelete(LeaderboardModel leaderboard)
             => await WithScopeAsync(async scope =>
             {
                 var work = scope.GetRequiredService<IUnitOfWork>();
                 var repo = work.GetRepository<LeaderboardModel>();
 
-                var board = new LeaderboardModel {
-                    Name = $"Board {leaderboardName}"
-                };
-
-                await repo.InsertAsync(board);
+                await repo.InsertAsync(leaderboard);
 
                 await work.SaveChangesAsync();
 
-                board.Name = $"{board.Name} 2";
+                leaderboard.Name = $"{leaderboard.Name} 2";
 
-                repo.Update(board);
-
-                await work.SaveChangesAsync();
-
-                Assert.True(board.IsActive);
-
-                repo.Delete(board);
+                repo.Update(leaderboard);
 
                 await work.SaveChangesAsync();
 
-                Assert.False(board.IsActive);
+                Assert.True(leaderboard.IsActive);
+
+                repo.Delete(leaderboard);
+
+                await work.SaveChangesAsync();
+
+                Assert.False(leaderboard.IsActive);
             });
     }
 }

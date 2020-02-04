@@ -10,6 +10,7 @@ using Leaderboard.Data;
 using Leaderboard.Managers;
 using Leaderboard.Models.Relationships;
 using Leaderboard.Tests.TestSetup;
+using Leaderboard.Tests.TestSetup.Fixtures;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,22 +25,19 @@ namespace Leaderboard.Tests.Models
         {
         }
 
-        public async IAsyncEnumerable<UserProfileModel> AddUsersAsync(UserProfileManager manager, Dictionary<string, string> users)
+        public async IAsyncEnumerable<UserProfileModel> AddUsersAsync(UserProfileManager manager, IEnumerable<IdentityUser> users)
         {
-            foreach ((var userName, var email) in users)
+            foreach (var user in users)
             {
-                yield return await AddUserAsync(manager, userName, email);
+                yield return await AddUserAsync(manager, user, user.Email);
             }
         }
+        public async Task<UserProfileModel> AddUserAsync(UserProfileManager manager, IdentityUser user)
+            => await AddUserAsync(manager, user, user.Email);
 
-        public async Task<UserProfileModel> AddUserAsync(UserProfileManager manager, string userName, string email)
+        public async Task<UserProfileModel> AddUserAsync(UserProfileManager manager, IdentityUser user, string email)
         {
-            var user = new IdentityUser(userName);
-
-            if (email != default)
-            {
-                user.Email = email;
-            }
+            user.Email = email;
 
             var result = await manager.CreateAsync(user);
 
@@ -53,17 +51,15 @@ namespace Leaderboard.Tests.Models
         }
 
 
-        [Theory, AutoData]
-        public async Task TestCreateUsers(Dictionary<string, string> userNames) => await WithScopeAsync(async scope =>
+        [Theory, DefaultData]
+        public async Task TestCreateUsers(IdentityUser[] users) => await WithScopeAsync(async scope =>
         {
             var manager = scope.GetRequiredService<UserProfileManager>();
 
-            var withEmails = userNames.ToDictionary(str => str.Key, str => $"{str.Value}@test.com");
-
             // unsetting one of the emails to make sure it can be created
-            withEmails[userNames.Keys.ElementAt(1)] = null;
+            users[1].Email = null;
 
-            await foreach (var profile in AddUsersAsync(manager, withEmails))
+            await foreach (var profile in AddUsersAsync(manager, users))
             {
                 Assert.NotNull(profile.User);
                 Assert.Equal(profile.UserId, profile.User.Id);
@@ -74,21 +70,18 @@ namespace Leaderboard.Tests.Models
         });
 
 
-        [Theory, AutoData]
-        public async Task TestModifyProfile(string[] leaderboardName, string userName) => await WithScopeAsync(async scope =>
+        [Theory, DefaultData]
+        public async Task TestModifyProfile(LeaderboardModel[] leaderboards, IdentityUser user)
+            => await WithScopeAsync(async scope =>
         {
             var manager = scope.GetRequiredService<UserProfileManager>();
             var ctx = scope.GetRequiredService<ApplicationDbContext>();
 
-            var profile = await AddUserAsync(manager, userName, default);
+            var profile = await AddUserAsync(manager, user, default);
             Assert.Empty(profile.UserLeaderboards);
 
-            var leaderboard = new LeaderboardModel {
-                Name = $"leaderboard {leaderboardName[0]}"
-            };
-
             profile.UserLeaderboards.Add(new UserLeaderboard {
-                Leaderboard = leaderboard,
+                Leaderboard = leaderboards[0],
                 User = profile
             });
 
@@ -96,11 +89,11 @@ namespace Leaderboard.Tests.Models
             await manager.SaveChangesAsync();
 
             await ctx.Entry(profile).ReloadAsync();
-            Assert.Contains(profile.UserLeaderboards, ul => ul.LeaderboardId == leaderboard.Id);
+            Assert.Contains(profile.UserLeaderboards, ul => ul.LeaderboardId == leaderboards[0].Id);
 
             // should throw duplicate key exception in the database
             profile.UserLeaderboards.Add(new UserLeaderboard {
-                Leaderboard = leaderboard,
+                Leaderboard = leaderboards[0],
                 User = profile
             });
             await Assert.ThrowsAsync<InvalidOperationException>(async () => await ctx.SaveChangesAsync());
