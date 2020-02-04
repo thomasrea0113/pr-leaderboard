@@ -18,7 +18,7 @@ namespace Leaderboard.Tests.Models.Features
         public async Task TestModifyAndDelete(string leaderboardName)
             => await WithScopeAsync(async scope =>
             {
-                var work = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var work = scope.GetRequiredService<IUnitOfWork>();
                 var repo = work.GetRepository<LeaderboardModel>();
 
                 var board = new LeaderboardModel {

@@ -37,11 +37,11 @@ namespace Leaderboard.Tests.TestSetup
             }
         }
 
-        public async Task WithScopeAsync(Func<IServiceScope, Task> testAsync)
+        public async Task WithScopeAsync(Func<IServiceProvider, Task> testAsync)
         {
             using (var scope = _factory.Services.CreateScope())
             {
-                await testAsync(scope);
+                await testAsync(scope.ServiceProvider);
             }
         }
 

@@ -21,8 +21,8 @@ namespace Leaderboard.Tests.Models.Identity.Validators
 
         [Theory, AutoData]
         public async Task TestInvalidEmail(string userName) => await WithScopeAsync(async scope => {
-            var manager = scope.ServiceProvider.GetRequiredService<UserProfileManager>();
-            var describer = scope.ServiceProvider.GetRequiredService<IdentityErrorDescriber>();
+            var manager = scope.GetRequiredService<UserProfileManager>();
+            var describer = scope.GetRequiredService<IdentityErrorDescriber>();
 
             var invalidEmail = "EHREHRHEdsdsdf92848****020394923949~!!";
 
@@ -39,7 +39,7 @@ namespace Leaderboard.Tests.Models.Identity.Validators
         [Theory, AutoData]
         public async Task TestBlankEmail(string userName) => await WithScopeAsync(async scope =>
         {
-            var manager = scope.ServiceProvider.GetRequiredService<UserProfileManager>();
+            var manager = scope.GetRequiredService<UserProfileManager>();
             var result = await manager.CreateAsync(new IdentityUser(userName));
             Assert.True(result.Succeeded);
         });
@@ -47,8 +47,8 @@ namespace Leaderboard.Tests.Models.Identity.Validators
         [Theory, AutoData]
         public async Task TestExistingEmail(string[] userNames, string emailStr) => await WithScopeAsync(async scope =>
         {
-            var manager = scope.ServiceProvider.GetRequiredService<UserProfileManager>();
-            var describer = scope.ServiceProvider.GetRequiredService<IdentityErrorDescriber>();
+            var manager = scope.GetRequiredService<UserProfileManager>();
+            var describer = scope.GetRequiredService<IdentityErrorDescriber>();
 
             var email = $"{emailStr}@test.com";
 

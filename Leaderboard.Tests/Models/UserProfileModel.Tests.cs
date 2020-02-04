@@ -56,7 +56,7 @@ namespace Leaderboard.Tests.Models
         [Theory, AutoData]
         public async Task TestCreateUsers(Dictionary<string, string> userNames) => await WithScopeAsync(async scope =>
         {
-            var manager = scope.ServiceProvider.GetRequiredService<UserProfileManager>();
+            var manager = scope.GetRequiredService<UserProfileManager>();
 
             var withEmails = userNames.ToDictionary(str => str.Key, str => $"{str.Value}@test.com");
 
@@ -77,8 +77,8 @@ namespace Leaderboard.Tests.Models
         [Theory, AutoData]
         public async Task TestModifyProfile(string[] leaderboardName, string userName) => await WithScopeAsync(async scope =>
         {
-            var manager = scope.ServiceProvider.GetRequiredService<UserProfileManager>();
-            var ctx = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var manager = scope.GetRequiredService<UserProfileManager>();
+            var ctx = scope.GetRequiredService<ApplicationDbContext>();
 
             var profile = await AddUserAsync(manager, userName, default);
             Assert.Empty(profile.UserLeaderboards);
