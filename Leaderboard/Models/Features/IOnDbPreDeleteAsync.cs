@@ -1,10 +1,11 @@
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Leaderboard.Models.Features
 {
-    public interface IOnDbDelete
+    public interface IOnDbPreDeleteAsync
     {
-        void OnDelete(DbContext ctx);
+        Task OnDeleteAsync(DbContext ctx);
     }
 }

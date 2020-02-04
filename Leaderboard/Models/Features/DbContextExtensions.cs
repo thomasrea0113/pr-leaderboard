@@ -1,6 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Leaderboard.Areas.Profiles.DbContextExtensions;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Leaderboard.Models.Features
@@ -43,5 +48,51 @@ namespace Leaderboard.Models.Features
         // The entity type can only configure itself. So if the generic parameter does not match
         // the type that implements the interface, we won't process it
         t => typeof(IDbEntity<>).MakeGenericType(t).IsAssignableFrom(t));
+
+        public static async Task ProcessPreSaveFeaturesAsync(this DbContext ctx, IEnumerable<EntityEntry> entries)
+        {
+            
+            var added = entries.Where(t => t.State == EntityState.Added);
+            foreach (var entry in added)
+            {
+                var entity = entry.Entity;
+
+                if (entry.Entity is IOnDbPreCreateAsync onCreate)
+                    await onCreate.OnPreCreateAsync(entry.Context, entry.CurrentValues);
+            }
+
+            var modified = entries.Where(t => t.State == EntityState.Modified);
+            foreach (var entry in modified)
+            {
+                var entity = entry.Entity;
+
+                if (entity is IOnDbPreSaveAsync onSave)
+                    await onSave.OnPreSaveAsync(entry.Context, entry.CurrentValues);
+            }
+
+            var deleted = entries.Where(t => t.State == EntityState.Deleted);
+            foreach (var entry in deleted)
+            {
+                var entity = entry.Entity;
+
+                if (entity is IOnDbPreDeleteAsync onDelete)
+                    await onDelete.OnDeleteAsync(entry.Context);
+
+                // if this model has an active feature, then we prevent the delete
+                // and set active to false
+                // TODO notify user somewhere of prevents deletion?
+                if (entity is IDbActive active)
+                {
+                    active.IsActive = false;
+                    entry.State = EntityState.Modified;
+                }
+            }
+        }
+
+        public static Task ProcessPostSaveFeaturesAsync(this DbContext ctx, IEnumerable<EntityEntry> entries)
+        {
+            // stubbed 
+            return Task.CompletedTask;
+        }
     }
 }

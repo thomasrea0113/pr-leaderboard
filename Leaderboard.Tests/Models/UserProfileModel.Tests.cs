@@ -65,7 +65,6 @@ namespace Leaderboard.Tests.Models
 
             await foreach (var profile in AddUsersAsync(manager, withEmails))
             {
-                // TODO why aren't properties lazy loaded?
                 Assert.NotNull(profile.User);
                 Assert.Equal(profile.UserId, profile.User.Id);
                 Assert.True(profile.IsActive);

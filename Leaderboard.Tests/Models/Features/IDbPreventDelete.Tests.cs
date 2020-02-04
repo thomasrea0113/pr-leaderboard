@@ -13,9 +13,7 @@ namespace Leaderboard.Tests.Models.Features
         public IDbPreventDeleteTests(WebOverrideFactory factory) : base(factory)
         {
         }
-
-        // TODO why don't userprofiles get tracked by auto history?
-
+        
         [Theory, AutoData]
         public async Task TestModifyAndDelete(string leaderboardName)
             => await WithScopeAsync(async scope =>

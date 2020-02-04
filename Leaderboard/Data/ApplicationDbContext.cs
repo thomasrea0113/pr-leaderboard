@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using Leaderboard.Areas.Leaderboards.Models;
 using Leaderboard.Areas.Profiles.Models;
+using Leaderboard.Areas.Profiles.DbContextExtensions;
 
 namespace Leaderboard.Data
 {
@@ -38,7 +39,7 @@ namespace Leaderboard.Data
 
         private Func<EntityEntry, bool> hasFeature = ee => {
             var e = ee.Entity;
-            return e is IOnDbSave || e is IOnDbPreCreateAsync;
+            return e is IOnDbPreSaveAsync || e is IOnDbPreCreateAsync;
         };
 
         public override int SaveChanges()
@@ -51,66 +52,28 @@ namespace Leaderboard.Data
             var allEntries = this.ChangeTracker.Entries();
 
             // All added users. need to evaluate the enumerable immediately
-            var users = allEntries.Where(ee => ee.State == EntityState.Added)
-                .Select(ee => ee.Entity)
+            var users = allEntries.Select(ee => ee.Entity)
                 .Where(e => e is IdentityUser)
-                .Select(e => (IdentityUser)e)
+                .Cast<IdentityUser>()
                 .ToArray();
 
-            // TODO getting all the users prevents multiple DB calls, but could
-            // be problematic with a large number of users
-            var userProfiles = await UserProfiles.ToListAsync();
-
-            // any time a user is created, make sure a profile for them also exists
-            foreach (var user in users)
-                if (!userProfiles.Any(p => p.UserId == user.Id))
-                    await UserProfiles.AddAsync(new UserProfileModel { UserId = user.Id });
-            
-            var added = allEntries.Where(t => t.State == EntityState.Added);
-            foreach (var entry in added)
-            {
-                var entity = entry.Entity;
-                if (entry.Entity is IOnDbPreCreateAsync onCreate)
-                    await onCreate.OnPreCreateAsync(entry.Context, entry.CurrentValues);
-            }
-
-            var modified = allEntries.Where(t => t.State == EntityState.Modified);
-            foreach (var entry in modified)
-            {
-                var entity = entry.Entity;
-
-                // additional OnSave functionality
-                if (entity is IOnDbSave onSave)
-                    onSave.OnSave(entry.Context, entry.CurrentValues);
-            }
-
-            var deleted = allEntries.Where(t => t.State == EntityState.Deleted);
-            foreach (var entry in deleted)
-            {
-                var entity = entry.Entity;
-
-                // additional actions to take when deleted
-                if (entity is IOnDbDelete onDelete)
-                    onDelete.OnDelete(entry.Context);
-
-                // if this model has an active feature, then we prevent the delete
-                // and set active to false
-                // TODO notify user somewhere of prevents deletion?
-                if (entity is IDbActive active)
-                {
-                    active.IsActive = false;
-                    entry.State = EntityState.Modified;
-                }
-
-                if (entity is IModelFeatures featured)
-                {
-                    
-                }
-            }
+            await this.EnsureProfilesAsync(users);
+            await this.ProcessPreSaveFeaturesAsync(allEntries);
 
             this.EnsureAutoHistory();
+
+            // our presave events may have added aditional changes. We need to recheck for
+            // changes so that the postSave events for those get picked up.
+            // TODO this means that anything that our presave events creates/deletes, won't have
+            // their presave events called
+            this.ChangeTracker.DetectChanges();
+            allEntries = this.ChangeTracker.Entries();
             
-            return await base.SaveChangesAsync();
+            var count = await base.SaveChangesAsync();
+
+            await this.ProcessPostSaveFeaturesAsync(allEntries);
+
+            return count;
         }
     }
 }

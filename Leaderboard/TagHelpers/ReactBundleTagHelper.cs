@@ -61,7 +61,6 @@ namespace Leaderboard.TagHelpers
             );
 
             // flatten the chunks to one list of Assets
-            // TODO handle public path
             _allAssets = _webpackStats.AssetsByChunkName
                 .SelectMany(a => a.Value.Select(a2 => (Asset)(a.Key, a2)))
                 .ToList();

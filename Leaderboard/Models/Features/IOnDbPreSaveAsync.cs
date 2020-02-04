@@ -1,10 +1,11 @@
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Leaderboard.Models.Features
 {
-    public interface IOnDbSave
+    public interface IOnDbPreSaveAsync
     {
-        void OnSave(DbContext ctx, PropertyValues values);
+        Task OnPreSaveAsync(DbContext ctx, PropertyValues values);
     }
 }
