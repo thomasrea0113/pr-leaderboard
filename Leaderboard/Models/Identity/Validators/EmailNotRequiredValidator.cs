@@ -19,15 +19,22 @@ namespace Leaderboard.Models.Identity.Validators
         {
             var errorDescriber = new IdentityErrorDescriber();
 
+            var failed = IdentityResult.Failed(errorDescriber.InvalidEmail(user.Email));
+
             if (user.Email != default)
             {
+                // username is just whitespace
+                if (String.IsNullOrWhiteSpace(user.Email))
+                    return failed;
+
+                // not a valid email
                 if (!Regex.IsMatch(user.Email, EmailRegexString))
-                    return IdentityResult.Failed(errorDescriber.InvalidEmail(user.Email));
+                    return failed;
 
                 var emailExists = await manager.Users.AnyAsync(u => u.Email == user.Email);
 
                 if (emailExists)
-                    return IdentityResult.Failed(errorDescriber.DuplicateEmail(user.Email));
+                    return failed;
             }
 
             return IdentityResult.Success;

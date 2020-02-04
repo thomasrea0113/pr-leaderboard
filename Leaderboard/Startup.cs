@@ -38,6 +38,8 @@ namespace Leaderboard
                 // disabling here so that we can handle email ourselves
                 options.User.RequireUniqueEmail = false;
 
+                options.Password.RequireNonAlphanumeric = false;
+
                 options.SignIn.RequireConfirmedEmail = false;
             })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
