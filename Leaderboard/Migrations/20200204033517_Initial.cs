@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace Leaderboard.Data.Migrations
+namespace Leaderboard.Migrations
 {
     public partial class Initial : Migration
     {
@@ -48,11 +48,29 @@ namespace Leaderboard.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AutoHistory",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    RowId = table.Column<string>(maxLength: 50, nullable: false),
+                    TableName = table.Column<string>(maxLength: 128, nullable: false),
+                    Changed = table.Column<string>(nullable: true),
+                    Kind = table.Column<int>(nullable: false),
+                    Created = table.Column<DateTime>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AutoHistory", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "leaderboards",
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
-                    Name = table.Column<string>(nullable: true)
+                    Name = table.Column<string>(nullable: true),
+                    IsActive = table.Column<bool>(nullable: true, defaultValue: true)
                 },
                 constraints: table =>
                 {
@@ -278,6 +296,9 @@ namespace Leaderboard.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "AutoHistory");
 
             migrationBuilder.DropTable(
                 name: "UserLeaderboards");

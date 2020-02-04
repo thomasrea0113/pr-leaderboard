@@ -13,10 +13,8 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Leaderboard.Areas.Profiles.Models
 {
-    public class UserProfileModel : IModelFeatures, IDbActive, IDbEntity<UserProfileModel>
+    public class UserProfileModel : IDbActive, IDbEntity<UserProfileModel>
     {
-        public ModelFeatures Features => ModelFeatures.PreventDelete;
-
         [Key]
         public string UserId { get; set; }
 

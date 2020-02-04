@@ -6,7 +6,7 @@ using Leaderboard.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
+using Arch.EntityFrameworkCore.UnitOfWork;
 using Leaderboard.Managers;
 using Leaderboard.Areas.Identity.Validators;
 
@@ -25,11 +25,9 @@ namespace Leaderboard
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(options =>
-                options
-                    // lazy loading prevents us from having to expliclity load all of our related models
-                    .UseLazyLoadingProxies()
-                    .UseNpgsql(
-                        Configuration.GetConnectionString("DefaultConnection")));
+                options.UseLazyLoadingProxies()
+                    .UseNpgsql(Configuration.GetConnectionString("DefaultConnection")))
+            .AddUnitOfWork<ApplicationDbContext>();
 
             // adding the default user models
             services.AddDefaultIdentity<IdentityUser>(options =>

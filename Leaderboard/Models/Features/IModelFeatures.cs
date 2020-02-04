@@ -4,7 +4,6 @@ namespace Leaderboard.Models.Features
 {
     [Flags]
     public enum ModelFeatures {
-        PreventDelete
     }
 
     public interface IModelFeatures

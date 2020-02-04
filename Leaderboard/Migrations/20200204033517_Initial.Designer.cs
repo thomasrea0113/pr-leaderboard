@@ -7,10 +7,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace Leaderboard.Data.Migrations
+namespace Leaderboard.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200203203357_Initial")]
+    [Migration("20200204033517_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,7 +21,29 @@ namespace Leaderboard.Data.Migrations
                 .HasAnnotation("ProductVersion", "3.1.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            modelBuilder.Entity("Leaderboard.Models.Identity.UserProfileModel", b =>
+            modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.LeaderboardModel", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text");
+
+                    b.Property<bool?>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("leaderboards");
+                });
+
+            modelBuilder.Entity("Leaderboard.Areas.Profiles.Models.UserProfileModel", b =>
                 {
                     b.Property<string>("UserId")
                         .HasColumnType("text");
@@ -39,23 +61,6 @@ namespace Leaderboard.Data.Migrations
                     b.HasIndex("UserId1");
 
                     b.ToTable("UserProfiles");
-                });
-
-            modelBuilder.Entity("Leaderboard.Models.LeaderboardModel", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("leaderboards");
                 });
 
             modelBuilder.Entity("Leaderboard.Models.Relationships.UserLeaderboard", b =>
@@ -271,7 +276,38 @@ namespace Leaderboard.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("Leaderboard.Models.Identity.UserProfileModel", b =>
+            modelBuilder.Entity("Microsoft.EntityFrameworkCore.AutoHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<string>("Changed")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("RowId")
+                        .IsRequired()
+                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(50);
+
+                    b.Property<string>("TableName")
+                        .IsRequired()
+                        .HasColumnType("character varying(128)")
+                        .HasMaxLength(128);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AutoHistory");
+                });
+
+            modelBuilder.Entity("Leaderboard.Areas.Profiles.Models.UserProfileModel", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
                         .WithMany()
@@ -280,13 +316,13 @@ namespace Leaderboard.Data.Migrations
 
             modelBuilder.Entity("Leaderboard.Models.Relationships.UserLeaderboard", b =>
                 {
-                    b.HasOne("Leaderboard.Models.LeaderboardModel", "Leaderboard")
+                    b.HasOne("Leaderboard.Areas.Leaderboards.Models.LeaderboardModel", "Leaderboard")
                         .WithMany("UserLeaderboards")
                         .HasForeignKey("LeaderboardId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Leaderboard.Models.Identity.UserProfileModel", "User")
+                    b.HasOne("Leaderboard.Areas.Profiles.Models.UserProfileModel", "User")
                         .WithMany("UserLeaderboards")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

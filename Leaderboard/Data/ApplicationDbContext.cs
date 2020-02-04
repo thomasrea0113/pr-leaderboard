@@ -33,6 +33,7 @@ namespace Leaderboard.Data
         {
             base.OnModelCreating(modelBuilder);
             this.ConfigureEntities(modelBuilder);
+            modelBuilder.EnableAutoHistory(null);
         }
 
         private Func<EntityEntry, bool> hasFeature = ee => {
@@ -64,10 +65,8 @@ namespace Leaderboard.Data
             foreach (var user in users)
                 if (!userProfiles.Any(p => p.UserId == user.Id))
                     await UserProfiles.AddAsync(new UserProfileModel { UserId = user.Id });
-
-            var featuredEntries = allEntries.Where(hasFeature);
             
-            var added = featuredEntries.Where(t => t.State == EntityState.Added);
+            var added = allEntries.Where(t => t.State == EntityState.Added);
             foreach (var entry in added)
             {
                 var entity = entry.Entity;
@@ -75,7 +74,7 @@ namespace Leaderboard.Data
                     await onCreate.OnPreCreateAsync(entry.Context, entry.CurrentValues);
             }
 
-            var modified = featuredEntries.Where(t => t.State == EntityState.Modified);
+            var modified = allEntries.Where(t => t.State == EntityState.Modified);
             foreach (var entry in modified)
             {
                 var entity = entry.Entity;
@@ -85,7 +84,7 @@ namespace Leaderboard.Data
                     onSave.OnSave(entry.Context, entry.CurrentValues);
             }
 
-            var deleted = featuredEntries.Where(t => t.State == EntityState.Deleted);
+            var deleted = allEntries.Where(t => t.State == EntityState.Deleted);
             foreach (var entry in deleted)
             {
                 var entity = entry.Entity;
@@ -96,21 +95,21 @@ namespace Leaderboard.Data
 
                 // if this model has an active feature, then we prevent the delete
                 // and set active to false
+                // TODO notify user somewhere of prevents deletion?
                 if (entity is IDbActive active)
                 {
                     active.IsActive = false;
                     entry.State = EntityState.Modified;
                 }
 
-                // prevents the model from being deleted
-                // TODO notify user somewhere of prevents deletion?
                 if (entity is IModelFeatures featured)
                 {
-                    if (featured.Features.HasFlag(ModelFeatures.PreventDelete))
-                        entry.State = EntityState.Unchanged;
+                    
                 }
             }
 
+            this.EnsureAutoHistory();
+            
             return await base.SaveChangesAsync();
         }
     }

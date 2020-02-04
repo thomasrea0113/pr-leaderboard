@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Leaderboard.Areas.Leaderboards.Models
 {
     // TODO implement sluggy on save
-    public class LeaderboardModel : IDbEntity<LeaderboardModel>
+    public class LeaderboardModel : IDbEntity<LeaderboardModel>, IDbActive
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
@@ -18,11 +18,14 @@ namespace Leaderboard.Areas.Leaderboards.Models
 
         public string Name { get; set; }
         public virtual ICollection<UserLeaderboard> UserLeaderboards { get; set; } = new List<UserLeaderboard>();
+        
+        public bool? IsActive { get; set; }
 
         public void OnModelCreating(EntityTypeBuilder<LeaderboardModel> builder)
         {
             // ensuring Name is unique
             builder.HasIndex(p => p.Name).IsUnique();
+            builder.Property(p => p.IsActive).HasDefaultValue(true);
         }
     }
 }
