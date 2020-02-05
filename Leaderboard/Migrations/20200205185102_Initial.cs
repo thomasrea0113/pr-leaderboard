@@ -232,8 +232,7 @@ namespace Leaderboard.Migrations
                 columns: table => new
                 {
                     TagId = table.Column<string>(nullable: false),
-                    RelatedId = table.Column<string>(nullable: false),
-                    Id = table.Column<string>(nullable: true)
+                    RelatedId = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {

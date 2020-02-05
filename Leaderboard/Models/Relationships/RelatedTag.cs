@@ -5,31 +5,33 @@ namespace Leaderboard.Models.Relationships
 {
     public class RelatedTag : IDbEntity<RelatedTag>
     {
-        public string Id { get; set; }
-
         public string TagId { get; set; }
         public virtual TagModel Tag { get; set; }
 
         public string RelatedId { get; set; }
         public virtual TagModel Related { get; set; }
 
+        public static RelatedTag Create(TagModel me, TagModel related)
+            => new RelatedTag
+            {
+                TagId = me.Id,
+                RelatedId = related.Id
+            };
+
         public void OnModelCreating(EntityTypeBuilder<RelatedTag> builder)
         {
-            builder.Property(u => u.RelatedId)
-                .ValueGeneratedNever()
-                .IsRequired();
-                
-            builder.Property(u => u.TagId)
-                .ValueGeneratedNever()
-                .IsRequired();
-
-            builder.HasKey(e => new {
+            builder.HasKey(e => new
+            {
                 e.TagId,
                 e.RelatedId
             });
 
-            builder.HasOne(e => e.Related)
+            builder.HasOne(e => e.Tag)
                 .WithMany(e => e.RelatedTags)
+                .HasForeignKey(e => e.TagId);
+
+            builder.HasOne(e => e.Related)
+                .WithMany(e => e.RelatedToMeTags)
                 .HasForeignKey(e => e.RelatedId);
         }
     }

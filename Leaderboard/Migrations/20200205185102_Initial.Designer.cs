@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Leaderboard.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200205162529_Initial")]
+    [Migration("20200205185102_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -94,9 +94,6 @@ namespace Leaderboard.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("RelatedId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Id")
                         .HasColumnType("text");
 
                     b.HasKey("TagId", "RelatedId");
@@ -361,13 +358,13 @@ namespace Leaderboard.Migrations
             modelBuilder.Entity("Leaderboard.Models.Relationships.RelatedTag", b =>
                 {
                     b.HasOne("Leaderboard.Models.TagModel", "Related")
-                        .WithMany("RelatedTags")
+                        .WithMany("RelatedToMeTags")
                         .HasForeignKey("RelatedId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Leaderboard.Models.TagModel", "Tag")
-                        .WithMany("RelatedToMeTags")
+                        .WithMany("RelatedTags")
                         .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

@@ -1,3 +1,7 @@
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+
 namespace Leaderboard.Models.Features
 {
     /// <summary>
@@ -6,5 +10,24 @@ namespace Leaderboard.Models.Features
     public interface IDbActive
     {
         bool? IsActive { get; set; }
+    }
+
+    public static class DbSetExtensions
+    {
+        public static async ValueTask<TModel> FindActiveAsync<TModel>(this DbSet<TModel> set, params object[] keyValues)
+            where TModel : class, IDbActive
+        {
+            var found = await set.FindAsync(keyValues);
+            if (!found.IsActive.HasValue || !found.IsActive.Value)
+                return default;
+            return found;
+        }
+
+        public static IQueryable<TModel> WhereActive<TModel>(this DbSet<TModel> set)
+            where TModel : class, IDbActive
+        {
+            var ret = set.Where(m => m.IsActive ?? false);
+            return ret;
+        }
     }
 }

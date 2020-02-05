@@ -94,9 +94,6 @@ namespace Leaderboard.Migrations
                     b.Property<string>("RelatedId")
                         .HasColumnType("text");
 
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
                     b.HasKey("TagId", "RelatedId");
 
                     b.HasIndex("RelatedId");
@@ -359,13 +356,13 @@ namespace Leaderboard.Migrations
             modelBuilder.Entity("Leaderboard.Models.Relationships.RelatedTag", b =>
                 {
                     b.HasOne("Leaderboard.Models.TagModel", "Related")
-                        .WithMany("RelatedTags")
+                        .WithMany("RelatedToMeTags")
                         .HasForeignKey("RelatedId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Leaderboard.Models.TagModel", "Tag")
-                        .WithMany("RelatedToMeTags")
+                        .WithMany("RelatedTags")
                         .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
