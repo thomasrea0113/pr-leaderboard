@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Leaderboard.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200204161309_Initial")]
+    [Migration("20200204201836_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -93,22 +93,39 @@ namespace Leaderboard.Migrations
                     b.Property<string>("TagId")
                         .HasColumnType("text");
 
-                    b.HasKey("TagId");
+                    b.Property<string>("RelatedId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.HasKey("TagId", "RelatedId");
+
+                    b.HasIndex("RelatedId");
 
                     b.ToTable("RelatedTags");
                 });
 
             modelBuilder.Entity("Leaderboard.Models.Relationships.UserLeaderboard", b =>
                 {
-                    b.Property<string>("UserId")
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("text");
 
                     b.Property<string>("LeaderboardId")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("UserId", "LeaderboardId");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("LeaderboardId");
+
+                    b.HasIndex("UserId", "LeaderboardId")
+                        .IsUnique();
 
                     b.ToTable("UserLeaderboards");
                 });
@@ -116,6 +133,7 @@ namespace Leaderboard.Migrations
             modelBuilder.Entity("Leaderboard.Models.TagModel", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("text");
 
                     b.Property<bool?>("IsActive")
@@ -382,8 +400,14 @@ namespace Leaderboard.Migrations
 
             modelBuilder.Entity("Leaderboard.Models.Relationships.RelatedTag", b =>
                 {
-                    b.HasOne("Leaderboard.Models.TagModel", "Tag")
+                    b.HasOne("Leaderboard.Models.TagModel", "Related")
                         .WithMany("RelatedTags")
+                        .HasForeignKey("RelatedId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Leaderboard.Models.TagModel", "Tag")
+                        .WithMany("RelatedToMeTags")
                         .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

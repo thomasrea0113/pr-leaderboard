@@ -12,6 +12,7 @@ using Leaderboard.Areas.Leaderboards.Models;
 using Leaderboard.Areas.Profiles.Models;
 using Leaderboard.Areas.Profiles.DbContextExtensions;
 using Leaderboard.Models;
+using System.Collections.Generic;
 
 namespace Leaderboard.Data
 {
@@ -72,8 +73,8 @@ namespace Leaderboard.Data
             // changes so that the postSave events for those get picked up.
             // TODO this means that anything that our presave events creates/deletes, won't have
             // their presave events called
-            this.ChangeTracker.DetectChanges();
-            allEntries = this.ChangeTracker.Entries();
+            // this.ChangeTracker.DetectChanges();
+            // allEntries = this.ChangeTracker.Entries();
             
             var count = await base.SaveChangesAsync();
 

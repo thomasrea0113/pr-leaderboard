@@ -11,22 +11,15 @@ using Xunit;
 
 namespace Leaderboard.Tests.TestSetup
 {
-    public class BaseTestClass : IClassFixture<WebOverrideFactory>, IDisposable
+    public class BaseTestClass : IClassFixture<WebOverrideFactory>
     {
         protected WebOverrideFactory _factory { get; }
         protected HttpClient _client { get; }
         protected IServiceProvider _services { get; }
 
-        private readonly DatabaseFacade _db;
-
         public BaseTestClass(WebOverrideFactory factory)
         {
             _factory = factory;
-
-            var ctx = _factory.Services.CreateScope().ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            _db = ctx.Database;
-            _db.OpenConnection();
-            _db.Migrate();
         }
 
         public void WithScope(Action<IServiceScope> test)
@@ -43,11 +36,6 @@ namespace Leaderboard.Tests.TestSetup
             {
                 await testAsync(scope.ServiceProvider);
             }
-        }
-
-        public void Dispose()
-        {
-            _db.CloseConnection();
         }
     }
 }

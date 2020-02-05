@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Leaderboard.Areas.Leaderboards.Models;
 using Leaderboard.Areas.Profiles.Models;
 using Leaderboard.Models.Features;
@@ -7,9 +9,12 @@ namespace Leaderboard.Models.Relationships
 {
     public class UserLeaderboard : IDbEntity<UserLeaderboard>
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Key]
+        public string Id { get; set; }
+
         public string UserId { get; set; }
         public virtual UserProfileModel User { get; set; }
-
 
         public string LeaderboardId { get; set; }
 
@@ -28,15 +33,15 @@ namespace Leaderboard.Models.Relationships
                 .HasForeignKey(pt => pt.LeaderboardId);
 
             
-            builder.Property(u => u.UserId).ValueGeneratedNever();
-            builder.Property(u => u.LeaderboardId).ValueGeneratedNever();
+            builder.Property(u => u.UserId).IsRequired();
+            builder.Property(u => u.LeaderboardId).IsRequired();
 
-            // composite key
-            builder.HasKey(e => new
+            // composite index
+            builder.HasIndex(e => new
             {
                 e.UserId,
                 e.LeaderboardId
-            });
+            }).IsUnique();
         }
     }
 }

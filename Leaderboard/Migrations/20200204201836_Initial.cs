@@ -248,11 +248,19 @@ namespace Leaderboard.Migrations
                 name: "RelatedTags",
                 columns: table => new
                 {
-                    TagId = table.Column<string>(nullable: false)
+                    TagId = table.Column<string>(nullable: false),
+                    RelatedId = table.Column<string>(nullable: false),
+                    Id = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RelatedTags", x => x.TagId);
+                    table.PrimaryKey("PK_RelatedTags", x => new { x.TagId, x.RelatedId });
+                    table.ForeignKey(
+                        name: "FK_RelatedTags_Tags_RelatedId",
+                        column: x => x.RelatedId,
+                        principalTable: "Tags",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_RelatedTags_Tags_TagId",
                         column: x => x.TagId,
@@ -265,12 +273,13 @@ namespace Leaderboard.Migrations
                 name: "UserLeaderboards",
                 columns: table => new
                 {
+                    Id = table.Column<string>(nullable: false),
                     UserId = table.Column<string>(nullable: false),
                     LeaderboardId = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserLeaderboards", x => new { x.UserId, x.LeaderboardId });
+                    table.PrimaryKey("PK_UserLeaderboards", x => x.Id);
                     table.ForeignKey(
                         name: "FK_UserLeaderboards_leaderboards_LeaderboardId",
                         column: x => x.LeaderboardId,
@@ -329,6 +338,11 @@ namespace Leaderboard.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_RelatedTags_RelatedId",
+                table: "RelatedTags",
+                column: "RelatedId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Tags_Name",
                 table: "Tags",
                 column: "Name",
@@ -338,6 +352,12 @@ namespace Leaderboard.Migrations
                 name: "IX_UserLeaderboards_LeaderboardId",
                 table: "UserLeaderboards",
                 column: "LeaderboardId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserLeaderboards_UserId_LeaderboardId",
+                table: "UserLeaderboards",
+                columns: new[] { "UserId", "LeaderboardId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserProfiles_UserId1",
