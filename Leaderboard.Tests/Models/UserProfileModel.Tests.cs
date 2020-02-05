@@ -103,7 +103,7 @@ namespace Leaderboard.Tests.Models
             });
             await Assert.ThrowsAsync<DbUpdateException>(async () => await ctx.SaveChangesAsync());
 
-            Assert.Equal(2, profile.UserLeaderboards.Count);
+            Assert.Equal(1, profile.UserLeaderboards.Count);
 
             // await ctx.Entry(profile).ReloadAsync();
             await ctx.Entry(profile).Collection(p => p.UserLeaderboards).LoadAsync();
