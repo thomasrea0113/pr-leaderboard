@@ -9,16 +9,21 @@ namespace Leaderboard.Models.Relationships
 {
     public class UserLeaderboard : IDbEntity<UserLeaderboard>
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [Key]
-        public string Id { get; set; }
-
         public string UserId { get; set; }
         public virtual UserProfileModel User { get; set; }
 
         public string LeaderboardId { get; set; }
 
         public virtual LeaderboardModel Leaderboard { get; set; }
+
+        public static UserLeaderboard Create(UserProfileModel user, LeaderboardModel board)
+            => new UserLeaderboard
+            {
+                // User = user,
+                UserId = user.UserId,
+                // Leaderboard = board,
+                LeaderboardId = board.Id,
+            };
 
         public void OnModelCreating(EntityTypeBuilder<UserLeaderboard> builder)
         {
@@ -32,16 +37,12 @@ namespace Leaderboard.Models.Relationships
                 .WithMany(t => t.UserLeaderboards)
                 .HasForeignKey(pt => pt.LeaderboardId);
 
-            
-            builder.Property(u => u.UserId).IsRequired();
-            builder.Property(u => u.LeaderboardId).IsRequired();
-
-            // composite index
-            builder.HasIndex(e => new
+            // composite key
+            builder.HasKey(e => new
             {
                 e.UserId,
                 e.LeaderboardId
-            }).IsUnique();
+            });
         }
     }
 }

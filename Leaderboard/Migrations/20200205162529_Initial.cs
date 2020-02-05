@@ -48,23 +48,6 @@ namespace Leaderboard.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AutoHistory",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    RowId = table.Column<string>(maxLength: 50, nullable: false),
-                    TableName = table.Column<string>(maxLength: 128, nullable: false),
-                    Changed = table.Column<string>(nullable: true),
-                    Kind = table.Column<int>(nullable: false),
-                    Created = table.Column<DateTime>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AutoHistory", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "leaderboards",
                 columns: table => new
                 {
@@ -273,13 +256,12 @@ namespace Leaderboard.Migrations
                 name: "UserLeaderboards",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
                     UserId = table.Column<string>(nullable: false),
                     LeaderboardId = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserLeaderboards", x => x.Id);
+                    table.PrimaryKey("PK_UserLeaderboards", x => new { x.UserId, x.LeaderboardId });
                     table.ForeignKey(
                         name: "FK_UserLeaderboards_leaderboards_LeaderboardId",
                         column: x => x.LeaderboardId,
@@ -354,12 +336,6 @@ namespace Leaderboard.Migrations
                 column: "LeaderboardId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserLeaderboards_UserId_LeaderboardId",
-                table: "UserLeaderboards",
-                columns: new[] { "UserId", "LeaderboardId" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_UserProfiles_UserId1",
                 table: "UserProfiles",
                 column: "UserId1");
@@ -381,9 +357,6 @@ namespace Leaderboard.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
-
-            migrationBuilder.DropTable(
-                name: "AutoHistory");
 
             migrationBuilder.DropTable(
                 name: "RelatedTags");

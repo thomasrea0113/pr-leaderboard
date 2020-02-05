@@ -41,7 +41,6 @@ namespace Leaderboard.Data
         {
             base.OnModelCreating(modelBuilder);
             this.ConfigureEntities(modelBuilder);
-            modelBuilder.EnableAutoHistory(null);
         }
 
         private Func<EntityEntry, bool> hasFeature = ee => {
@@ -67,14 +66,7 @@ namespace Leaderboard.Data
             await this.EnsureProfilesAsync(users);
             await this.ProcessPreSaveFeaturesAsync(allEntries);
 
-            this.EnsureAutoHistory();
-
-            // our presave events may have added aditional changes. We need to recheck for
-            // changes so that the postSave events for those get picked up.
-            // TODO this means that anything that our presave events creates/deletes, won't have
-            // their presave events called
-            // this.ChangeTracker.DetectChanges();
-            // allEntries = this.ChangeTracker.Entries();
+            var added = allEntries.Where(s => s.State == EntityState.Added);
             
             var count = await base.SaveChangesAsync();
 

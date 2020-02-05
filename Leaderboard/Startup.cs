@@ -6,7 +6,6 @@ using Leaderboard.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Arch.EntityFrameworkCore.UnitOfWork;
 using Leaderboard.Managers;
 using Leaderboard.Areas.Identity.Validators;
 
@@ -24,10 +23,12 @@ namespace Leaderboard
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseLazyLoadingProxies()
-                    .UseNpgsql(Configuration.GetConnectionString("DefaultConnection")))
-            .AddUnitOfWork<ApplicationDbContext>();
+                options
+                    .UseLazyLoadingProxies()
+                    .EnableSensitiveDataLogging()
+                    .UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
 
             // adding the default user models
             services.AddDefaultIdentity<IdentityUser>(options =>

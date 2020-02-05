@@ -69,71 +69,59 @@ namespace Leaderboard.Tests.Models
             await manager.SaveChangesAsync();
         });
 
+        [Theory, DefaultData]
+        public Task TestDuplicateDisconnectedConnected(LeaderboardModel[] leaderboards, IdentityUser user)
+        {
+            throw new NotImplementedException();
+        }
+        
+        [Theory, DefaultData]
+        public Task TestNullLeaderboardConnected(LeaderboardModel[] leaderboards, IdentityUser user)
+        {
+            throw new NotImplementedException();
+        }
 
         [Theory, DefaultData]
-        public async Task TestModifyProfile(LeaderboardModel[] leaderboards, IdentityUser user)
+        public Task TestNullLeaderboardDisonnected(LeaderboardModel[] leaderboards, IdentityUser user)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        [Theory, DefaultData]
+        public async Task TestDuplicateLeaderboardConnected(LeaderboardModel[] leaderboards, IdentityUser user)
             => await WithScopeAsync(async scope =>
         {
             var manager = scope.GetRequiredService<UserProfileManager>();
             var ctx = scope.GetRequiredService<ApplicationDbContext>();
 
+            // seed a user and some boards
             var profile = await AddUserAsync(manager, user, default);
-            Assert.Empty(profile.UserLeaderboards);
+            await ctx.leaderboards.AddRangeAsync(leaderboards);
+            await ctx.SaveChangesAsync();
 
-            var id = Guid.NewGuid().ToString();
-            leaderboards[0].Id = id;
-            var b = (await ctx.leaderboards.AddAsync(leaderboards[0])).Entity;
-            Assert.Equal(id, b.Id);
+            // create some test relationships
+            var ub1 = UserLeaderboard.Create(profile, leaderboards[0]);
+            var ub1Duplicate = UserLeaderboard.Create(profile, leaderboards[0]);
+            var ub2 = UserLeaderboard.Create(profile, leaderboards[1]);
 
-            profile.UserLeaderboards.Add(new UserLeaderboard {
-                Leaderboard = leaderboards[0],
-                User = profile
-            });
-
-
+            // add the first and make sure it's the only one present
+            await ctx.UserLeaderboards.AddAsync(ub1);
             await manager.SaveChangesAsync();
+            Assert.Single(profile.UserLeaderboards);
 
-            await ctx.Entry(profile).Collection(p => p.UserLeaderboards).LoadAsync();
-            Assert.Contains(profile.UserLeaderboards, ul => ul.LeaderboardId == leaderboards[0].Id);
-
-            // should throw duplicate key exception in the database
-            profile.UserLeaderboards.Add(new UserLeaderboard {
-                Leaderboard = leaderboards[0],
-                User = profile
-            });
-            await Assert.ThrowsAsync<DbUpdateException>(async () => await ctx.SaveChangesAsync());
-
-            Assert.Equal(1, profile.UserLeaderboards.Count);
-
-            // await ctx.Entry(profile).ReloadAsync();
-            await ctx.Entry(profile).Collection(p => p.UserLeaderboards).LoadAsync();
+            // add the duplicate key and wait for it to fail
+            await Assert.ThrowsAsync<InvalidOperationException>(async () => await ctx.UserLeaderboards.AddAsync(ub1Duplicate));
 
             Assert.Single(profile.UserLeaderboards);
 
-            // should throw exception because leaderbard is null
-            // profile.UserLeaderboards.Add(new UserLeaderboard {
-            //     Leaderboard = null,
-            //     User = profile
-            // });
+            // add second ub, which should add successfully
+            // FIXME it's trying to add the first one again, even though that's been saved to the database...
+            ctx.Entry(ub1Duplicate).State = EntityState.Detached;
 
-            var board = await ctx.UserLeaderboards.AddAsync(new UserLeaderboard {
-                Leaderboard = null,
-                User = profile
-            });
+            await ctx.UserLeaderboards.AddAsync(ub2);
+            await ctx.SaveChangesAsync();
 
-            await Assert.ThrowsAsync<InvalidOperationException>(async () => await ctx.SaveChangesAsync());
-
-            // NOTE you cannot create related objects like below - the object must already exist
-            // profile.UserLeaderboards.Add(new UserLeaderboard {
-            //     Leaderboard = new LeaderboardModel { Name = leaderboardName[1] },
-            //     User = profile
-            // });
-            // await ctx.SaveChangesAsync();
-
-            await ctx.Entry(profile).ReloadAsync();
-
-            // FIXME for some reason, the null Leaderboard doesn't prevent the relationship from being saved.
-            // somewhere, the LeaderboardId is being set
             Assert.Equal(2, profile.UserLeaderboards.Count);
         });
     }

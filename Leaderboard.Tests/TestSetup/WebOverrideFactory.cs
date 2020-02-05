@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using System;
 using Microsoft.Extensions.Hosting;
+using Npgsql.Logging;
 
 namespace Leaderboard.Tests.TestSetup
 {
