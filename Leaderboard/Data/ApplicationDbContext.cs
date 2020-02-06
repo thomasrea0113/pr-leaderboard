@@ -4,23 +4,22 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Leaderboard.Models.Features;
-using Microsoft.AspNetCore.Identity;
 using Leaderboard.Models.Relationships;
 using System.Threading.Tasks;
 using System.Threading;
 using Leaderboard.Areas.Leaderboards.Models;
-using Leaderboard.Areas.Profiles.Models;
-using Leaderboard.Areas.Profiles.DbContextExtensions;
 using Leaderboard.Models;
 using Leaderboard.Areas.Identity.Models;
 
 namespace Leaderboard.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string>
+    public class ApplicationDbContext : IdentityDbContext<
+        ApplicationUser, ApplicationRole, string,
+        ApplicationUserClaim, ApplicationUserRole, ApplicationUserLogin,
+        ApplicationRoleClaim, ApplicationUserToken>
+
     {
         public DbSet<LeaderboardModel> leaderboards { get; set; }
-        public DbSet<UserProfileModel> UserProfiles { get; set; }
-
         public DbSet<TagModel> Tags { get; set; }
         public DbSet<ScoreModel> Scores { get; set; }
         public DbSet<UnitOfMeasureModel> UnitsOfMeasure { get; set; }
@@ -59,11 +58,10 @@ namespace Leaderboard.Data
 
             // All added users. need to evaluate the enumerable immediately
             var users = allEntries.Select(ee => ee.Entity)
-                .Where(e => e is IdentityUser)
-                .Cast<IdentityUser>()
+                .Where(e => e is ApplicationUser)
+                .Cast<ApplicationUser>()
                 .ToArray();
 
-            await this.EnsureProfilesAsync(users);
             await this.ProcessPreSaveFeaturesAsync(allEntries);
 
             var added = allEntries.Where(s => s.State == EntityState.Added);

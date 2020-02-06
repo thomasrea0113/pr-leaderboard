@@ -1,13 +1,10 @@
-using System;
-using System.Linq;
 using System.Threading.Tasks;
-using AutoFixture.Xunit2;
+using Leaderboard.Areas.Identity.Managers;
+using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Areas.Identity.Validators;
-using Leaderboard.Managers;
 using Leaderboard.Tests.TestSetup;
 using Leaderboard.Tests.TestSetup.Fixtures;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -20,8 +17,8 @@ namespace Leaderboard.Tests.Models.Identity.Validators
         }
 
         [Theory, DefaultData]
-        public async Task TestInvalidEmail(IdentityUser user) => await WithScopeAsync(async scope => {
-            var manager = scope.GetRequiredService<UserProfileManager>();
+        public async Task TestInvalidEmail(ApplicationUser user) => await WithScopeAsync(async scope => {
+            var manager = scope.GetRequiredService<AppUserManager>();
             var describer = scope.GetRequiredService<IdentityErrorDescriber>();
 
             user.Email = "EHREHRHEdsdsdf92848****020394923949~!!";
@@ -33,19 +30,19 @@ namespace Leaderboard.Tests.Models.Identity.Validators
         });
 
         [Theory, DefaultData]
-        public async Task TestBlankEmail(IdentityUser user) => await WithScopeAsync(async scope =>
+        public async Task TestBlankEmail(ApplicationUser user) => await WithScopeAsync(async scope =>
         {
             user.Email = default;
 
-            var manager = scope.GetRequiredService<UserProfileManager>();
+            var manager = scope.GetRequiredService<AppUserManager>();
             var result = await manager.CreateAsync(user);
             Assert.True(result.Succeeded);
         });
 
         [Theory, DefaultData]
-        public async Task TestExistingEmail(IdentityUser[] users) => await WithScopeAsync(async scope =>
+        public async Task TestExistingEmail(ApplicationUser[] users) => await WithScopeAsync(async scope =>
         {
-            var manager = scope.GetRequiredService<UserProfileManager>();
+            var manager = scope.GetRequiredService<AppUserManager>();
             var describer = scope.GetRequiredService<IdentityErrorDescriber>();
 
             Assert.Contains(manager.UserValidators, u => u.GetType() == typeof(EmailNotRequiredValidator));

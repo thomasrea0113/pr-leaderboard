@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Leaderboard.Models.Features;
 using Leaderboard.Models.Relationships;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Leaderboard.Areas.Identity.Models
@@ -13,10 +14,10 @@ namespace Leaderboard.Areas.Identity.Models
 
         public bool? IsActive { get; set; }
 
-        public virtual ICollection<IdentityUserClaim<string>> Claims { get; set; }
-        public virtual ICollection<IdentityUserLogin<string>> Logins { get; set; }
-        public virtual ICollection<IdentityUserToken<string>> Tokens { get; set; }
-        public virtual ICollection<IdentityUserRole<string>> UserRoles { get; set; }
+        public virtual ICollection<ApplicationUserClaim> Claims { get; set; }
+        public virtual ICollection<ApplicationUserLogin> Logins { get; set; }
+        public virtual ICollection<ApplicationUserToken> Tokens { get; set; }
+        public virtual ICollection<ApplicationUserRole> UserRoles { get; set; }
 
         public ApplicationUser()
         {
@@ -51,6 +52,8 @@ namespace Leaderboard.Areas.Identity.Models
                 .WithOne()
                 .HasForeignKey(ur => ur.UserId)
                 .IsRequired();
+                
+            builder.Property(p => p.IsActive).HasDefaultValue(true);
         }
     }
 }

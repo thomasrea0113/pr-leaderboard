@@ -1,10 +1,8 @@
 using Leaderboard.Areas.Identity.Models;
 using Microsoft.AspNetCore.Identity;
 
-namespace Area.Identity.Models
+namespace Leaderboard.Areas.Identity.Models
 {
-
-
     public class ApplicationUserRole : IdentityUserRole<string>
     {
         public virtual ApplicationUser User { get; set; }

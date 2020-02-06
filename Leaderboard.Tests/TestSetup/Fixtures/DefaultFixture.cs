@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoFixture;
 using AutoFixture.Kernel;
+using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Areas.Leaderboards.Models;
 using Leaderboard.Models;
 using Microsoft.AspNetCore.Identity;
@@ -25,7 +26,7 @@ namespace Leaderboard.Tests.TestSetup.Fixtures
                 Name = $"Leaderboard {this.Create<string>()}"
             });
 
-            this.Register<IdentityUser>(() => new IdentityUser {
+            this.Register<ApplicationUser>(() => new ApplicationUser {
                 UserName = $"User_{this.Create<string>()}",
                 Email = $"Email.{this.Create<string>()}@test.com"
             });

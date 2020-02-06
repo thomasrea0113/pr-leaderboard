@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Leaderboard.Areas.Identity.Models;
-using Leaderboard.Areas.Profiles.Models;
 using Leaderboard.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,25 +26,6 @@ namespace Leaderboard.Areas.Identity.Managers
                 passwordValidators, keyNormalizer, errors, services, logger)
         {
             _ctx = services.GetRequiredService<ApplicationDbContext>();
-        }
-
-        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-        {
-            return await _ctx.SaveChangesAsync(cancellationToken);
-        }
-
-        public async Task<UserProfileModel> GetProfileAsync(ApplicationUser user)
-            => await GetProfileAsync(user.Id);
-
-        public async Task<UserProfileModel> GetProfileAsync(string userId)
-        {
-            var profile = await _ctx.UserProfiles.FindAsync(userId);
-
-            // becauze lazy loading requries both entities be aware of the relationship,
-            // it won't work. We have to explicitly load the object here.
-            profile.User = await FindByIdAsync(userId.ToString());
-
-            return profile;
         }
     }
 }

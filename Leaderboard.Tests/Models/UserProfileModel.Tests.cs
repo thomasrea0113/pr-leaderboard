@@ -2,76 +2,64 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Leaderboard.Areas.Identity.Managers;
+using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Areas.Leaderboards.Models;
-using Leaderboard.Areas.Profiles.Models;
 using Leaderboard.Data;
-using Leaderboard.Managers;
 using Leaderboard.Models.Relationships;
 using Leaderboard.Tests.TestSetup;
 using Leaderboard.Tests.TestSetup.Fixtures;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Leaderboard.Tests.Models
 {
-    public class UserProfileModelTests : BaseTestClass
+    public class ApplicationUserTests : BaseTestClass
     {
 
-        public UserProfileModelTests(WebOverrideFactory factory) : base(factory)
+        public ApplicationUserTests(WebOverrideFactory factory) : base(factory)
         {
         }
 
-        public async IAsyncEnumerable<UserProfileModel> AddUsersAsync(UserProfileManager manager, IEnumerable<IdentityUser> users)
+        public async IAsyncEnumerable<ApplicationUser> AddUsersAsync(AppUserManager manager, IEnumerable<ApplicationUser> users)
         {
             foreach (var user in users)
             {
                 yield return await AddUserAsync(manager, user, user.Email);
             }
         }
-        public async Task<UserProfileModel> AddUserAsync(UserProfileManager manager, IdentityUser user)
+        public async Task<ApplicationUser> AddUserAsync(AppUserManager manager, ApplicationUser user)
             => await AddUserAsync(manager, user, user.Email);
 
-        public async Task<UserProfileModel> AddUserAsync(UserProfileManager manager, IdentityUser user, string email)
+        public async Task<ApplicationUser> AddUserAsync(AppUserManager manager, ApplicationUser user, string email)
         {
             user.Email = email;
-
             var result = await manager.CreateAsync(user);
-
             Assert.Empty(result.Errors);
-
-            var profile = await manager.GetProfileAsync(user);
-
-            Assert.NotNull(profile);
-
-            return profile;
+            return user;
         }
 
 
         [Theory, DefaultData]
-        public async Task TestCreateUsers(IdentityUser[] users) => await WithScopeAsync(async scope =>
+        public async Task TestCreateUsers(ApplicationUser[] users) => await WithScopeAsync(async scope =>
         {
-            var manager = scope.GetRequiredService<UserProfileManager>();
+            var manager = scope.GetRequiredService<AppUserManager>();
 
             // unsetting one of the emails to make sure it can be created
             users[1].Email = null;
 
             await foreach (var profile in AddUsersAsync(manager, users))
             {
-                Assert.NotNull(profile.User);
-                Assert.Equal(profile.UserId, profile.User.Id);
                 Assert.True(profile.IsActive);
             }
-
-            await manager.SaveChangesAsync();
         });
 
         [Theory, DefaultData]
-        public async Task TestDuplicateLeaderboardConnected(LeaderboardModel[] leaderboards, IdentityUser user)
+        public async Task TestDuplicateLeaderboardConnected(LeaderboardModel[] leaderboards, ApplicationUser user)
             => await WithScopeAsync(async scope =>
         {
-            var manager = scope.GetRequiredService<UserProfileManager>();
+            var manager = scope.GetRequiredService<AppUserManager>();
             var ctx = scope.GetRequiredService<ApplicationDbContext>();
 
             // seed a user and some boards
@@ -86,7 +74,7 @@ namespace Leaderboard.Tests.Models
 
             // add the first and make sure it's the only one present
             await ctx.UserLeaderboards.AddAsync(ub1);
-            await manager.SaveChangesAsync();
+            await ctx.SaveChangesAsync();
             Assert.Single(profile.UserLeaderboards);
 
             // add the duplicate key and wait for it to fail
@@ -106,10 +94,10 @@ namespace Leaderboard.Tests.Models
         });
 
         [Theory, DefaultData]
-        public async Task TestDuplicateLeaderboardDisonnected(LeaderboardModel[] leaderboards, IdentityUser user)
+        public async Task TestDuplicateLeaderboardDisonnected(LeaderboardModel[] leaderboards, ApplicationUser user)
             => await WithScopeAsync(async scope =>
         {
-            var manager = scope.GetRequiredService<UserProfileManager>();
+            var manager = scope.GetRequiredService<AppUserManager>();
             var ctx = scope.GetRequiredService<ApplicationDbContext>();
 
             // seed a user and some boards
@@ -124,14 +112,14 @@ namespace Leaderboard.Tests.Models
 
             // add the first and make sure it's the only one present
             await ctx.UserLeaderboards.AddAsync(ub1);
-            await manager.SaveChangesAsync();
+            await ctx.SaveChangesAsync();
             Assert.Single(profile.UserLeaderboards);
 
             // detach all and reload the profile. Now we have data in the DB that isn't
             // tracked locally
             foreach (var entry in ctx.ChangeTracker.Entries())
                 entry.State = EntityState.Detached;
-            profile = await ctx.UserProfiles.FindAsync(profile.UserId);
+            profile = await manager.FindByIdAsync(profile.Id);
 
             // add the duplicate key. Will not fail because we aren't tracking it locally... I think.
             // I don't honestly know why this doesn't fail.

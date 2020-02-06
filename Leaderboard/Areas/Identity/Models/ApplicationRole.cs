@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Area.Identity.Models;
 using Leaderboard.Models.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

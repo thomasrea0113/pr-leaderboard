@@ -28,7 +28,7 @@ namespace Leaderboard
             services.AddDbContext<ApplicationDbContext>(options =>
                 options
                     .UseLazyLoadingProxies()
-                    .EnableSensitiveDataLogging()
+                    // .EnableSensitiveDataLogging()
                     .UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
 
             // adding the default user models

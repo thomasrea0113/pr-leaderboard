@@ -1,7 +1,5 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Areas.Leaderboards.Models;
-using Leaderboard.Areas.Profiles.Models;
 using Leaderboard.Models.Features;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,17 +8,17 @@ namespace Leaderboard.Models.Relationships
     public class UserLeaderboard : IDbEntity<UserLeaderboard>
     {
         public string UserId { get; set; }
-        public virtual UserProfileModel User { get; set; }
+        public virtual ApplicationUser User { get; set; }
 
         public string LeaderboardId { get; set; }
 
         public virtual LeaderboardModel Leaderboard { get; set; }
 
-        public static UserLeaderboard Create(UserProfileModel user, LeaderboardModel board)
+        public static UserLeaderboard Create(ApplicationUser user, LeaderboardModel board)
             => new UserLeaderboard
             {
                 // User = user,
-                UserId = user.UserId,
+                UserId = user.Id,
                 // Leaderboard = board,
                 LeaderboardId = board.Id,
             };
