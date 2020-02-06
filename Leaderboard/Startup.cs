@@ -6,8 +6,9 @@ using Leaderboard.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Leaderboard.Managers;
 using Leaderboard.Areas.Identity.Validators;
+using Leaderboard.Areas.Identity.Models;
+using Leaderboard.Areas.Identity.Managers;
 
 namespace Leaderboard
 {
@@ -31,7 +32,7 @@ namespace Leaderboard
                     .UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
 
             // adding the default user models
-            services.AddDefaultIdentity<IdentityUser>(options =>
+            services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = true;
 
@@ -49,7 +50,7 @@ namespace Leaderboard
                 .AddDefaultTokenProviders()
                 .AddUserValidator<EmailNotRequiredValidator>();
 
-            services.AddScoped<UserProfileManager>();
+            services.AddScoped<AppUserManager>();
 
             services.AddControllersWithViews();
             services.AddRazorPages();

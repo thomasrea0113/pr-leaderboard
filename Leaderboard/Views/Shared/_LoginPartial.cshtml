@@ -1,6 +1,8 @@
 ﻿@using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
+@using Leaderboard.Areas.Identity.Models
+@using Leaderboard.Areas.Identity.Managers
+@inject SignInManager<ApplicationUser> SignInManager
+@inject AppUserManager UserManager
 
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))

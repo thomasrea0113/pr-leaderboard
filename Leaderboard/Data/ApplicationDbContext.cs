@@ -12,11 +12,11 @@ using Leaderboard.Areas.Leaderboards.Models;
 using Leaderboard.Areas.Profiles.Models;
 using Leaderboard.Areas.Profiles.DbContextExtensions;
 using Leaderboard.Models;
-using System.Collections.Generic;
+using Leaderboard.Areas.Identity.Models;
 
 namespace Leaderboard.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string>
     {
         public DbSet<LeaderboardModel> leaderboards { get; set; }
         public DbSet<UserProfileModel> UserProfiles { get; set; }

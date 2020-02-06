@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Areas.Profiles.Models;
 using Leaderboard.Data;
 using Microsoft.AspNetCore.Identity;
@@ -9,19 +10,19 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Leaderboard.Managers
+namespace Leaderboard.Areas.Identity.Managers
 {
-    public class UserProfileManager : UserManager<IdentityUser>
+    public class AppUserManager : UserManager<ApplicationUser>
     {
         private ApplicationDbContext _ctx { get; }
 
-        public UserProfileManager(IUserStore<IdentityUser> store,
+        public AppUserManager(IUserStore<ApplicationUser> store,
             IOptions<IdentityOptions> optionsAccessor,
-            IPasswordHasher<IdentityUser> passwordHasher,
-            IEnumerable<IUserValidator<IdentityUser>> userValidators,
-            IEnumerable<IPasswordValidator<IdentityUser>> passwordValidators,
+            IPasswordHasher<ApplicationUser> passwordHasher,
+            IEnumerable<IUserValidator<ApplicationUser>> userValidators,
+            IEnumerable<IPasswordValidator<ApplicationUser>> passwordValidators,
             ILookupNormalizer keyNormalizer, IdentityErrorDescriber errors,
-            IServiceProvider services, ILogger<UserManager<IdentityUser>> logger) :
+            IServiceProvider services, ILogger<UserManager<ApplicationUser>> logger) :
                 base(store, optionsAccessor, passwordHasher, userValidators,
                 passwordValidators, keyNormalizer, errors, services, logger)
         {
@@ -33,7 +34,7 @@ namespace Leaderboard.Managers
             return await _ctx.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<UserProfileModel> GetProfileAsync(IdentityUser user)
+        public async Task<UserProfileModel> GetProfileAsync(ApplicationUser user)
             => await GetProfileAsync(user.Id);
 
         public async Task<UserProfileModel> GetProfileAsync(string userId)
