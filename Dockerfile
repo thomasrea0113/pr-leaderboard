@@ -5,6 +5,9 @@ RUN wget -q -O - https://deb.nodesource.com/setup_13.x | bash
 RUN apt update && apt upgrade -y && apt install -y \
     nodejs \
     #
+    # Other general depencencies
+    iproute2 net-tools \
+    #
     # Install Docker CE CLI
     apt-transport-https ca-certificates curl gnupg-agent software-properties-common lsb-release \
     && curl -fsSL https://download.docker.com/linux/$(lsb_release -is | tr '[:upper:]' '[:lower:]')/gpg | apt-key add - 2>/dev/null \

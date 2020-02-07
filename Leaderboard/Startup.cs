@@ -9,6 +9,9 @@ using Microsoft.Extensions.Hosting;
 using Leaderboard.Areas.Identity.Validators;
 using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Areas.Identity.Managers;
+using Leaderboard.Data.SeedExtensions;
+using System.Threading.Tasks;
+using System;
 
 namespace Leaderboard
 {
@@ -32,7 +35,7 @@ namespace Leaderboard
                     .UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
 
             // adding the default user models
-            services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
+            services.AddDefaultIdentity<ApplicationUser>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = true;
 
@@ -45,6 +48,9 @@ namespace Leaderboard
                 options.SignIn.RequireConfirmedAccount = false;
                 options.SignIn.RequireConfirmedPhoneNumber = false;
             })
+                .AddRoles<ApplicationRole>()
+                .AddUserManager<AppUserManager>()
+                .AddRoleManager<AppRoleManager>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultUI()
                 .AddDefaultTokenProviders()
@@ -64,8 +70,19 @@ namespace Leaderboard
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IConfiguration config,
+            ApplicationDbContext context, AppUserManager userManager, AppRoleManager roleManager)
         {
+            // if seeding is configured for this configuration, attemps to run the seed method syncronously
+            // and cancels it if it does not complete in time
+            if (config.GetValue("SeedData:Enabled", false))
+            {
+                var timeout = config.GetValue("SeedData:TimeoutInSeconds", 60) * 1000;
+                // Is this a bad idea? Seeding the data and continuing execution shouldn't cause issues.
+                if (!app.SeedIdentityAsync(context, userManager, roleManager).Wait(timeout))
+                    throw new TimeoutException($"The {nameof(SeedExtensions.SeedIdentityAsync)} method did not complete in {timeout} seconds");
+            }
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -93,13 +110,6 @@ namespace Leaderboard
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });
-
-            // app.UseSpa(spa => {
-            //     spa.Options.SourcePath = "../ClientApp";
-            //     spa.Options.DefaultPage = "/404";
-
-            //     spa.UseReactDevelopmentServer("start");
-            // });
         }
     }
 }

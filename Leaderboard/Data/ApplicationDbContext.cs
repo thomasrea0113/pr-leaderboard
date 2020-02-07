@@ -10,6 +10,9 @@ using System.Threading;
 using Leaderboard.Areas.Leaderboards.Models;
 using Leaderboard.Models;
 using Leaderboard.Areas.Identity.Models;
+using Microsoft.Extensions.Configuration;
+using Leaderboard.Data.SeedExtensions;
+using Leaderboard.Areas.Identity.Managers;
 
 namespace Leaderboard.Data
 {
@@ -31,21 +34,25 @@ namespace Leaderboard.Data
 
         #endregion
 
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        /// <summary>
+        /// A flag indicating if we should seed aditional development data
+        /// </summary>
+        private readonly bool _seed;
+
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IConfiguration config)
             : base(options)
         {
+            _seed = config.GetValue<bool>("SeedData:Enabled", false);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
             this.ConfigureEntities(modelBuilder);
+            
+            if (_seed)
+                this.SeedData(modelBuilder);
         }
-
-        private Func<EntityEntry, bool> hasFeature = ee => {
-            var e = ee.Entity;
-            return e is IOnDbPreSaveAsync || e is IOnDbPreCreateAsync;
-        };
 
         public override int SaveChanges()
             => throw new NotImplementedException("Please use the SaveChangesAsync method.");

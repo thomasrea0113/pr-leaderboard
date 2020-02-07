@@ -34,6 +34,7 @@ namespace Leaderboard.Tests.TestSetup
                 // without overriding base path, we'd still be pointing to the Leaderboard
                 // bin directory, not the Leaderboard.Tests bin directory
                 c.SetBasePath(System.IO.Directory.GetCurrentDirectory())
+                    .AddJsonFile("appsettings.Development.json")
                     .AddJsonFile("appsettings.unittest.json"));
         }
     }

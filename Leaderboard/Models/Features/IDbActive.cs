@@ -25,9 +25,6 @@ namespace Leaderboard.Models.Features
 
         public static IQueryable<TModel> WhereActive<TModel>(this DbSet<TModel> set)
             where TModel : class, IDbActive
-        {
-            var ret = set.Where(m => m.IsActive ?? false);
-            return ret;
-        }
+            => set.Where(m => m.IsActive ?? false);
     }
 }

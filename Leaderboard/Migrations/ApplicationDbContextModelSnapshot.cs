@@ -155,14 +155,9 @@ namespace Leaderboard.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("UserId1")
-                        .HasColumnType("text");
-
                     b.HasKey("Id");
 
                     b.HasIndex("UserId");
-
-                    b.HasIndex("UserId1");
 
                     b.ToTable("AspNetUserClaims");
                 });
@@ -170,10 +165,12 @@ namespace Leaderboard.Migrations
             modelBuilder.Entity("Leaderboard.Areas.Identity.Models.ApplicationUserLogin", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(128)")
+                        .HasMaxLength(128);
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(128)")
+                        .HasMaxLength(128);
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("text");
@@ -182,14 +179,9 @@ namespace Leaderboard.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("UserId1")
-                        .HasColumnType("text");
-
                     b.HasKey("LoginProvider", "ProviderKey");
 
                     b.HasIndex("UserId");
-
-                    b.HasIndex("UserId1");
 
                     b.ToTable("AspNetUserLogins");
                 });
@@ -202,14 +194,9 @@ namespace Leaderboard.Migrations
                     b.Property<string>("RoleId")
                         .HasColumnType("text");
 
-                    b.Property<string>("UserId1")
-                        .HasColumnType("text");
-
                     b.HasKey("UserId", "RoleId");
 
                     b.HasIndex("RoleId");
-
-                    b.HasIndex("UserId1");
 
                     b.ToTable("AspNetUserRoles");
                 });
@@ -220,20 +207,17 @@ namespace Leaderboard.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(128)")
+                        .HasMaxLength(128);
 
                     b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserId1")
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(128)")
+                        .HasMaxLength(128);
 
                     b.Property<string>("Value")
                         .HasColumnType("text");
 
                     b.HasKey("UserId", "LoginProvider", "Name");
-
-                    b.HasIndex("UserId1");
 
                     b.ToTable("AspNetUserTokens");
                 });
@@ -258,6 +242,26 @@ namespace Leaderboard.Migrations
                         .IsUnique();
 
                     b.ToTable("leaderboards");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "61c6fe69-0be4-4d4e-bdca-3bc641b4402a",
+                            IsActive = true,
+                            Name = "Deadlift 1 Rep Max"
+                        },
+                        new
+                        {
+                            Id = "95ffb9c3-2122-410a-ba44-272f2188ed56",
+                            IsActive = true,
+                            Name = "Bench 1 Rep Max"
+                        },
+                        new
+                        {
+                            Id = "1c161800-801e-492b-9053-e01203d63490",
+                            IsActive = true,
+                            Name = "Squat 1 Rep Max"
+                        });
                 });
 
             modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.ScoreModel", b =>
@@ -349,28 +353,20 @@ namespace Leaderboard.Migrations
 
             modelBuilder.Entity("Leaderboard.Areas.Identity.Models.ApplicationUserClaim", b =>
                 {
-                    b.HasOne("Leaderboard.Areas.Identity.Models.ApplicationUser", null)
+                    b.HasOne("Leaderboard.Areas.Identity.Models.ApplicationUser", "User")
                         .WithMany("Claims")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Leaderboard.Areas.Identity.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId1");
                 });
 
             modelBuilder.Entity("Leaderboard.Areas.Identity.Models.ApplicationUserLogin", b =>
                 {
-                    b.HasOne("Leaderboard.Areas.Identity.Models.ApplicationUser", null)
+                    b.HasOne("Leaderboard.Areas.Identity.Models.ApplicationUser", "User")
                         .WithMany("Logins")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Leaderboard.Areas.Identity.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId1");
                 });
 
             modelBuilder.Entity("Leaderboard.Areas.Identity.Models.ApplicationUserRole", b =>
@@ -381,28 +377,20 @@ namespace Leaderboard.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Leaderboard.Areas.Identity.Models.ApplicationUser", null)
+                    b.HasOne("Leaderboard.Areas.Identity.Models.ApplicationUser", "User")
                         .WithMany("UserRoles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Leaderboard.Areas.Identity.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId1");
                 });
 
             modelBuilder.Entity("Leaderboard.Areas.Identity.Models.ApplicationUserToken", b =>
                 {
-                    b.HasOne("Leaderboard.Areas.Identity.Models.ApplicationUser", null)
+                    b.HasOne("Leaderboard.Areas.Identity.Models.ApplicationUser", "User")
                         .WithMany("Tokens")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Leaderboard.Areas.Identity.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId1");
                 });
 
             modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.ScoreModel", b =>

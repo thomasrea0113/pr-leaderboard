@@ -115,8 +115,7 @@ namespace Leaderboard.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     UserId = table.Column<string>(nullable: false),
                     ClaimType = table.Column<string>(nullable: true),
-                    ClaimValue = table.Column<string>(nullable: true),
-                    UserId1 = table.Column<string>(nullable: true)
+                    ClaimValue = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -127,23 +126,16 @@ namespace Leaderboard.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AspNetUserClaims_AspNetUsers_UserId1",
-                        column: x => x.UserId1,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(nullable: false),
-                    ProviderKey = table.Column<string>(nullable: false),
+                    LoginProvider = table.Column<string>(maxLength: 128, nullable: false),
+                    ProviderKey = table.Column<string>(maxLength: 128, nullable: false),
                     ProviderDisplayName = table.Column<string>(nullable: true),
-                    UserId = table.Column<string>(nullable: false),
-                    UserId1 = table.Column<string>(nullable: true)
+                    UserId = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -154,12 +146,6 @@ namespace Leaderboard.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AspNetUserLogins_AspNetUsers_UserId1",
-                        column: x => x.UserId1,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -167,8 +153,7 @@ namespace Leaderboard.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<string>(nullable: false),
-                    RoleId = table.Column<string>(nullable: false),
-                    UserId1 = table.Column<string>(nullable: true)
+                    RoleId = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -185,12 +170,6 @@ namespace Leaderboard.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AspNetUserRoles_AspNetUsers_UserId1",
-                        column: x => x.UserId1,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -198,10 +177,9 @@ namespace Leaderboard.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<string>(nullable: false),
-                    LoginProvider = table.Column<string>(nullable: false),
-                    Name = table.Column<string>(nullable: false),
-                    Value = table.Column<string>(nullable: true),
-                    UserId1 = table.Column<string>(nullable: true)
+                    LoginProvider = table.Column<string>(maxLength: 128, nullable: false),
+                    Name = table.Column<string>(maxLength: 128, nullable: false),
+                    Value = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -212,12 +190,6 @@ namespace Leaderboard.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AspNetUserTokens_AspNetUsers_UserId1",
-                        column: x => x.UserId1,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -285,6 +257,16 @@ namespace Leaderboard.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.InsertData(
+                table: "leaderboards",
+                columns: new[] { "Id", "IsActive", "Name" },
+                values: new object[,]
+                {
+                    { "61c6fe69-0be4-4d4e-bdca-3bc641b4402a", true, "Deadlift 1 Rep Max" },
+                    { "95ffb9c3-2122-410a-ba44-272f2188ed56", true, "Bench 1 Rep Max" },
+                    { "1c161800-801e-492b-9053-e01203d63490", true, "Squat 1 Rep Max" }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -302,29 +284,14 @@ namespace Leaderboard.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AspNetUserClaims_UserId1",
-                table: "AspNetUserClaims",
-                column: "UserId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserLogins_UserId",
                 table: "AspNetUserLogins",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AspNetUserLogins_UserId1",
-                table: "AspNetUserLogins",
-                column: "UserId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserRoles_RoleId",
                 table: "AspNetUserRoles",
                 column: "RoleId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AspNetUserRoles_UserId1",
-                table: "AspNetUserRoles",
-                column: "UserId1");
 
             migrationBuilder.CreateIndex(
                 name: "EmailIndex",
@@ -336,11 +303,6 @@ namespace Leaderboard.Migrations
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AspNetUserTokens_UserId1",
-                table: "AspNetUserTokens",
-                column: "UserId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_leaderboards_Name",

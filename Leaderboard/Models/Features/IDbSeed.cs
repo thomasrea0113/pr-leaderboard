@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Leaderboard.Models.Features
 {
-    public interface IDbEntity<TEntity>
+    public interface IDbSeed<TEntity>
         where TEntity : class, new()
     {
         /// <summary>
@@ -14,6 +14,6 @@ namespace Leaderboard.Models.Features
         /// </summary>P
         /// <param name="builder"></param>
         /// <param name="requestSeed">Indicates if we are seeding a development database with test data</param>
-        void OnModelCreating(EntityTypeBuilder<TEntity> builder);
+        void SeedData(EntityTypeBuilder<TEntity> builder);
     }
 }
