@@ -266,10 +266,25 @@ namespace Leaderboard.Migrations
 
             modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.ScoreModel", b =>
                 {
-                    b.Property<string>("BoardId")
+                    b.Property<string>("Id")
                         .HasColumnType("text");
 
-                    b.HasKey("BoardId");
+                    b.Property<string>("BoardId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("Value")
+                        .HasColumnType("decimal(12,4)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BoardId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Scores");
                 });
@@ -398,6 +413,12 @@ namespace Leaderboard.Migrations
                     b.HasOne("Leaderboard.Areas.Leaderboards.Models.LeaderboardModel", "Board")
                         .WithMany("Scores")
                         .HasForeignKey("BoardId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Leaderboard.Areas.Identity.Models.ApplicationUser", "User")
+                        .WithMany("Scores")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

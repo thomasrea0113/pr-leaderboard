@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Leaderboard.Areas.Identity.Managers;
@@ -12,6 +13,15 @@ namespace Leaderboard.Data.SeedExtensions
 {
     public static class SeedExtensions
     {
+        public static string[] UserIds = new string[]
+        {
+            "admin-user-id",
+            "test-user-1-id",
+            "test-user-2-id",
+            "test-user-3-id",
+            "test-user-4-id",
+        };
+
         /// <summary>
         /// Allows for identity user/role seeding using the provided managers.
         /// </summary>
@@ -23,25 +33,45 @@ namespace Leaderboard.Data.SeedExtensions
             // wait for the database to be created
             await context.Database.EnsureCreatedAsync();
 
-            var admin = new ApplicationUser("SooperDooperLifter")
+            var users = UserIds.Select(id => new ApplicationUser($"{id}-username")
             {
-                Email = "thomasrea0113@gmail.com"
-            };
-            await userManager.CreateOrUpdateByNameAsync(admin, "Password123");
+                Id = id,
+                Email = $"{id}@gmail.com"
+            }).ToArray();
+
+            foreach (var user in users)
+                await userManager.CreateOrUpdateByNameAsync(user, "Password123");
 
             var adminRole = new ApplicationRole("Admin");
             await roleManager.TryCreateByNameAsync(adminRole);
 
-            await userManager.TryAddToRoleAsync(admin, adminRole.Name);
+            await userManager.TryAddToRoleAsync(users[0], adminRole.Name);
 
-            var boards = await context.Set<LeaderboardModel>()
-                .Where(b => b.Name == "Bench 1 Rep Max" || b.Name == "Deadlift 1 Rep Max")
-                .ToListAsync();
+            var boards = await context.Set<LeaderboardModel>().ToListAsync();
 
             var ubs = context.Set<UserLeaderboard>();
 
-            foreach (var board in boards)
-                await ubs.FindOrAddAsync(UserLeaderboard.Create(admin, board), admin.Id, board.Id);
+            // add all users to all boards
+            foreach (var user in users)
+                foreach (var board in boards)
+                    await ubs.FindOrAddAsync(UserLeaderboard.Create(user, board), user.Id, board.Id);
+                    
+            var  SeedIds = Enumerable.Range(0, 150)
+                .Select(i => $"score-{i}-id")
+                .ToArray();
+            
+            var rand = new Random();
+            var scores = SeedIds.Select((id, index) => new ScoreModel
+            {
+                Id = id,
+                BoardId = LeaderboardModel.SeedIds[index % 3],
+                UserId = SeedExtensions.UserIds[index % 5],
+                Value = Convert.ToDecimal(rand.NextDouble()) * 100
+            });
+
+            var scoreSet = context.Set<ScoreModel>();
+            foreach (var score in scores)
+                await scoreSet.FindOrAddAsync(score, score.Id);
 
             await context.SaveChangesAsync();
             return builder;

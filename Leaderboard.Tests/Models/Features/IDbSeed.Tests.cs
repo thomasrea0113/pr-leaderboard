@@ -19,8 +19,6 @@ namespace Leaderboard.Tests.Models.Features
 
         /// <summary>
         /// Tests the data seeding method (both for identity and the calls to HasData on the model builder).
-        /// This test is executed twice. The first time the test will create all the models (assuming a fresh
-        /// database), and the second time the seed method should retrieve the models
         /// </summary>
         /// <param name="executionCount"></param>
         /// <returns></returns>
@@ -30,7 +28,7 @@ namespace Leaderboard.Tests.Models.Features
             var ctx = scope.GetRequiredService<ApplicationDbContext>();
             var um = scope.GetRequiredService<AppUserManager>();
 
-            var admin = await um.FindByNameAsync("SooperDooperLifter");
+            var admin = await um.FindByNameAsync("admin-user-id");
 
             Assert.NotNull(admin);
 
@@ -42,6 +40,24 @@ namespace Leaderboard.Tests.Models.Features
 
             Assert.Equal(2, admin.UserLeaderboards.Count);
             Assert.All(admin.UserLeaderboards.Select(ub => ub.Leaderboard), b=> boards.Contains(b));
+        });
+
+        /// <summary>
+        /// Tests the data seeding method (both for identity and the calls to HasData on the model builder).
+        /// </summary>
+        /// <param name="executionCount"></param>
+        /// <returns></returns>
+        [Fact]
+        public async Task TestSeededScores() => await WithScopeAsync(async scope =>
+        {
+            var ctx = scope.GetRequiredService<ApplicationDbContext>();
+            var um = scope.GetRequiredService<AppUserManager>();
+
+            var admin = await um.FindByNameAsync("admin-user-id");
+            Assert.NotNull(admin.Scores);
+            Assert.NotEmpty(admin.Scores);
+            Assert.All(admin.Scores, s => Assert.NotNull(s.Board));
+            Assert.All(admin.Scores, s => Assert.NotEqual(default, s.Value));
         });
     }
 }

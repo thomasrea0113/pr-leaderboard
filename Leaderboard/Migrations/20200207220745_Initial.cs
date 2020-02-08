@@ -196,15 +196,24 @@ namespace Leaderboard.Migrations
                 name: "Scores",
                 columns: table => new
                 {
-                    BoardId = table.Column<string>(nullable: false)
+                    Id = table.Column<string>(nullable: false),
+                    BoardId = table.Column<string>(nullable: false),
+                    UserId = table.Column<string>(nullable: false),
+                    Value = table.Column<decimal>(type: "decimal(12,4)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Scores", x => x.BoardId);
+                    table.PrimaryKey("PK_Scores", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Scores_leaderboards_BoardId",
                         column: x => x.BoardId,
                         principalTable: "leaderboards",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Scores_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -314,6 +323,16 @@ namespace Leaderboard.Migrations
                 name: "IX_RelatedTags_RelatedId",
                 table: "RelatedTags",
                 column: "RelatedId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Scores_BoardId",
+                table: "Scores",
+                column: "BoardId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Scores_UserId",
+                table: "Scores",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tags_Name",

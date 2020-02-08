@@ -30,21 +30,28 @@ namespace Leaderboard.Areas.Leaderboards.Models
             builder.Property(p => p.IsActive).HasDefaultValue(true);
         }
 
+        public static string[] SeedIds { get; } = new string[]
+        {
+            "61c6fe69-0be4-4d4e-bdca-3bc641b4402a",
+            "95ffb9c3-2122-410a-ba44-272f2188ed56",
+            "1c161800-801e-492b-9053-e01203d63490"
+        };
+
         public void SeedData(EntityTypeBuilder<LeaderboardModel> builder)
         {
             builder.HasData(new LeaderboardModel
             {
-                Id = "61c6fe69-0be4-4d4e-bdca-3bc641b4402a",
+                Id = SeedIds[0].ToString(),
                 Name = "Deadlift 1 Rep Max",
                 IsActive = true
             }, new LeaderboardModel
             {
-                Id = "95ffb9c3-2122-410a-ba44-272f2188ed56",
+                Id = SeedIds[1].ToString(),
                 Name = "Bench 1 Rep Max",
                 IsActive = true
             }, new LeaderboardModel
             {
-                Id = "1c161800-801e-492b-9053-e01203d63490",
+                Id = SeedIds[2].ToString(),
                 Name = "Squat 1 Rep Max",
                 IsActive = true
             });

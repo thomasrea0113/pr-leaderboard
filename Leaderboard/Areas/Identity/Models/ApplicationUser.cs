@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Leaderboard.Areas.Leaderboards.Models;
 using Leaderboard.Models.Features;
 using Leaderboard.Models.Relationships;
 using Microsoft.AspNetCore.Identity;
@@ -11,13 +12,18 @@ namespace Leaderboard.Areas.Identity.Models
     {
 
         public virtual ICollection<UserLeaderboard> UserLeaderboards { get; set; } = new List<UserLeaderboard>();
+        public virtual ICollection<ScoreModel> Scores { get; set; } = new List<ScoreModel>();
 
         public bool? IsActive { get; set; }
+
+        #region identity relationships
 
         public virtual ICollection<ApplicationUserClaim> Claims { get; set; }
         public virtual ICollection<ApplicationUserLogin> Logins { get; set; }
         public virtual ICollection<ApplicationUserToken> Tokens { get; set; }
         public virtual ICollection<ApplicationUserRole> UserRoles { get; set; }
+
+        #endregion
 
         public ApplicationUser()
         {
@@ -52,7 +58,7 @@ namespace Leaderboard.Areas.Identity.Models
                 .WithOne(e => e.User)
                 .HasForeignKey(ur => ur.UserId)
                 .IsRequired();
-                
+
             builder.Property(p => p.IsActive).HasDefaultValue(true);
         }
     }
