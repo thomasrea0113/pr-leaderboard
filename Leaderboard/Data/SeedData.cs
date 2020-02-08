@@ -27,7 +27,7 @@ namespace Leaderboard.Data.SeedExtensions
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public static async Task<IApplicationBuilder> SeedIdentityAsync(this IApplicationBuilder builder, DbContext context,
+        public static async Task<IApplicationBuilder> SeedDevelopmentDataAsync(this IApplicationBuilder builder, DbContext context,
         AppUserManager userManager, AppRoleManager roleManager)
         {
             // wait for the database to be created

@@ -79,8 +79,8 @@ namespace Leaderboard
             {
                 var timeout = config.GetValue("SeedData:TimeoutInSeconds", 60) * 1000;
                 // Is this a bad idea? Seeding the data and continuing execution shouldn't cause issues.
-                if (!app.SeedIdentityAsync(context, userManager, roleManager).Wait(timeout))
-                    throw new TimeoutException($"The {nameof(SeedExtensions.SeedIdentityAsync)} method did not complete in {timeout} seconds");
+                if (!app.SeedDevelopmentDataAsync(context, userManager, roleManager).Wait(timeout))
+                    throw new TimeoutException($"The {nameof(SeedExtensions.SeedDevelopmentDataAsync)} method did not complete in {timeout} seconds");
             }
 
             if (env.IsDevelopment())

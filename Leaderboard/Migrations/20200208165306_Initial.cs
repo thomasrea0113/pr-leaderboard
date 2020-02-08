@@ -54,6 +54,7 @@ namespace Leaderboard.Migrations
                 {
                     Id = table.Column<string>(nullable: false),
                     Name = table.Column<string>(nullable: true),
+                    DivisionId = table.Column<string>(nullable: true),
                     IsActive = table.Column<bool>(nullable: true, defaultValue: true)
                 },
                 constraints: table =>
@@ -193,6 +194,30 @@ namespace Leaderboard.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Division",
+                columns: table => new
+                {
+                    Id = table.Column<string>(nullable: false),
+                    Gender = table.Column<int>(nullable: false),
+                    Name = table.Column<string>(nullable: true),
+                    AgeLowerBound = table.Column<int>(nullable: false),
+                    AgeUpperBound = table.Column<int>(nullable: false),
+                    WeightLowerBound = table.Column<int>(nullable: false),
+                    WeightUpperBound = table.Column<int>(nullable: false),
+                    BoardId = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Division", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Division_leaderboards_BoardId",
+                        column: x => x.BoardId,
+                        principalTable: "leaderboards",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Scores",
                 columns: table => new
                 {
@@ -268,12 +293,12 @@ namespace Leaderboard.Migrations
 
             migrationBuilder.InsertData(
                 table: "leaderboards",
-                columns: new[] { "Id", "IsActive", "Name" },
+                columns: new[] { "Id", "DivisionId", "IsActive", "Name" },
                 values: new object[,]
                 {
-                    { "61c6fe69-0be4-4d4e-bdca-3bc641b4402a", true, "Deadlift 1 Rep Max" },
-                    { "95ffb9c3-2122-410a-ba44-272f2188ed56", true, "Bench 1 Rep Max" },
-                    { "1c161800-801e-492b-9053-e01203d63490", true, "Squat 1 Rep Max" }
+                    { "61c6fe69-0be4-4d4e-bdca-3bc641b4402a", null, true, "Deadlift 1 Rep Max" },
+                    { "95ffb9c3-2122-410a-ba44-272f2188ed56", null, true, "Bench 1 Rep Max" },
+                    { "1c161800-801e-492b-9053-e01203d63490", null, true, "Squat 1 Rep Max" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -311,6 +336,12 @@ namespace Leaderboard.Migrations
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Division_BoardId",
+                table: "Division",
+                column: "BoardId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -362,6 +393,9 @@ namespace Leaderboard.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "Division");
 
             migrationBuilder.DropTable(
                 name: "RelatedTags");

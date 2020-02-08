@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Leaderboard.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200207220745_Initial")]
+    [Migration("20200208165306_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -224,10 +224,48 @@ namespace Leaderboard.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.Division", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text");
+
+                    b.Property<int>("AgeLowerBound")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("AgeUpperBound")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("BoardId")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Gender")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<int>("WeightLowerBound")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("WeightUpperBound")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BoardId")
+                        .IsUnique();
+
+                    b.ToTable("Division");
+                });
+
             modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.LeaderboardModel", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("text");
+
+                    b.Property<string>("DivisionId")
                         .HasColumnType("text");
 
                     b.Property<bool?>("IsActive")
@@ -408,6 +446,14 @@ namespace Leaderboard.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.Division", b =>
+                {
+                    b.HasOne("Leaderboard.Areas.Leaderboards.Models.LeaderboardModel", "Board")
+                        .WithOne("Division")
+                        .HasForeignKey("Leaderboard.Areas.Leaderboards.Models.Division", "BoardId")
+                        .OnDelete(DeleteBehavior.SetNull);
                 });
 
             modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.ScoreModel", b =>

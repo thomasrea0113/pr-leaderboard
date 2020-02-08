@@ -10,25 +10,23 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Leaderboard.Areas.Leaderboards.Models
 {
     // TODO implement sluggy on save
-    public class LeaderboardModel : IDbEntity<LeaderboardModel>, IDbSeed<LeaderboardModel>, IDbActive
+    public class LeaderboardModel : IDbEntity<LeaderboardModel>, IDbActive
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public string Id { get; set; }
 
         public string Name { get; set; }
+
+        public string DivisionId { get; set; }
+        public virtual Division Division { get; set; }
+
+
         public virtual ICollection<UserLeaderboard> UserLeaderboards { get; set; } = new List<UserLeaderboard>();
 
         public bool? IsActive { get; set; }
 
         public virtual ICollection<ScoreModel> Scores { get; set; }
-
-        public void OnModelCreating(EntityTypeBuilder<LeaderboardModel> builder)
-        {
-            // ensuring Name is unique
-            builder.HasIndex(p => p.Name).IsUnique();
-            builder.Property(p => p.IsActive).HasDefaultValue(true);
-        }
 
         public static string[] SeedIds { get; } = new string[]
         {
@@ -37,8 +35,19 @@ namespace Leaderboard.Areas.Leaderboards.Models
             "1c161800-801e-492b-9053-e01203d63490"
         };
 
-        public void SeedData(EntityTypeBuilder<LeaderboardModel> builder)
+        public void OnModelCreating(EntityTypeBuilder<LeaderboardModel> builder)
         {
+            // ensuring Name is unique
+            builder.HasIndex(p => p.Name).IsUnique();
+            builder.Property(p => p.IsActive).HasDefaultValue(true);
+
+            // a board has one division. When we delete the board, we don't
+            // want to automatically delete the division as well.
+            builder.HasOne(b => b.Division)
+                .WithOne(b => b.Board)
+                .HasForeignKey<Division>(b => b.BoardId)
+                .OnDelete(DeleteBehavior.SetNull);
+
             builder.HasData(new LeaderboardModel
             {
                 Id = SeedIds[0].ToString(),

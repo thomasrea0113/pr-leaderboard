@@ -34,24 +34,15 @@ namespace Leaderboard.Data
 
         #endregion
 
-        /// <summary>
-        /// A flag indicating if we should seed aditional development data
-        /// </summary>
-        private readonly bool _seed;
-
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IConfiguration config)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
-            _seed = config.GetValue<bool>("SeedData:Enabled", false);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
             this.ConfigureEntities(modelBuilder);
-            
-            if (_seed)
-                this.SeedData(modelBuilder);
         }
 
         public override int SaveChanges()
