@@ -18,7 +18,7 @@ namespace Leaderboard.Tests.TestSetup.Fixtures
     {
         public DefaultFixture(string dbName = default)
         {
-            this.Register<TagModel>(() => new TagModel {
+            this.Register<Division>(() => new Division {
                 Name = $"Tag {this.Create<string>()}"
             });
 

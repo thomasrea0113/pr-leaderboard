@@ -28,6 +28,9 @@ namespace Leaderboard.Areas.Leaderboards.Models
 
         public virtual ICollection<ScoreModel> Scores { get; set; }
 
+        public virtual string UOMId { get; set; }
+        public virtual UnitOfMeasureModel UOM { get; set; }
+
         public static string[] SeedIds { get; } = new string[]
         {
             "61c6fe69-0be4-4d4e-bdca-3bc641b4402a",
@@ -38,8 +41,17 @@ namespace Leaderboard.Areas.Leaderboards.Models
         public void OnModelCreating(EntityTypeBuilder<LeaderboardModel> builder)
         {
             // ensuring Name is unique
+            builder.Property(p => p.Name).IsRequired();
             builder.HasIndex(p => p.Name).IsUnique();
             builder.Property(p => p.IsActive).HasDefaultValue(true);
+
+            // all boards must have a unit of measure. If you try and delete a
+            // unit of measure while it is in use by a board, we will prevent it.
+            builder.HasOne(b => b.UOM)
+                .WithMany(b => b.Boards)
+                .HasForeignKey(b => b.UOMId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .IsRequired();
 
             // a board has one division. When we delete the board, we don't
             // want to automatically delete the division as well.
@@ -52,17 +64,20 @@ namespace Leaderboard.Areas.Leaderboards.Models
             {
                 Id = SeedIds[0].ToString(),
                 Name = "Deadlift 1 Rep Max",
-                IsActive = true
+                IsActive = true,
+                UOMId = UnitOfMeasureModel.UOMIds[0]
             }, new LeaderboardModel
             {
                 Id = SeedIds[1].ToString(),
                 Name = "Bench 1 Rep Max",
-                IsActive = true
+                IsActive = true,
+                UOMId = UnitOfMeasureModel.UOMIds[0]
             }, new LeaderboardModel
             {
                 Id = SeedIds[2].ToString(),
                 Name = "Squat 1 Rep Max",
-                IsActive = true
+                IsActive = true,
+                UOMId = UnitOfMeasureModel.UOMIds[0]
             });
         }
     }

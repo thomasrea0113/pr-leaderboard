@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Leaderboard.Areas.Leaderboards.Models;
+using Leaderboard.Models;
 using Leaderboard.Models.Features;
 using Leaderboard.Models.Relationships;
 using Microsoft.AspNetCore.Identity;
@@ -13,6 +14,7 @@ namespace Leaderboard.Areas.Identity.Models
 
         public virtual ICollection<UserLeaderboard> UserLeaderboards { get; set; } = new List<UserLeaderboard>();
         public virtual ICollection<ScoreModel> Scores { get; set; } = new List<ScoreModel>();
+        public virtual ICollection<FileModel> UploadedFiles { get; set; } = new List<FileModel>();
 
         public bool? IsActive { get; set; }
 

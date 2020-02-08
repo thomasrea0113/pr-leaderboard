@@ -23,14 +23,14 @@ namespace Leaderboard.Data
 
     {
         public DbSet<LeaderboardModel> leaderboards { get; set; }
-        public DbSet<TagModel> Tags { get; set; }
+        public DbSet<Division> Divisions { get; set; }
         public DbSet<ScoreModel> Scores { get; set; }
         public DbSet<UnitOfMeasureModel> UnitsOfMeasure { get; set; }
 
         #region relationship tables
 
         public DbSet<UserLeaderboard> UserLeaderboards { get; set; }
-        public DbSet<RelatedTag> RelatedTags { get; set; }
+        public DbSet<RelatedDivision> RelatedDivisions { get; set; }
 
         #endregion
 
