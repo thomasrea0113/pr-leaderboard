@@ -22,7 +22,7 @@ namespace Leaderboard.Models
         public string Path { get; set; }
         public DateTime UploadDate { get; set; }
 
-        public string ApplicationUserId { get; set; }
+        public string UserId { get; set; }
         public virtual ApplicationUser CreatedBy { get; set; }
 
         public void OnModelCreating(EntityTypeBuilder<FileModel> builder)
@@ -38,7 +38,7 @@ namespace Leaderboard.Models
 
             builder.HasOne(b => b.CreatedBy)
                 .WithMany(b => b.UploadedFiles)
-                .HasForeignKey(b => b.ApplicationUserId)
+                .HasForeignKey(b => b.UserId)
                 .IsRequired();
         }
     }

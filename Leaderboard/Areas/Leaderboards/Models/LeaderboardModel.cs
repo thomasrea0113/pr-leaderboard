@@ -31,18 +31,18 @@ namespace Leaderboard.Areas.Leaderboards.Models
         public virtual string UOMId { get; set; }
         public virtual UnitOfMeasureModel UOM { get; set; }
 
-        public static string[] SeedIds { get; } = new string[]
-        {
-            "61c6fe69-0be4-4d4e-bdca-3bc641b4402a",
-            "95ffb9c3-2122-410a-ba44-272f2188ed56",
-            "1c161800-801e-492b-9053-e01203d63490"
-        };
-
         public void OnModelCreating(EntityTypeBuilder<LeaderboardModel> builder)
         {
             // ensuring Name is unique
             builder.Property(p => p.Name).IsRequired();
-            builder.HasIndex(p => p.Name).IsUnique();
+
+            // A division can only contain one board with a given name
+            builder.HasIndex(p => new 
+            {
+                p.DivisionId,
+                p.Name
+            }).IsUnique();
+
             builder.Property(p => p.IsActive).HasDefaultValue(true);
 
             // all boards must have a unit of measure. If you try and delete a
@@ -53,32 +53,11 @@ namespace Leaderboard.Areas.Leaderboards.Models
                 .OnDelete(DeleteBehavior.Restrict)
                 .IsRequired();
 
-            // a board has one division. When we delete the board, we don't
-            // want to automatically delete the division as well.
+            // a board has one division, but a division has many boards
             builder.HasOne(b => b.Division)
-                .WithOne(b => b.Board)
-                .HasForeignKey<Division>(b => b.BoardId)
-                .OnDelete(DeleteBehavior.SetNull);
-
-            builder.HasData(new LeaderboardModel
-            {
-                Id = SeedIds[0].ToString(),
-                Name = "Deadlift 1 Rep Max",
-                IsActive = true,
-                UOMId = UnitOfMeasureModel.UOMIds[0]
-            }, new LeaderboardModel
-            {
-                Id = SeedIds[1].ToString(),
-                Name = "Bench 1 Rep Max",
-                IsActive = true,
-                UOMId = UnitOfMeasureModel.UOMIds[0]
-            }, new LeaderboardModel
-            {
-                Id = SeedIds[2].ToString(),
-                Name = "Squat 1 Rep Max",
-                IsActive = true,
-                UOMId = UnitOfMeasureModel.UOMIds[0]
-            });
+                .WithMany(b => b.Boards)
+                .HasForeignKey(b => b.DivisionId)
+                .IsRequired();
         }
     }
 }

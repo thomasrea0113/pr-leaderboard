@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -26,6 +26,7 @@ namespace Leaderboard.Data
         public DbSet<Division> Divisions { get; set; }
         public DbSet<ScoreModel> Scores { get; set; }
         public DbSet<UnitOfMeasureModel> UnitsOfMeasure { get; set; }
+        public DbSet<FileModel> UploadedFiles { get; set; }
 
         #region relationship tables
 

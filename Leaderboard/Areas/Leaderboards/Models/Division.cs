@@ -35,8 +35,7 @@ namespace Leaderboard.Areas.Leaderboards.Models
         /// <value></value>
         public int WeightUpperBound { get; set; }
 
-        public string BoardId { get; set; }
-        public virtual LeaderboardModel Board { get; set; }
+        public virtual ICollection<LeaderboardModel> Boards { get; set; }
 
         public virtual List<RelatedDivision> RelatedDivisions { get; set; } = new List<RelatedDivision>();
         public virtual List<RelatedDivision> DivisionsRelatedToMe { get; set; } = new List<RelatedDivision>();
@@ -64,12 +63,6 @@ namespace Leaderboard.Areas.Leaderboards.Models
                 b.Gender,
                 b.Name
             }).IsUnique();
-
-            // a board has one division
-            builder.HasOne(b => b.Board)
-                .WithOne(b => b.Division)
-                .HasForeignKey<LeaderboardModel>(b => b.DivisionId)
-                .IsRequired();
         }
 
         public override string ToString()
