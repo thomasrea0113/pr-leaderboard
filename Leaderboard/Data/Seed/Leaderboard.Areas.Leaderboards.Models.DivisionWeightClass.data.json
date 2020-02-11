@@ -1,0 +1,17 @@
+[
+    {
+        "Id": "22b43262-9bff-4831-be74-da3578aa12ea",
+        "WeightClassId": "01eef25f-2b66-4a8b-92f4-b68a837169f7",
+        "DivisionId": "0025ec6a-2006-48f2-b563-368d9f363582"
+    },
+    {
+        "Id": "6b02ed84-428b-4630-8633-2832978f43ef",
+        "WeightClassId": "40b02d89-022b-4b00-af83-cc9614d0016a",
+        "DivisionId": "7cf02a99-8e49-4ff1-b7a2-93fd3a081868"
+    },
+    {
+        "Id": "a2e9afbe-9517-415c-b6bb-2eca581e3aa7",
+        "WeightClassId": "23adb0ef-8efb-47ed-89da-ea56f96a0f78",
+        "DivisionId": "831e128d-2837-48da-b31b-c40dbe17a8a6"
+    }
+]

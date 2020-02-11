@@ -70,17 +70,18 @@ namespace Leaderboard
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IConfiguration config,
-            ApplicationDbContext context, AppUserManager userManager, AppRoleManager roleManager)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IConfiguration config, IServiceProvider services)
         {
             // if seeding is configured for this configuration, attemps to run the seed method syncronously
             // and cancels it if it does not complete in time
             if (config.GetValue("SeedData:Enabled", false))
             {
                 var timeout = config.GetValue("SeedData:TimeoutInSeconds", 60) * 1000;
-                // Is this a bad idea? Seeding the data and continuing execution shouldn't cause issues.
-                if (!app.SeedDevelopmentDataAsync(context, userManager, roleManager).Wait(timeout))
-                    throw new TimeoutException($"The {nameof(SeedExtensions.SeedDevelopmentDataAsync)} method did not complete in {timeout} seconds");
+                using (var scope = services.CreateScope())
+                {
+                    if (!app.SeedDataAsync(scope.ServiceProvider, env.EnvironmentName.ToLower()).Wait(timeout))
+                        throw new TimeoutException($"The {nameof(SeedExtensions.SeedDataAsync)} method did not complete in {timeout} seconds");
+                }
             }
 
             if (env.IsDevelopment())

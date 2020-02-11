@@ -49,42 +49,44 @@ namespace Leaderboard.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "leaderboards",
+                name: "Divisions",
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
-                    Name = table.Column<string>(nullable: true),
-                    DivisionId = table.Column<string>(nullable: true),
-                    IsActive = table.Column<bool>(nullable: true, defaultValue: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_leaderboards", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Tags",
-                columns: table => new
-                {
-                    Id = table.Column<string>(nullable: false),
+                    Gender = table.Column<string>(nullable: false, defaultValue: "All"),
                     Name = table.Column<string>(nullable: false),
-                    IsActive = table.Column<bool>(nullable: true, defaultValue: true)
+                    AgeLowerBound = table.Column<int>(nullable: false),
+                    AgeUpperBound = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Tags", x => x.Id);
+                    table.PrimaryKey("PK_Divisions", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "UnitsOfMeasure",
                 columns: table => new
                 {
+                    Id = table.Column<string>(nullable: false),
                     Unit = table.Column<string>(nullable: false),
                     IsActive = table.Column<bool>(nullable: true, defaultValue: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UnitsOfMeasure", x => x.Unit);
+                    table.PrimaryKey("PK_UnitsOfMeasure", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WeightClasses",
+                columns: table => new
+                {
+                    Id = table.Column<string>(nullable: false),
+                    WeightLowerBound = table.Column<int>(nullable: false),
+                    WeightUpperBound = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WeightClasses", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -194,27 +196,99 @@ namespace Leaderboard.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Division",
+                name: "UploadedFiles",
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
-                    Gender = table.Column<int>(nullable: false),
-                    Name = table.Column<string>(nullable: true),
-                    AgeLowerBound = table.Column<int>(nullable: false),
-                    AgeUpperBound = table.Column<int>(nullable: false),
-                    WeightLowerBound = table.Column<int>(nullable: false),
-                    WeightUpperBound = table.Column<int>(nullable: false),
-                    BoardId = table.Column<string>(nullable: true)
+                    Path = table.Column<string>(nullable: false),
+                    UploadDate = table.Column<DateTime>(nullable: false),
+                    UserId = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Division", x => x.Id);
+                    table.PrimaryKey("PK_UploadedFiles", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Division_leaderboards_BoardId",
-                        column: x => x.BoardId,
-                        principalTable: "leaderboards",
+                        name: "FK_UploadedFiles_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RelatedDivisions",
+                columns: table => new
+                {
+                    DivisionId = table.Column<string>(nullable: false),
+                    RelatedId = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RelatedDivisions", x => new { x.DivisionId, x.RelatedId });
+                    table.ForeignKey(
+                        name: "FK_RelatedDivisions_Divisions_DivisionId",
+                        column: x => x.DivisionId,
+                        principalTable: "Divisions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_RelatedDivisions_Divisions_RelatedId",
+                        column: x => x.RelatedId,
+                        principalTable: "Divisions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "leaderboards",
+                columns: table => new
+                {
+                    Id = table.Column<string>(nullable: false),
+                    Name = table.Column<string>(nullable: false),
+                    DivisionId = table.Column<string>(nullable: false),
+                    IsActive = table.Column<bool>(nullable: true, defaultValue: true),
+                    UOMId = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_leaderboards", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_leaderboards_Divisions_DivisionId",
+                        column: x => x.DivisionId,
+                        principalTable: "Divisions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_leaderboards_UnitsOfMeasure_UOMId",
+                        column: x => x.UOMId,
+                        principalTable: "UnitsOfMeasure",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DivisionWeightClasses",
+                columns: table => new
+                {
+                    Id = table.Column<string>(nullable: false),
+                    DivisionId = table.Column<string>(nullable: false),
+                    WeightClassId = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DivisionWeightClasses", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DivisionWeightClasses_Divisions_DivisionId",
+                        column: x => x.DivisionId,
+                        principalTable: "Divisions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_DivisionWeightClasses_WeightClasses_WeightClassId",
+                        column: x => x.WeightClassId,
+                        principalTable: "WeightClasses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -222,6 +296,8 @@ namespace Leaderboard.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
+                    IsApproved = table.Column<bool>(nullable: true, defaultValue: false),
+                    VideoProofId = table.Column<string>(nullable: true),
                     BoardId = table.Column<string>(nullable: false),
                     UserId = table.Column<string>(nullable: false),
                     Value = table.Column<decimal>(type: "decimal(12,4)", nullable: false)
@@ -241,6 +317,12 @@ namespace Leaderboard.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Scores_UploadedFiles_VideoProofId",
+                        column: x => x.VideoProofId,
+                        principalTable: "UploadedFiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -267,38 +349,14 @@ namespace Leaderboard.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "RelatedTags",
-                columns: table => new
-                {
-                    TagId = table.Column<string>(nullable: false),
-                    RelatedId = table.Column<string>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RelatedTags", x => new { x.TagId, x.RelatedId });
-                    table.ForeignKey(
-                        name: "FK_RelatedTags_Tags_RelatedId",
-                        column: x => x.RelatedId,
-                        principalTable: "Tags",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_RelatedTags_Tags_TagId",
-                        column: x => x.TagId,
-                        principalTable: "Tags",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.InsertData(
-                table: "leaderboards",
-                columns: new[] { "Id", "DivisionId", "IsActive", "Name" },
+                table: "UnitsOfMeasure",
+                columns: new[] { "Id", "IsActive", "Unit" },
                 values: new object[,]
                 {
-                    { "61c6fe69-0be4-4d4e-bdca-3bc641b4402a", null, true, "Deadlift 1 Rep Max" },
-                    { "95ffb9c3-2122-410a-ba44-272f2188ed56", null, true, "Bench 1 Rep Max" },
-                    { "1c161800-801e-492b-9053-e01203d63490", null, true, "Squat 1 Rep Max" }
+                    { "e362dd90-d6fe-459b-ba26-09db002bfff6", true, "Kilograms" },
+                    { "12c7c15a-db13-4912-a7c8-fc86db54849b", true, "Seconds" },
+                    { "d77c24f6-54f1-448d-9117-ea4e7034904f", true, "Meters" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -339,20 +397,36 @@ namespace Leaderboard.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Division_BoardId",
-                table: "Division",
-                column: "BoardId",
+                name: "IX_Divisions_Gender_Name",
+                table: "Divisions",
+                columns: new[] { "Gender", "Name" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_leaderboards_Name",
+                name: "IX_DivisionWeightClasses_WeightClassId",
+                table: "DivisionWeightClasses",
+                column: "WeightClassId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DivisionWeightClasses_DivisionId_WeightClassId",
+                table: "DivisionWeightClasses",
+                columns: new[] { "DivisionId", "WeightClassId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_leaderboards_UOMId",
                 table: "leaderboards",
-                column: "Name",
+                column: "UOMId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_leaderboards_DivisionId_Name",
+                table: "leaderboards",
+                columns: new[] { "DivisionId", "Name" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_RelatedTags_RelatedId",
-                table: "RelatedTags",
+                name: "IX_RelatedDivisions_RelatedId",
+                table: "RelatedDivisions",
                 column: "RelatedId");
 
             migrationBuilder.CreateIndex(
@@ -366,15 +440,37 @@ namespace Leaderboard.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Tags_Name",
-                table: "Tags",
-                column: "Name",
+                name: "IX_Scores_VideoProofId",
+                table: "Scores",
+                column: "VideoProofId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UnitsOfMeasure_Unit",
+                table: "UnitsOfMeasure",
+                column: "Unit",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UploadedFiles_Path",
+                table: "UploadedFiles",
+                column: "Path",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UploadedFiles_UserId",
+                table: "UploadedFiles",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserLeaderboards_LeaderboardId",
                 table: "UserLeaderboards",
                 column: "LeaderboardId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WeightClasses_WeightLowerBound_WeightUpperBound",
+                table: "WeightClasses",
+                columns: new[] { "WeightLowerBound", "WeightUpperBound" },
+                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -395,16 +491,13 @@ namespace Leaderboard.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Division");
+                name: "DivisionWeightClasses");
 
             migrationBuilder.DropTable(
-                name: "RelatedTags");
+                name: "RelatedDivisions");
 
             migrationBuilder.DropTable(
                 name: "Scores");
-
-            migrationBuilder.DropTable(
-                name: "UnitsOfMeasure");
 
             migrationBuilder.DropTable(
                 name: "UserLeaderboards");
@@ -413,13 +506,22 @@ namespace Leaderboard.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Tags");
+                name: "WeightClasses");
+
+            migrationBuilder.DropTable(
+                name: "UploadedFiles");
 
             migrationBuilder.DropTable(
                 name: "leaderboards");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Divisions");
+
+            migrationBuilder.DropTable(
+                name: "UnitsOfMeasure");
         }
     }
 }

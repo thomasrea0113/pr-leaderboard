@@ -1,0 +1,23 @@
+[
+    {
+        "Id": "0025ec6a-2006-48f2-b563-368d9f363582",
+        "Gender": 0,
+        "Name": "Open",
+        "AgeUpperBound": 0,
+        "AgeLowerBound": 14
+    },
+    {
+        "Id": "7cf02a99-8e49-4ff1-b7a2-93fd3a081868",
+        "Gender": 1,
+        "Name": "Open",
+        "AgeUpperBound": 0,
+        "AgeLowerBound": 14
+    },
+    {
+        "Id": "831e128d-2837-48da-b31b-c40dbe17a8a6",
+        "Gender": 0,
+        "Name": "Junior",
+        "AgeUpperBound": 23,
+        "AgeLowerBound": 19
+    }
+]

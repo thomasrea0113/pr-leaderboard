@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Leaderboard.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200208165306_Initial")]
+    [Migration("20200211144838_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -236,27 +236,46 @@ namespace Leaderboard.Migrations
                     b.Property<int>("AgeUpperBound")
                         .HasColumnType("integer");
 
-                    b.Property<string>("BoardId")
-                        .HasColumnType("text");
-
-                    b.Property<int>("Gender")
-                        .HasColumnType("integer");
+                    b.Property<string>("Gender")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("All");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<int>("WeightLowerBound")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("WeightUpperBound")
-                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BoardId")
+                    b.HasIndex("Gender", "Name")
                         .IsUnique();
 
-                    b.ToTable("Division");
+                    b.ToTable("Divisions");
+                });
+
+            modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.DivisionWeightClass", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text");
+
+                    b.Property<string>("DivisionId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("WeightClassId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WeightClassId");
+
+                    b.HasIndex("DivisionId", "WeightClassId")
+                        .IsUnique();
+
+                    b.ToTable("DivisionWeightClasses");
                 });
 
             modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.LeaderboardModel", b =>
@@ -266,6 +285,7 @@ namespace Leaderboard.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("DivisionId")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool?>("IsActive")
@@ -274,34 +294,36 @@ namespace Leaderboard.Migrations
                         .HasDefaultValue(true);
 
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UOMId")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
+                    b.HasIndex("UOMId");
+
+                    b.HasIndex("DivisionId", "Name")
                         .IsUnique();
 
                     b.ToTable("leaderboards");
+                });
 
-                    b.HasData(
-                        new
-                        {
-                            Id = "61c6fe69-0be4-4d4e-bdca-3bc641b4402a",
-                            IsActive = true,
-                            Name = "Deadlift 1 Rep Max"
-                        },
-                        new
-                        {
-                            Id = "95ffb9c3-2122-410a-ba44-272f2188ed56",
-                            IsActive = true,
-                            Name = "Bench 1 Rep Max"
-                        },
-                        new
-                        {
-                            Id = "1c161800-801e-492b-9053-e01203d63490",
-                            IsActive = true,
-                            Name = "Squat 1 Rep Max"
-                        });
+            modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.RelatedDivision", b =>
+                {
+                    b.Property<string>("DivisionId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("RelatedId")
+                        .HasColumnType("text");
+
+                    b.HasKey("DivisionId", "RelatedId");
+
+                    b.HasIndex("RelatedId");
+
+                    b.ToTable("RelatedDivisions");
                 });
 
             modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.ScoreModel", b =>
@@ -313,6 +335,11 @@ namespace Leaderboard.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<bool?>("IsApproved")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("text");
@@ -320,18 +347,24 @@ namespace Leaderboard.Migrations
                     b.Property<decimal>("Value")
                         .HasColumnType("decimal(12,4)");
 
+                    b.Property<string>("VideoProofId")
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.HasIndex("BoardId");
 
                     b.HasIndex("UserId");
 
+                    b.HasIndex("VideoProofId");
+
                     b.ToTable("Scores");
                 });
 
             modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.UnitOfMeasureModel", b =>
                 {
-                    b.Property<string>("Unit")
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("text");
 
                     b.Property<bool?>("IsActive")
@@ -339,24 +372,83 @@ namespace Leaderboard.Migrations
                         .HasColumnType("boolean")
                         .HasDefaultValue(true);
 
-                    b.HasKey("Unit");
+                    b.Property<string>("Unit")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Unit")
+                        .IsUnique();
 
                     b.ToTable("UnitsOfMeasure");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "e362dd90-d6fe-459b-ba26-09db002bfff6",
+                            IsActive = true,
+                            Unit = "Kilograms"
+                        },
+                        new
+                        {
+                            Id = "12c7c15a-db13-4912-a7c8-fc86db54849b",
+                            IsActive = true,
+                            Unit = "Seconds"
+                        },
+                        new
+                        {
+                            Id = "d77c24f6-54f1-448d-9117-ea4e7034904f",
+                            IsActive = true,
+                            Unit = "Meters"
+                        });
                 });
 
-            modelBuilder.Entity("Leaderboard.Models.Relationships.RelatedTag", b =>
+            modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.WeightClass", b =>
                 {
-                    b.Property<string>("TagId")
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("text");
 
-                    b.Property<string>("RelatedId")
+                    b.Property<int>("WeightLowerBound")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("WeightUpperBound")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WeightLowerBound", "WeightUpperBound")
+                        .IsUnique();
+
+                    b.ToTable("WeightClasses");
+                });
+
+            modelBuilder.Entity("Leaderboard.Models.FileModel", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("text");
 
-                    b.HasKey("TagId", "RelatedId");
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.HasIndex("RelatedId");
+                    b.Property<DateTime>("UploadDate")
+                        .HasColumnType("timestamp without time zone");
 
-                    b.ToTable("RelatedTags");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Path")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UploadedFiles");
                 });
 
             modelBuilder.Entity("Leaderboard.Models.Relationships.UserLeaderboard", b =>
@@ -372,29 +464,6 @@ namespace Leaderboard.Migrations
                     b.HasIndex("LeaderboardId");
 
                     b.ToTable("UserLeaderboards");
-                });
-
-            modelBuilder.Entity("Leaderboard.Models.TagModel", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("text");
-
-                    b.Property<bool?>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("Tags");
                 });
 
             modelBuilder.Entity("Leaderboard.Areas.Identity.Models.ApplicationRoleClaim", b =>
@@ -448,12 +517,49 @@ namespace Leaderboard.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.Division", b =>
+            modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.DivisionWeightClass", b =>
                 {
-                    b.HasOne("Leaderboard.Areas.Leaderboards.Models.LeaderboardModel", "Board")
-                        .WithOne("Division")
-                        .HasForeignKey("Leaderboard.Areas.Leaderboards.Models.Division", "BoardId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                    b.HasOne("Leaderboard.Areas.Leaderboards.Models.Division", "Division")
+                        .WithMany("WeightClasses")
+                        .HasForeignKey("DivisionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Leaderboard.Areas.Leaderboards.Models.WeightClass", "WeightClass")
+                        .WithMany("Divisions")
+                        .HasForeignKey("WeightClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.LeaderboardModel", b =>
+                {
+                    b.HasOne("Leaderboard.Areas.Leaderboards.Models.Division", "Division")
+                        .WithMany("Boards")
+                        .HasForeignKey("DivisionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Leaderboard.Areas.Leaderboards.Models.UnitOfMeasureModel", "UOM")
+                        .WithMany("Boards")
+                        .HasForeignKey("UOMId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.RelatedDivision", b =>
+                {
+                    b.HasOne("Leaderboard.Areas.Leaderboards.Models.Division", "Division")
+                        .WithMany("RelatedDivisions")
+                        .HasForeignKey("DivisionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Leaderboard.Areas.Leaderboards.Models.Division", "Related")
+                        .WithMany("DivisionsRelatedToMe")
+                        .HasForeignKey("RelatedId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.ScoreModel", b =>
@@ -469,19 +575,17 @@ namespace Leaderboard.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Leaderboard.Models.FileModel", "VideoProof")
+                        .WithMany()
+                        .HasForeignKey("VideoProofId");
                 });
 
-            modelBuilder.Entity("Leaderboard.Models.Relationships.RelatedTag", b =>
+            modelBuilder.Entity("Leaderboard.Models.FileModel", b =>
                 {
-                    b.HasOne("Leaderboard.Models.TagModel", "Related")
-                        .WithMany("RelatedToMeTags")
-                        .HasForeignKey("RelatedId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Leaderboard.Models.TagModel", "Tag")
-                        .WithMany("RelatedTags")
-                        .HasForeignKey("TagId")
+                    b.HasOne("Leaderboard.Areas.Identity.Models.ApplicationUser", "CreatedBy")
+                        .WithMany("UploadedFiles")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

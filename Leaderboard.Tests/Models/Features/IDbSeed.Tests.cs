@@ -48,16 +48,15 @@ namespace Leaderboard.Tests.Models.Features
         /// <param name="executionCount"></param>
         /// <returns></returns>
         [Fact]
-        public async Task TestSeededScores() => await WithScopeAsync(async scope =>
+        public async Task TestDivisionSeed() => await WithScopeAsync(async scope =>
         {
             var ctx = scope.GetRequiredService<ApplicationDbContext>();
-            var um = scope.GetRequiredService<AppUserManager>();
 
-            var admin = await um.FindByNameAsync("admin-user-id");
-            Assert.NotNull(admin.Scores);
-            Assert.NotEmpty(admin.Scores);
-            Assert.All(admin.Scores, s => Assert.NotNull(s.Board));
-            Assert.All(admin.Scores, s => Assert.NotEqual(default, s.Value));
+            // these numbers will change whever the seed files change
+            Assert.Equal(3, await EntityFrameworkQueryableExtensions.CountAsync(ctx.Divisions));
+            Assert.Equal(3, await EntityFrameworkQueryableExtensions.CountAsync(ctx.WeightClasses));
+            Assert.All(ctx.Divisions, d => Assert.Single(d.WeightClasses));
+            Assert.All(ctx.WeightClasses, wc => Assert.Single(wc.Divisions));
         });
     }
 }

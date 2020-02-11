@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -13,6 +13,7 @@ using Leaderboard.Areas.Identity.Models;
 using Microsoft.Extensions.Configuration;
 using Leaderboard.Data.SeedExtensions;
 using Leaderboard.Areas.Identity.Managers;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Leaderboard.Data
 {
@@ -24,6 +25,7 @@ namespace Leaderboard.Data
     {
         public DbSet<LeaderboardModel> leaderboards { get; set; }
         public DbSet<Division> Divisions { get; set; }
+        public DbSet<WeightClass> WeightClasses { get; set; }
         public DbSet<ScoreModel> Scores { get; set; }
         public DbSet<UnitOfMeasureModel> UnitsOfMeasure { get; set; }
         public DbSet<FileModel> UploadedFiles { get; set; }
@@ -32,12 +34,16 @@ namespace Leaderboard.Data
 
         public DbSet<UserLeaderboard> UserLeaderboards { get; set; }
         public DbSet<RelatedDivision> RelatedDivisions { get; set; }
+        public DbSet<DivisionWeightClass> DivisionWeightClasses { get; set; }
 
         #endregion
 
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        private readonly string _appConfiguration;
+
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IWebHostEnvironment env)
             : base(options)
         {
+            _appConfiguration = env.EnvironmentName.ToLower();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

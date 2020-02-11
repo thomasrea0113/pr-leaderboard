@@ -11,7 +11,7 @@ using Xunit;
 
 namespace Leaderboard.Tests.TestSetup
 {
-    public class BaseTestClass : IClassFixture<WebOverrideFactory>
+    public class BaseTestClass : IClassFixture<WebOverrideFactory>, IDisposable
     {
         protected WebOverrideFactory _factory { get; }
         protected HttpClient _client { get; }
@@ -36,6 +36,11 @@ namespace Leaderboard.Tests.TestSetup
             {
                 await testAsync(scope.ServiceProvider);
             }
+        }
+
+        public void Dispose()
+        {
+            _factory.Dispose();
         }
     }
 }

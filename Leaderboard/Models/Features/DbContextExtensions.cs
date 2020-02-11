@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Leaderboard.Areas.Identity.Managers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
@@ -10,7 +9,7 @@ namespace Leaderboard.Models.Features
 {
     public static class DbContextExtensions
     {
-        private static void ForEachDbSetEntity(this DbContext ctx, Action<Type> action, Func<Type, bool> condition = default)
+        public static void ForEachDbSetEntity(this DbContext ctx, Action<Type> action, Func<Type, bool> condition = default)
         {
             var dbSetType = typeof(DbSet<>);
             var entityTypes = ctx.GetType().GetProperties()
