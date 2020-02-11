@@ -27,6 +27,7 @@ namespace Leaderboard.Areas.Leaderboards.Models
         public int WeightUpperBound { get; set; }
 
         public virtual ICollection<DivisionWeightClass> Divisions { get; set; }
+        public virtual ICollection<LeaderboardModel> Boards { get; set; }
 
         public void OnModelCreating(EntityTypeBuilder<WeightClass> builder)
         {

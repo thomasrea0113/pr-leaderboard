@@ -21,6 +21,9 @@ namespace Leaderboard.Areas.Leaderboards.Models
         public string DivisionId { get; set; }
         public virtual Division Division { get; set; }
 
+        public string WeightClassId { get; set; }
+        public virtual WeightClass WeightClass { get; set; }
+
 
         public virtual ICollection<UserLeaderboard> UserLeaderboards { get; set; } = new List<UserLeaderboard>();
 
@@ -40,6 +43,7 @@ namespace Leaderboard.Areas.Leaderboards.Models
             builder.HasIndex(p => new 
             {
                 p.DivisionId,
+                p.WeightClassId,
                 p.Name
             }).IsUnique();
 
@@ -58,6 +62,11 @@ namespace Leaderboard.Areas.Leaderboards.Models
                 .WithMany(b => b.Boards)
                 .HasForeignKey(b => b.DivisionId)
                 .IsRequired();
+
+            // a board has one weight class, but a weight class has many boards
+            builder.HasOne(b => b.WeightClass)
+                .WithMany(b => b.Boards)
+                .HasForeignKey(b => b.WeightClassId);
         }
     }
 }

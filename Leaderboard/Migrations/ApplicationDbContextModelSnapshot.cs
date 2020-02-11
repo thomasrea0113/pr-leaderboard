@@ -299,11 +299,16 @@ namespace Leaderboard.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("WeightClassId")
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.HasIndex("UOMId");
 
-                    b.HasIndex("DivisionId", "Name")
+                    b.HasIndex("WeightClassId");
+
+                    b.HasIndex("DivisionId", "WeightClassId", "Name")
                         .IsUnique();
 
                     b.ToTable("leaderboards");
@@ -543,6 +548,10 @@ namespace Leaderboard.Migrations
                         .HasForeignKey("UOMId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("Leaderboard.Areas.Leaderboards.Models.WeightClass", "WeightClass")
+                        .WithMany("Boards")
+                        .HasForeignKey("WeightClassId");
                 });
 
             modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.RelatedDivision", b =>

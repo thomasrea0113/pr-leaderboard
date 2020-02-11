@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Leaderboard.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200211144838_Initial")]
+    [Migration("20200211163246_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -301,11 +301,16 @@ namespace Leaderboard.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("WeightClassId")
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.HasIndex("UOMId");
 
-                    b.HasIndex("DivisionId", "Name")
+                    b.HasIndex("WeightClassId");
+
+                    b.HasIndex("DivisionId", "WeightClassId", "Name")
                         .IsUnique();
 
                     b.ToTable("leaderboards");
@@ -545,6 +550,10 @@ namespace Leaderboard.Migrations
                         .HasForeignKey("UOMId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("Leaderboard.Areas.Leaderboards.Models.WeightClass", "WeightClass")
+                        .WithMany("Boards")
+                        .HasForeignKey("WeightClassId");
                 });
 
             modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.RelatedDivision", b =>
