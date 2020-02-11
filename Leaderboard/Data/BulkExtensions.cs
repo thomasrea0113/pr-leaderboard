@@ -68,7 +68,7 @@ namespace Leaderboard.Data.BulkExtensions
         {
             var set = context.Set<T>();
 
-            var existing = await set.Where(e => entities.Contains(e)).ToListAsync();
+            var existing = await set.AsQueryable().Where(e => entities.Contains(e)).ToListAsync();
 
             var updatedEntities = entities.Where(e => equality(existing, e)).ToList();
             var newEntitities = entities.Where(e => !equality(existing, e)).ToList();

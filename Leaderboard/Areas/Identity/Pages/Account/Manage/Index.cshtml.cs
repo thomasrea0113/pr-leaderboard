@@ -57,7 +57,7 @@ namespace Leaderboard.Areas.Identity.Pages.Account.Manage
 
             Username = userName;
 
-            Leaderboards = await _ctx.UserLeaderboards
+            Leaderboards = await _ctx.UserLeaderboards.AsQueryable()
                 .Where(ub => ub.UserId == user.Id)
                 .Select(ub => ub.Leaderboard)
                 .ToListAsync();

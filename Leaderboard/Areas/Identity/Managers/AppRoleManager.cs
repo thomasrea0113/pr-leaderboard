@@ -27,28 +27,34 @@ namespace Leaderboard.Areas.Identity.Managers
             _ctx = context;
         }
 
-        public async Task<ValueTuple<bool, ApplicationRole>> TryCreateByNameAsync(ApplicationRole role)
+        public async Task<bool> TryCreateByNameAsync(ApplicationRole role)
         {
-            try
+            role.NormalizedName = role.Name.ToUpper();
+            var existingRole = await FindByNameAsync(role.NormalizedName);
+            if (existingRole == default)
             {
                 await CreateAsync(role);
-                return (true, role);
-            } catch (InvalidOperationException)
-            {
-                return (false, await FindByNameAsync(role.Name));
+                return true;
             }
-            // var foundRole = await FindByNameAsync(role.Name);
-            // if (foundRole == default)
-            //     return (true, await CreateAsync(role));
 
-            // // the passed in role may having a matching name, but the IDs may not match.
-            // // We also need to overwrite the tracked entity with the passed in entity,
-            // // so we detach both and update the id of the new one.
-            // _ctx.Entry(foundRole).State = EntityState.Detached;
-            // role.Id = foundRole.Id;
-            // _ctx.Attach(role);
+            // the passed in user may having a matching name, but the IDs may not match.
+            // We also need to overwrite the tracked entity with the passed in entity,
+            // so we detach both and update the id of the new one.
+            role.Id = existingRole.Id;
 
-            // return (false, await UpdateAsync(role));
+            var tracked = _ctx.ChangeTracker.Entries()
+                .Where(e => e.Entity is ApplicationRole)
+                .SingleOrDefault(e => (e.Entity as ApplicationRole)?.Id == role.Id);
+
+            // if we're already tracking this entity, then we simply need to overwrite the values
+            if (tracked != default)
+            {
+                tracked.CurrentValues.SetValues(role);
+                await _ctx.SaveChangesAsync();
+            }
+            else
+                await UpdateAsync(role);
+            return false;
         }
     }
 }

@@ -336,24 +336,25 @@ namespace Leaderboard.Migrations
                 name: "UserLeaderboards",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(nullable: false),
-                    LeaderboardId = table.Column<string>(nullable: false)
+                    Id = table.Column<string>(nullable: false),
+                    UserId = table.Column<string>(nullable: true),
+                    LeaderboardId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserLeaderboards", x => new { x.UserId, x.LeaderboardId });
+                    table.PrimaryKey("PK_UserLeaderboards", x => x.Id);
                     table.ForeignKey(
                         name: "FK_UserLeaderboards_leaderboards_LeaderboardId",
                         column: x => x.LeaderboardId,
                         principalTable: "leaderboards",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_UserLeaderboards_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.InsertData(
@@ -477,6 +478,12 @@ namespace Leaderboard.Migrations
                 name: "IX_UserLeaderboards_LeaderboardId",
                 table: "UserLeaderboards",
                 column: "LeaderboardId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserLeaderboards_UserId_LeaderboardId",
+                table: "UserLeaderboards",
+                columns: new[] { "UserId", "LeaderboardId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_WeightClasses_WeightLowerBound_WeightUpperBound",

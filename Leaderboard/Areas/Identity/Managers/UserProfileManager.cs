@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Leaderboard.Areas.Identity.Models;
@@ -41,21 +42,37 @@ namespace Leaderboard.Areas.Identity.Managers
             _ctx = services.GetRequiredService<ApplicationDbContext>();
         }
 
-        public async Task<ValueTuple<bool, IdentityResult>> CreateOrUpdateByNameAsync(ApplicationUser user, string password)
+        public async Task<bool> CreateOrUpdateByNameAsync(ApplicationUser user, string password)
         {
             var existingUser = await FindByNameAsync(user.UserName);
             if (existingUser == default)
-                return (true, await CreateAsync(user, password));
+            {
+                await CreateAsync(user, password);
+                return true;
+            }
 
             // the passed in user may having a matching name, but the IDs may not match.
             // We also need to overwrite the tracked entity with the passed in entity,
             // so we detach both and update the id of the new one.
-            _ctx.Entry(existingUser).State = EntityState.Detached;
             user.Id = existingUser.Id;
 
-            var result = await UpdateAsync(user);
-            await ResetPasswordAsync(user, await GeneratePasswordResetTokenAsync(user), password);
-            return (false, result);
+            var tracked = _ctx.ChangeTracker.Entries()
+                .Where(e => e.Entity is ApplicationUser)
+                .SingleOrDefault(e => (e.Entity as ApplicationUser)?.Id == user.Id);
+                
+            // if we're already tracking this entity, then we simply need to overwrite the values
+            if (tracked != default)
+            {
+                tracked.CurrentValues.SetValues(user);
+                await _ctx.SaveChangesAsync();
+            }
+            else
+            {
+                await UpdateAsync(user);
+                await ResetPasswordAsync(user, await GeneratePasswordResetTokenAsync(user), password);
+            }
+
+            return false;
         }
     }
 }

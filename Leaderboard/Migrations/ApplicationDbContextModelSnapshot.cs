@@ -456,15 +456,22 @@ namespace Leaderboard.Migrations
 
             modelBuilder.Entity("Leaderboard.Models.Relationships.UserLeaderboard", b =>
                 {
-                    b.Property<string>("UserId")
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("text");
 
                     b.Property<string>("LeaderboardId")
                         .HasColumnType("text");
 
-                    b.HasKey("UserId", "LeaderboardId");
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("LeaderboardId");
+
+                    b.HasIndex("UserId", "LeaderboardId")
+                        .IsUnique();
 
                     b.ToTable("UserLeaderboards");
                 });
@@ -601,15 +608,11 @@ namespace Leaderboard.Migrations
                 {
                     b.HasOne("Leaderboard.Areas.Leaderboards.Models.LeaderboardModel", "Leaderboard")
                         .WithMany("UserLeaderboards")
-                        .HasForeignKey("LeaderboardId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("LeaderboardId");
 
                     b.HasOne("Leaderboard.Areas.Identity.Models.ApplicationUser", "User")
                         .WithMany("UserLeaderboards")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
                 });
 #pragma warning restore 612, 618
         }

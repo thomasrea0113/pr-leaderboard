@@ -8,7 +8,9 @@ using System.Text;
 namespace Leaderboard.Utilities
 {
     /// <summary>
-	/// Helper methods for working with <see cref="Guid"/>.
+	/// Helper methods for working with <see cref="Guid"/>. Primarily used to generate deterministic
+	/// lists of Guids, that are alwasy the same provided the same input. See here for more information:
+	/// https://github.com/Faithlife/FaithlifeUtility/blob/master/src/Faithlife.Utility/GuidUtility.cs
 	/// </summary>
 	public static class GuidUtility
 	{

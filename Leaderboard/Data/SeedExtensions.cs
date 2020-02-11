@@ -6,8 +6,11 @@ using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Leaderboard.Areas.Identity.Managers;
+using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Areas.Leaderboards.Models;
 using Leaderboard.Data.BulkExtensions;
+using Leaderboard.Models.Relationships;
+using Leaderboard.Utilities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -43,6 +46,89 @@ namespace Leaderboard.Data.SeedExtensions
             return objects;
         }
 
+        private static IEnumerable<LeaderboardModel> GenerateLeaderboards(List<Division> divisions, List<WeightClass> weightClasses)
+        {
+            foreach (var division in divisions)
+                foreach (var weightClass in weightClasses)
+                {
+                    Func<string, LeaderboardModel> generateBoard = name
+                        => new LeaderboardModel {
+                            Id = GuidUtility.Create(GuidUtility.UrlNamespace, $"lb_{weightClass.Id}{division.Id}{name}").ToString(),
+                            Name = name,
+                            IsActive = true,
+                            WeightClassId = weightClass.Id,
+                            DivisionId = division.Id,
+                            UOMId = "e362dd90-d6fe-459b-ba26-09db002bfff6"
+                        };
+
+                    yield return generateBoard("Bench");
+                    yield return generateBoard("Squat");
+                    yield return generateBoard("Deadlift");
+                }
+        }
+
+        private static async IAsyncEnumerable<ApplicationRole> GetOrCreateRoles(this AppRoleManager manager, params string[] roleNames)
+        {
+            foreach (var roleName in roleNames)
+            {
+                var role = new ApplicationRole(roleName);
+                // {
+                //     Id = GuidUtility.Create(GuidUtility.UrlNamespace, $"role_{roleName}").ToString()
+                // };
+                await manager.TryCreateByNameAsync(role);
+                yield return role;
+            }
+        }
+
+        private static async IAsyncEnumerable<ApplicationUser> GetOrCreateUsers(this AppUserManager manager, params string[] userNames)
+        {
+            foreach (var userName in userNames)
+            {
+                var user = new ApplicationUser(userName);
+                // {
+                //     Id = GuidUtility.Create(GuidUtility.UrlNamespace, $"u_{userName}").ToString()
+                // };
+                await manager.CreateOrUpdateByNameAsync(user, "Password123");
+                yield return user;
+            }
+        }
+
+        private static IEnumerable<UserLeaderboard> GenerateUserLeaderboards(
+            List<LeaderboardModel> boards,
+            List<ApplicationUser> users)
+        {
+            foreach (var board in boards)
+                foreach (var user in users)
+                    yield return new UserLeaderboard
+                    {
+                        Id = GuidUtility.Create(GuidUtility.UrlNamespace, $"ub_{board.Id}{user.Id}").ToString(),
+                        UserId = user.Id,
+                        LeaderboardId = board.Id
+                    };
+        }
+
+        private static IEnumerable<ScoreModel> GenerateScores(List<LeaderboardModel> boards)
+        {
+            // sudo random number generation. Always seed with 1, so the calls to Next are predictable
+            var rand = new Random(1);
+
+            foreach (var board in boards)
+            {
+                var userIds = board.UserLeaderboards.Select(ub => ub.UserId);
+                foreach (var user in userIds)
+                    for (var i = 0; i < 10; i++)
+                    {
+                        yield return new ScoreModel {
+                            Id = GuidUtility.Create(GuidUtility.UrlNamespace, $"score_{i}").ToString(),
+                            IsApproved = i % 2 == 0, // if i is even, then true. All odd indexes will be false,
+                            UserId = user,
+                            BoardId = board.Id,
+                            Value = Convert.ToDecimal(rand.NextDouble() * rand.Next(200, 1500))
+                        };
+                    }
+            }
+        }
+
         /// <summary>
         /// Allows for identity user/role seeding using the provided managers.
         /// </summary>
@@ -71,6 +157,18 @@ namespace Leaderboard.Data.SeedExtensions
 
             var divisionWeightClasses = await builder.GetSeedDataFromFile<DivisionWeightClass>(environmentName);
             await context.BulkInsertOrUpdateAsync(divisionWeightClasses.ToArray());
+
+            var boards = GenerateLeaderboards(divisions, weightClasses);
+            await context.BulkInsertOrUpdateAsync(boards.ToArray());
+
+            await context.SaveChangesAsync();
+
+            var roles = await roleManager.GetOrCreateRoles("admin").ToListAsync();
+            var users = await userManager.GetOrCreateUsers("Admin", "LifterDuder", "LiftLife").ToListAsync();
+            await userManager.TryAddToRoleAsync(users.First(), "Admin");
+
+            var userBoards = GenerateUserLeaderboards(boards.ToList(), users);
+            await context.BulkInsertOrUpdateAsync(e => new { e.UserId, e.LeaderboardId }, userBoards.ToArray());
 
             await context.SaveChangesAsync();
             return builder;

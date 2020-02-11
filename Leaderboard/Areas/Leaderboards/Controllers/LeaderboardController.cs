@@ -23,7 +23,7 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
         // GET: Leaderboards/Leaderboard
         public async Task<IActionResult> Index()
         {
-            return View(await _context.leaderboards.ToListAsync());
+            return View(await _context.leaderboards.AsQueryable().ToListAsync());
         }
 
         // GET: Leaderboards/Leaderboard/Details/5
@@ -34,7 +34,7 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
                 return NotFound();
             }
 
-            var leaderboardModel = await _context.leaderboards
+            var leaderboardModel = await _context.leaderboards.AsQueryable()
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (leaderboardModel == null)
             {
@@ -125,7 +125,7 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
                 return NotFound();
             }
 
-            var leaderboardModel = await _context.leaderboards
+            var leaderboardModel = await _context.leaderboards.AsQueryable()
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (leaderboardModel == null)
             {
