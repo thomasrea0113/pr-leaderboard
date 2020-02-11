@@ -71,10 +71,10 @@ namespace Leaderboard.Data.SeedExtensions
         {
             foreach (var roleName in roleNames)
             {
-                var role = new ApplicationRole(roleName);
-                // {
-                //     Id = GuidUtility.Create(GuidUtility.UrlNamespace, $"role_{roleName}").ToString()
-                // };
+                var role = new ApplicationRole(roleName)
+                {
+                    Id = GuidUtility.Create(GuidUtility.UrlNamespace, $"role_{roleName}").ToString()
+                };
                 await manager.TryCreateByNameAsync(role);
                 yield return role;
             }
@@ -84,10 +84,11 @@ namespace Leaderboard.Data.SeedExtensions
         {
             foreach (var userName in userNames)
             {
-                var user = new ApplicationUser(userName);
-                // {
-                //     Id = GuidUtility.Create(GuidUtility.UrlNamespace, $"u_{userName}").ToString()
-                // };
+                var user = new ApplicationUser(userName)
+                {
+                    Id = GuidUtility.Create(GuidUtility.UrlNamespace, $"u_{userName}").ToString(),
+                    IsActive = true
+                };
                 await manager.CreateOrUpdateByNameAsync(user, "Password123");
                 yield return user;
             }
@@ -107,25 +108,23 @@ namespace Leaderboard.Data.SeedExtensions
                     };
         }
 
-        private static IEnumerable<ScoreModel> GenerateScores(List<LeaderboardModel> boards)
+        private static IEnumerable<ScoreModel> GenerateScores(List<UserLeaderboard> userBoards)
         {
             // sudo random number generation. Always seed with 1, so the calls to Next are predictable
             var rand = new Random(1);
 
-            foreach (var board in boards)
+            foreach (var board in userBoards)
             {
-                var userIds = board.UserLeaderboards.Select(ub => ub.UserId);
-                foreach (var user in userIds)
-                    for (var i = 0; i < 10; i++)
-                    {
-                        yield return new ScoreModel {
-                            Id = GuidUtility.Create(GuidUtility.UrlNamespace, $"score_{i}").ToString(),
-                            IsApproved = i % 2 == 0, // if i is even, then true. All odd indexes will be false,
-                            UserId = user,
-                            BoardId = board.Id,
-                            Value = Convert.ToDecimal(rand.NextDouble() * rand.Next(200, 1500))
-                        };
-                    }
+                for (var i = 0; i < 10; i++)
+                {
+                    yield return new ScoreModel {
+                        Id = GuidUtility.Create(GuidUtility.UrlNamespace, $"score_{board.UserId}{board.LeaderboardId}{i}").ToString(),
+                        IsApproved = i % 2 == 0, // if i is even, then true. All odd indexes will be false,
+                        UserId = board.UserId,
+                        BoardId = board.LeaderboardId,
+                        Value = Convert.ToDecimal(rand.NextDouble() * rand.Next(200, 1500))
+                    };
+                }
             }
         }
 
@@ -164,11 +163,19 @@ namespace Leaderboard.Data.SeedExtensions
             await context.SaveChangesAsync();
 
             var roles = await roleManager.GetOrCreateRoles("admin").ToListAsync();
-            var users = await userManager.GetOrCreateUsers("Admin", "LifterDuder", "LiftLife").ToListAsync();
+            var users = await userManager.GetOrCreateUsers("Admin").ToListAsync();
             await userManager.TryAddToRoleAsync(users.First(), "Admin");
 
-            var userBoards = GenerateUserLeaderboards(boards.ToList(), users);
-            await context.BulkInsertOrUpdateAsync(e => new { e.UserId, e.LeaderboardId }, userBoards.ToArray());
+            if (environmentName != "production")
+            {
+                users = await userManager.GetOrCreateUsers("LifterDuder", "LiftLife").ToListAsync();
+
+                var userBoards = GenerateUserLeaderboards(boards.ToList(), users);
+                await context.BulkInsertOrUpdateAsync(e => new { e.UserId, e.LeaderboardId }, userBoards.ToArray());
+
+                var scores = GenerateScores(userBoards.ToList());
+                await context.BulkInsertOrUpdateAsync(scores.ToArray());
+            }
 
             await context.SaveChangesAsync();
             return builder;

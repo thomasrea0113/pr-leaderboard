@@ -44,7 +44,8 @@ namespace Leaderboard.Areas.Identity.Managers
 
         public async Task<bool> CreateOrUpdateByNameAsync(ApplicationUser user, string password)
         {
-            var existingUser = await FindByNameAsync(user.UserName);
+            user.NormalizedUserName = user.UserName.ToUpper();
+            var existingUser = await FindByNameAsync(user.NormalizedUserName);
             if (existingUser == default)
             {
                 await CreateAsync(user, password);

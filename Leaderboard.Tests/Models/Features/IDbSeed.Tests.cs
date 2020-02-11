@@ -51,12 +51,20 @@ namespace Leaderboard.Tests.Models.Features
         public async Task TestDivisionSeed() => await WithScopeAsync(async scope =>
         {
             var ctx = scope.GetRequiredService<ApplicationDbContext>();
+            var um = scope.GetRequiredService<AppUserManager>();
 
             // these numbers will change whever the seed files change
             Assert.Equal(3, await EntityFrameworkQueryableExtensions.CountAsync(ctx.Divisions));
             Assert.Equal(3, await EntityFrameworkQueryableExtensions.CountAsync(ctx.WeightClasses));
             Assert.All(ctx.Divisions, d => Assert.Single(d.WeightClasses));
             Assert.All(ctx.WeightClasses, wc => Assert.Single(wc.Divisions));
+
+            // assert user has leaderboards, and all the leaderboards have scores
+            var user = await um.FindByNameAsync("LifterDuder");
+            Assert.NotEmpty(user.UserLeaderboards);
+            Assert.All(user.UserLeaderboards, ub => Assert.NotEmpty(ub.Leaderboard.Scores));
+
+            Assert.NotEmpty(user.Scores);
         });
     }
 }
