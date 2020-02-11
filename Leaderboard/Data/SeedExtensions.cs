@@ -26,7 +26,7 @@ namespace Leaderboard.Data.SeedExtensions
         /// <summary>
         /// Loads all the data for the given type.
         /// </summary>
-        public static async Task<List<TEntity>> GetSeedDataFromFile<TEntity>(this IApplicationBuilder builder, string environmentName, params string[] keyNames)
+        public static async Task<List<TEntity>> GetSeedDataFromFile<TEntity>(string environmentName, params string[] keyNames)
         {
             var configuringType = typeof(TEntity);
 
@@ -133,9 +133,8 @@ namespace Leaderboard.Data.SeedExtensions
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public static async Task<IApplicationBuilder> SeedDataAsync(
-            this IApplicationBuilder builder,
-            IServiceProvider services,
+        public static async Task SeedDataAsync(
+            this IServiceProvider services,
             string environmentName)
         {
             var context = services.GetRequiredService<ApplicationDbContext>();
@@ -146,15 +145,15 @@ namespace Leaderboard.Data.SeedExtensions
             await context.Database.EnsureCreatedAsync();
 
             // see below for an example of how to use the different bulk insert overloads
-            var weightClasses = await builder.GetSeedDataFromFile<WeightClass>(environmentName);
+            var weightClasses = await GetSeedDataFromFile<WeightClass>(environmentName);
             await context.BulkInsertOrUpdateAsync(t => new { t.Id }, weightClasses.ToArray());
 
-            var divisions = await builder.GetSeedDataFromFile<Division>(environmentName);
+            var divisions = await GetSeedDataFromFile<Division>(environmentName);
             await context.BulkInsertOrUpdateAsync((elist, e) => elist.Any(e2 => e2.Id == e.Id), divisions.ToArray());
             
             await context.SaveChangesAsync();
 
-            var divisionWeightClasses = await builder.GetSeedDataFromFile<DivisionWeightClass>(environmentName);
+            var divisionWeightClasses = await GetSeedDataFromFile<DivisionWeightClass>(environmentName);
             await context.BulkInsertOrUpdateAsync(divisionWeightClasses.ToArray());
 
             var boards = GenerateLeaderboards(divisions, weightClasses);
@@ -179,7 +178,6 @@ namespace Leaderboard.Data.SeedExtensions
             }
 
             await context.SaveChangesAsync();
-            return builder;
         }
     }
 }

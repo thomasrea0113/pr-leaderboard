@@ -10,7 +10,6 @@ using Leaderboard.Areas.Identity.Validators;
 using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Areas.Identity.Managers;
 using Leaderboard.Data.SeedExtensions;
-using System.Threading.Tasks;
 using System;
 
 namespace Leaderboard
@@ -79,7 +78,7 @@ namespace Leaderboard
                 var timeout = config.GetValue("SeedData:TimeoutInSeconds", 60) * 1000;
                 using (var scope = services.CreateScope())
                 {
-                    if (!app.SeedDataAsync(scope.ServiceProvider, env.EnvironmentName.ToLower()).Wait(timeout))
+                    if (!scope.ServiceProvider.SeedDataAsync(env.EnvironmentName.ToLower()).Wait(timeout))
                         throw new TimeoutException($"The {nameof(SeedExtensions.SeedDataAsync)} method did not complete in {timeout} seconds");
                 }
             }
