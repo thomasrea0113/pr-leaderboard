@@ -166,6 +166,7 @@ namespace Leaderboard.Data.SeedExtensions
             var users = await userManager.GetOrCreateUsers("Admin").ToListAsync();
             await userManager.TryAddToRoleAsync(users.First(), "Admin");
 
+            // if not in productions, we want some dummy users and scores
             if (environmentName != "production")
             {
                 users = await userManager.GetOrCreateUsers("LifterDuder", "LiftLife").ToListAsync();

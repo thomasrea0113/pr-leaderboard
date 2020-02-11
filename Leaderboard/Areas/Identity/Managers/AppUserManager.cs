@@ -66,6 +66,8 @@ namespace Leaderboard.Areas.Identity.Managers
             {
                 tracked.CurrentValues.SetValues(user);
                 await _ctx.SaveChangesAsync();
+                var trackedEntity = (ApplicationUser)tracked.Entity;
+                await ResetPasswordAsync(trackedEntity, await GeneratePasswordResetTokenAsync(trackedEntity), password);
             }
             else
             {
