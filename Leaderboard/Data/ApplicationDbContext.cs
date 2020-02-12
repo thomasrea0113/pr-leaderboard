@@ -29,11 +29,12 @@ namespace Leaderboard.Data
         public DbSet<ScoreModel> Scores { get; set; }
         public DbSet<UnitOfMeasureModel> UnitsOfMeasure { get; set; }
         public DbSet<FileModel> UploadedFiles { get; set; }
+        public DbSet<Category> Categories { get; set; }
 
         #region relationship tables
 
         public DbSet<UserLeaderboard> UserLeaderboards { get; set; }
-        public DbSet<RelatedDivision> RelatedDivisions { get; set; }
+        public DbSet<DivisionCategory> DivisionCategories { get; set; }
         public DbSet<DivisionWeightClass> DivisionWeightClasses { get; set; }
 
         #endregion

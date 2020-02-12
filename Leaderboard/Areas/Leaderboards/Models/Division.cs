@@ -27,22 +27,8 @@ namespace Leaderboard.Areas.Leaderboards.Models
         public int AgeUpperBound { get; set; }
 
         public virtual ICollection<DivisionWeightClass> WeightClasses { get; set; }
-
         public virtual ICollection<LeaderboardModel> Boards { get; set; }
-
-        public virtual List<RelatedDivision> RelatedDivisions { get; set; } = new List<RelatedDivision>();
-        public virtual List<RelatedDivision> DivisionsRelatedToMe { get; set; } = new List<RelatedDivision>();
-
-        /// <summary>
-        /// All related divisions, including what has added the current tag as a related tag
-        /// </summary>
-        /// <param name="t.Related"></param>
-        /// <returns></returns>
-        [NotMapped]
-        public List<Division> AllRelatedDivisions => RelatedDivisions.Select(t => t.Related)
-            .Union(DivisionsRelatedToMe.Select(t => t.Division))
-            .OrderBy(t => t.Name)
-            .ToList();
+        public virtual ICollection<DivisionCategory> DivisionCategories { get; set; }
 
         public void OnModelCreating(EntityTypeBuilder<Division> builder)
         {

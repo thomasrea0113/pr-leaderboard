@@ -128,6 +128,14 @@ namespace Leaderboard.Data.SeedExtensions
             }
         }
 
+        private static List<DivisionCategory> GenerateDivisionCategories(List<Division> divisions, string categoryId)
+            => divisions.Select(d => new DivisionCategory
+            {
+                Id = GuidUtility.Create(GuidUtility.UrlNamespace, $"dc_{d.Id}{categoryId}").ToString(),
+                CategoryId = categoryId,
+                DivisionId = d.Id
+            }).ToList();
+
         /// <summary>
         /// Allows for identity user/role seeding using the provided managers.
         /// </summary>
@@ -152,6 +160,10 @@ namespace Leaderboard.Data.SeedExtensions
             await context.BulkInsertOrUpdateAsync((elist, e) => elist.Any(e2 => e2.Id == e.Id), divisions.ToArray());
             
             await context.SaveChangesAsync();
+
+            // categoryId from Category.cs call to HasData()
+            var divisionCategories = GenerateDivisionCategories(divisions, "642313a2-1f0c-4329-a676-7a9cdac045bd");
+            await context.BulkInsertOrUpdateAsync(divisionCategories.ToArray());
 
             var divisionWeightClasses = await GetSeedDataFromFile<DivisionWeightClass>(environmentName);
             await context.BulkInsertOrUpdateAsync(divisionWeightClasses.ToArray());

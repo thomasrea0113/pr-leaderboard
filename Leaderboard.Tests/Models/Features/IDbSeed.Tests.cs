@@ -29,12 +29,17 @@ namespace Leaderboard.Tests.Models.Features
             var um = scope.GetRequiredService<AppUserManager>();
 
             var admin = await um.FindByNameAsync("Admin");
-
             Assert.NotNull(admin);
-
             Assert.True(await um.IsInRoleAsync(admin, "Admin"));
-
             Assert.Empty(admin.UserLeaderboards);
+
+            var user = await um.FindByNameAsync("LifterDuder");
+            Assert.NotNull(user);
+            Assert.NotEmpty(user.UserLeaderboards);
+            Assert.All(user.UserLeaderboards, lb => {
+                Assert.Single(lb.Leaderboard.Division.DivisionCategories);
+                Assert.Equal("Powerlifting", lb.Leaderboard.Division.DivisionCategories.First().Category.Name);
+            });
         });
     }
 }

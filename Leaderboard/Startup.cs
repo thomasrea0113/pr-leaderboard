@@ -86,6 +86,8 @@ namespace Leaderboard
                         if (config.GetValue("AutoMigrate:AutoSeed", false))
                         {
                             var timeout = config.GetValue("AutoMigrate:TimeoutInSeconds", 60) * 1000;
+                            // TODO if this throws an exception, it won't try and reseed at next startup because the migrations
+                            // have already been applied
                             if (!scope.ServiceProvider.SeedDataAsync(env.EnvironmentName.ToLower()).Wait(timeout))
                                 throw new TimeoutException($"The {nameof(SeedExtensions.SeedDataAsync)} method did not complete in {timeout} seconds");
                         }

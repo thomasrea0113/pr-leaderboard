@@ -49,6 +49,18 @@ namespace Leaderboard.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Categories",
+                columns: table => new
+                {
+                    Id = table.Column<string>(nullable: false),
+                    Name = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Categories", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Divisions",
                 columns: table => new
                 {
@@ -216,24 +228,25 @@ namespace Leaderboard.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "RelatedDivisions",
+                name: "DivisionCategories",
                 columns: table => new
                 {
+                    Id = table.Column<string>(nullable: false),
                     DivisionId = table.Column<string>(nullable: false),
-                    RelatedId = table.Column<string>(nullable: false)
+                    CategoryId = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RelatedDivisions", x => new { x.DivisionId, x.RelatedId });
+                    table.PrimaryKey("PK_DivisionCategories", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_RelatedDivisions_Divisions_DivisionId",
-                        column: x => x.DivisionId,
-                        principalTable: "Divisions",
+                        name: "FK_DivisionCategories_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_RelatedDivisions_Divisions_RelatedId",
-                        column: x => x.RelatedId,
+                        name: "FK_DivisionCategories_Divisions_DivisionId",
+                        column: x => x.DivisionId,
                         principalTable: "Divisions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -358,6 +371,16 @@ namespace Leaderboard.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "Categories",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
+                {
+                    { "642313a2-1f0c-4329-a676-7a9cdac045bd", "Powerlifting" },
+                    { "9edc53a6-34ec-4cde-8eb0-cac009579b72", "Weightlifting" },
+                    { "6772a358-e5b7-49dd-a49b-9d855ed46c5e", "Running" }
+                });
+
+            migrationBuilder.InsertData(
                 table: "UnitsOfMeasure",
                 columns: new[] { "Id", "IsActive", "Unit" },
                 values: new object[,]
@@ -405,6 +428,23 @@ namespace Leaderboard.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Categories_Name",
+                table: "Categories",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DivisionCategories_DivisionId",
+                table: "DivisionCategories",
+                column: "DivisionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DivisionCategories_CategoryId_DivisionId",
+                table: "DivisionCategories",
+                columns: new[] { "CategoryId", "DivisionId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Divisions_Gender_Name",
                 table: "Divisions",
                 columns: new[] { "Gender", "Name" },
@@ -436,11 +476,6 @@ namespace Leaderboard.Migrations
                 table: "leaderboards",
                 columns: new[] { "DivisionId", "WeightClassId", "Name" },
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_RelatedDivisions_RelatedId",
-                table: "RelatedDivisions",
-                column: "RelatedId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Scores_BoardId",
@@ -510,10 +545,10 @@ namespace Leaderboard.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "DivisionWeightClasses");
+                name: "DivisionCategories");
 
             migrationBuilder.DropTable(
-                name: "RelatedDivisions");
+                name: "DivisionWeightClasses");
 
             migrationBuilder.DropTable(
                 name: "Scores");
@@ -523,6 +558,9 @@ namespace Leaderboard.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Categories");
 
             migrationBuilder.DropTable(
                 name: "UploadedFiles");

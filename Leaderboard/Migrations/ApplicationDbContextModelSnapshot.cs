@@ -222,6 +222,41 @@ namespace Leaderboard.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.Category", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "642313a2-1f0c-4329-a676-7a9cdac045bd",
+                            Name = "Powerlifting"
+                        },
+                        new
+                        {
+                            Id = "9edc53a6-34ec-4cde-8eb0-cac009579b72",
+                            Name = "Weightlifting"
+                        },
+                        new
+                        {
+                            Id = "6772a358-e5b7-49dd-a49b-9d855ed46c5e",
+                            Name = "Running"
+                        });
+                });
+
             modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.Division", b =>
                 {
                     b.Property<string>("Id")
@@ -250,6 +285,30 @@ namespace Leaderboard.Migrations
                         .IsUnique();
 
                     b.ToTable("Divisions");
+                });
+
+            modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.DivisionCategory", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text");
+
+                    b.Property<string>("CategoryId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("DivisionId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DivisionId");
+
+                    b.HasIndex("CategoryId", "DivisionId")
+                        .IsUnique();
+
+                    b.ToTable("DivisionCategories");
                 });
 
             modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.DivisionWeightClass", b =>
@@ -312,21 +371,6 @@ namespace Leaderboard.Migrations
                         .IsUnique();
 
                     b.ToTable("leaderboards");
-                });
-
-            modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.RelatedDivision", b =>
-                {
-                    b.Property<string>("DivisionId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("RelatedId")
-                        .HasColumnType("text");
-
-                    b.HasKey("DivisionId", "RelatedId");
-
-                    b.HasIndex("RelatedId");
-
-                    b.ToTable("RelatedDivisions");
                 });
 
             modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.ScoreModel", b =>
@@ -527,6 +571,21 @@ namespace Leaderboard.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.DivisionCategory", b =>
+                {
+                    b.HasOne("Leaderboard.Areas.Leaderboards.Models.Category", "Category")
+                        .WithMany("DivisionCategories")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Leaderboard.Areas.Leaderboards.Models.Division", "Division")
+                        .WithMany("DivisionCategories")
+                        .HasForeignKey("DivisionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.DivisionWeightClass", b =>
                 {
                     b.HasOne("Leaderboard.Areas.Leaderboards.Models.Division", "Division")
@@ -559,21 +618,6 @@ namespace Leaderboard.Migrations
                     b.HasOne("Leaderboard.Areas.Leaderboards.Models.WeightClass", "WeightClass")
                         .WithMany("Boards")
                         .HasForeignKey("WeightClassId");
-                });
-
-            modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.RelatedDivision", b =>
-                {
-                    b.HasOne("Leaderboard.Areas.Leaderboards.Models.Division", "Division")
-                        .WithMany("RelatedDivisions")
-                        .HasForeignKey("DivisionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Leaderboard.Areas.Leaderboards.Models.Division", "Related")
-                        .WithMany("DivisionsRelatedToMe")
-                        .HasForeignKey("RelatedId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.ScoreModel", b =>
