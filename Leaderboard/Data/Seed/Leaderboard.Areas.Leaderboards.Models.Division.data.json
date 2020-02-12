@@ -15,7 +15,7 @@
     },
     {
         "Id": "831e128d-2837-48da-b31b-c40dbe17a8a6",
-        "Gender": 0,
+        "Gender": 2,
         "Name": "Junior",
         "AgeUpperBound": 23,
         "AgeLowerBound": 19

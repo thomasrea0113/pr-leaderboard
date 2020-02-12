@@ -80,13 +80,14 @@ namespace Leaderboard.Data.SeedExtensions
             }
         }
 
-        private static async IAsyncEnumerable<ApplicationUser> GetOrCreateUsers(this AppUserManager manager, params string[] userNames)
+        private static async IAsyncEnumerable<ApplicationUser> GetOrCreateUsers(this AppUserManager manager, GenderValues? gender, params string[] userNames)
         {
             foreach (var userName in userNames)
             {
                 var user = new ApplicationUser(userName)
                 {
                     Id = GuidUtility.Create(GuidUtility.UrlNamespace, $"u_{userName}").ToString(),
+                    Gender = gender,
                     IsActive = true
                 };
                 await manager.CreateOrUpdateByNameAsync(user, "Password123");
@@ -174,13 +175,18 @@ namespace Leaderboard.Data.SeedExtensions
             await context.SaveChangesAsync();
 
             var roles = await roleManager.GetOrCreateRoles("admin").ToListAsync();
-            var users = await userManager.GetOrCreateUsers("Admin").ToListAsync();
+            var users = await userManager.GetOrCreateUsers(null, "Admin").ToListAsync();
             await userManager.TryAddToRoleAsync(users.First(), "Admin");
 
             // if not in productions, we want some dummy users and scores
             if (environmentName != "production")
             {
-                users = await userManager.GetOrCreateUsers("LifterDuder", "LiftLife").ToListAsync();
+                users = await userManager.GetOrCreateUsers(GenderValues.Male, "LifterDuder", "LiftLife", "Lifter22").ToListAsync();
+
+                // setting some birthdates
+                users[0].BirthDate = DateTime.Parse("05/11/1993");
+                users[1].BirthDate = DateTime.Parse("01/12/2011");
+                users[2].BirthDate = DateTime.Parse("05/11/2099");
 
                 var userBoards = GenerateUserLeaderboards(boards.ToList(), users);
                 await context.BulkInsertOrUpdateAsync(e => new { e.UserId, e.LeaderboardId }, userBoards.ToArray());

@@ -40,6 +40,11 @@ namespace Leaderboard.Tests.Models.Features
                 Assert.Single(lb.Leaderboard.Division.DivisionCategories);
                 Assert.Equal("Powerlifting", lb.Leaderboard.Division.DivisionCategories.First().Category.Name);
             });
+
+            var ages = await ctx.Users.AsQueryable().Select(u => new {
+                u.UserName,
+                u.Age
+            }).ToListAsync();
         });
     }
 }

@@ -65,6 +65,12 @@ namespace Leaderboard.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+
+            public GenderValues Gender { get; set; }
+
+            public DateTime? Age { get; set; }
+
+            public decimal Weight { get; set; }
         }
 
         public async Task OnGetAsync(string returnUrl = null)
@@ -79,7 +85,13 @@ namespace Leaderboard.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = Input.Username, Email = Input.Email };
+                var user = new ApplicationUser {
+                    UserName = Input.Username,
+                    Email = Input.Email,
+                    Gender = Input.Gender,
+                    Weight = Input.Weight,
+                    BirthDate = Input.Age
+                };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {

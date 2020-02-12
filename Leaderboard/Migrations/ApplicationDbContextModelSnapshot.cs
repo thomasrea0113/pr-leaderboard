@@ -77,6 +77,9 @@ namespace Leaderboard.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
 
+                    b.Property<DateTime?>("BirthDate")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("text");
@@ -87,6 +90,11 @@ namespace Leaderboard.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
+
+                    b.Property<int>("Gender")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(2);
 
                     b.Property<bool?>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -125,6 +133,9 @@ namespace Leaderboard.Migrations
                     b.Property<string>("UserName")
                         .HasColumnType("character varying(256)")
                         .HasMaxLength(256);
+
+                    b.Property<decimal?>("Weight")
+                        .HasColumnType("decimal(13,3)");
 
                     b.HasKey("Id");
 
@@ -270,10 +281,7 @@ namespace Leaderboard.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("Gender")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("text")
-                        .HasDefaultValue("All");
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()

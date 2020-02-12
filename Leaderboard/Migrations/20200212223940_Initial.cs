@@ -41,6 +41,9 @@ namespace Leaderboard.Migrations
                     LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
                     LockoutEnabled = table.Column<bool>(nullable: false),
                     AccessFailedCount = table.Column<int>(nullable: false),
+                    Gender = table.Column<int>(nullable: false, defaultValue: 2),
+                    Weight = table.Column<decimal>(type: "decimal(13,3)", nullable: true),
+                    BirthDate = table.Column<DateTime>(nullable: true),
                     IsActive = table.Column<bool>(nullable: true, defaultValue: true)
                 },
                 constraints: table =>
@@ -65,7 +68,7 @@ namespace Leaderboard.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
-                    Gender = table.Column<string>(nullable: false, defaultValue: "All"),
+                    Gender = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: false),
                     AgeLowerBound = table.Column<int>(nullable: false),
                     AgeUpperBound = table.Column<int>(nullable: false)
