@@ -11,6 +11,7 @@ using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Areas.Identity.Managers;
 using Leaderboard.Data.SeedExtensions;
 using System;
+using System.Linq;
 
 namespace Leaderboard
 {
@@ -71,15 +72,24 @@ namespace Leaderboard
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IConfiguration config, IServiceProvider services)
         {
-            // if seeding is configured for this configuration, attemps to run the seed method syncronously
-            // and cancels it if it does not complete in time
-            if (config.GetValue("SeedData:Enabled", false))
+            if (config.GetValue("AutoMigrate:Enabled", false))
             {
-                var timeout = config.GetValue("SeedData:TimeoutInSeconds", 60) * 1000;
                 using (var scope = services.CreateScope())
                 {
-                    if (!scope.ServiceProvider.SeedDataAsync(env.EnvironmentName.ToLower()).Wait(timeout))
-                        throw new TimeoutException($"The {nameof(SeedExtensions.SeedDataAsync)} method did not complete in {timeout} seconds");
+                    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+                    if (context.Database.GetPendingMigrations().Any())
+                    {
+                        context.Database.Migrate();
+                        // if seeding is configured for this configuration, attemps to run the seed method syncronously
+                        // and cancels it if it does not complete in time
+                        if (config.GetValue("AutoMigrate:AutoSeed", false))
+                        {
+                            var timeout = config.GetValue("AutoMigrate:TimeoutInSeconds", 60) * 1000;
+                            if (!scope.ServiceProvider.SeedDataAsync(env.EnvironmentName.ToLower()).Wait(timeout))
+                                throw new TimeoutException($"The {nameof(SeedExtensions.SeedDataAsync)} method did not complete in {timeout} seconds");
+                        }
+                    }
                 }
             }
 
