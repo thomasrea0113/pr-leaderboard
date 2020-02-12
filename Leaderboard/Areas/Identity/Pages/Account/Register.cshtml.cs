@@ -68,6 +68,7 @@ namespace Leaderboard.Areas.Identity.Pages.Account
 
             public GenderValues Gender { get; set; }
 
+            [DataType(DataType.Date)]
             public DateTime? Age { get; set; }
 
             public decimal Weight { get; set; }
