@@ -56,49 +56,19 @@ namespace Leaderboard.Tests.Models
         });
 
         [Theory, DefaultData]
-        public async Task TestDuplicateLeaderboardConnected(LeaderboardModel[] leaderboards, ApplicationUser user)
+        public async Task TestDuplicateLeaderboard(LeaderboardModel[] leaderboards, ApplicationUser user)
             => await WithScopeAsync(async scope =>
         {
             var manager = scope.GetRequiredService<AppUserManager>();
             var ctx = scope.GetRequiredService<ApplicationDbContext>();
 
-            // seed a user and some boards
-            var profile = await AddUserAsync(manager, user, default);
-            await ctx.leaderboards.AddRangeAsync(leaderboards);
-            await ctx.SaveChangesAsync();
-
-            // create some test relationships
-            var ub1 = UserLeaderboard.Create(profile, leaderboards[0]);
-            var ub1Duplicate = UserLeaderboard.Create(profile, leaderboards[0]);
-            var ub2 = UserLeaderboard.Create(profile, leaderboards[1]);
-
-            // add the first and make sure it's the only one present
-            await ctx.UserLeaderboards.AddAsync(ub1);
-            await ctx.SaveChangesAsync();
-            Assert.Single(profile.UserLeaderboards);
-
-            // add the duplicate key and wait for it to fail
-            await Assert.ThrowsAsync<InvalidOperationException>(async () => await ctx.UserLeaderboards.AddAsync(ub1Duplicate));
-
-            Assert.Single(profile.UserLeaderboards);
-
-            // even though the add threw an invalid operation exception, it still attached it to the context,
-            // so we have to explicitly remove it
-            ctx.Entry(ub1Duplicate).State = EntityState.Detached;
-
-            // add second ub, which should add successfully
-            await ctx.UserLeaderboards.AddAsync(ub2);
-            await ctx.SaveChangesAsync();
-
-            Assert.Equal(2, profile.UserLeaderboards.Count);
-        });
-
-        [Theory, DefaultData]
-        public async Task TestDuplicateLeaderboardDisonnected(LeaderboardModel[] leaderboards, ApplicationUser user)
-            => await WithScopeAsync(async scope =>
-        {
-            var manager = scope.GetRequiredService<AppUserManager>();
-            var ctx = scope.GetRequiredService<ApplicationDbContext>();
+            var did = (await ctx.Divisions.AsQueryable().FirstAsync()).Id;
+            var uomid = (await ctx.UnitsOfMeasure.AsQueryable().FirstAsync()).Id;
+            foreach (var leaderboard in leaderboards)
+            {
+                leaderboard.DivisionId = did;
+                leaderboard.UOMId = uomid;
+            }
 
             // seed a user and some boards
             var profile = await AddUserAsync(manager, user, default);
@@ -127,7 +97,7 @@ namespace Leaderboard.Tests.Models
 
             // I don't understand why this works. ChangeTracking is a mystery to me. Only thing
             // that matters is that after saving, it shows just the one
-            Assert.Equal(2, profile.UserLeaderboards.Count);
+            Assert.Equal(1, profile.UserLeaderboards.Count);
             await ctx.SaveChangesAsync();
             Assert.Single(profile.UserLeaderboards);
 

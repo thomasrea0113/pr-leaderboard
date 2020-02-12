@@ -28,43 +28,13 @@ namespace Leaderboard.Tests.Models.Features
             var ctx = scope.GetRequiredService<ApplicationDbContext>();
             var um = scope.GetRequiredService<AppUserManager>();
 
-            var admin = await um.FindByNameAsync("admin-user-id");
+            var admin = await um.FindByNameAsync("Admin");
 
             Assert.NotNull(admin);
 
             Assert.True(await um.IsInRoleAsync(admin, "Admin"));
 
-            var boards = await ctx.Set<LeaderboardModel>().AsQueryable()
-                .Where(b => b.Name == "Bench 1 Rep Max" || b.Name == "Deadlift 1 Rep Max")
-                .ToListAsync();
-
-            Assert.Equal(2, admin.UserLeaderboards.Count);
-            Assert.All(admin.UserLeaderboards.Select(ub => ub.Leaderboard), b=> boards.Contains(b));
-        });
-
-        /// <summary>
-        /// Tests the data seeding method (both for identity and the calls to HasData on the model builder).
-        /// </summary>
-        /// <param name="executionCount"></param>
-        /// <returns></returns>
-        [Fact]
-        public async Task TestDivisionSeed() => await WithScopeAsync(async scope =>
-        {
-            var ctx = scope.GetRequiredService<ApplicationDbContext>();
-            var um = scope.GetRequiredService<AppUserManager>();
-
-            // these numbers will change whever the seed files change
-            Assert.Equal(3, await EntityFrameworkQueryableExtensions.CountAsync(ctx.Divisions));
-            Assert.Equal(3, await EntityFrameworkQueryableExtensions.CountAsync(ctx.WeightClasses));
-            Assert.All(ctx.Divisions, d => Assert.Single(d.WeightClasses));
-            Assert.All(ctx.WeightClasses, wc => Assert.Single(wc.Divisions));
-
-            // assert user has leaderboards, and all the leaderboards have scores
-            var user = await um.FindByNameAsync("LifterDuder");
-            Assert.NotEmpty(user.UserLeaderboards);
-            Assert.All(user.UserLeaderboards, ub => Assert.NotEmpty(ub.Leaderboard.Scores));
-
-            Assert.NotEmpty(user.Scores);
+            Assert.Empty(admin.UserLeaderboards);
         });
     }
 }

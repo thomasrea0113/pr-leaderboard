@@ -20,33 +20,37 @@ namespace Leaderboard.Tests.Models.Features
         public async Task TestModifyAndDelete(LeaderboardModel leaderboard)
             => await WithScopeAsync(async scope =>
             {
-                var work = scope.GetRequiredService<ApplicationDbContext>();
-                var repo = work.leaderboards;
+                var ctx = scope.GetRequiredService<ApplicationDbContext>();
+                var set = ctx.leaderboards;
+
+                // we don't care which division/uom we use for the purpose of this test
+                leaderboard.DivisionId = (await ctx.Divisions.FirstAsync()).Id;
+                leaderboard.UOMId = (await ctx.UnitsOfMeasure.FirstAsync()).Id;
 
                 // add board
-                await repo.AddAsync(leaderboard);
-                await work.SaveChangesAsync();
+                await set.AddAsync(leaderboard);
+                await ctx.SaveChangesAsync();
 
-                Assert.Contains(leaderboard, repo.WhereActive());
+                Assert.Contains(leaderboard, set.WhereActive());
 
                 // modify board
                 leaderboard.Name = $"{leaderboard.Name} 2";
-                repo.Update(leaderboard);
-                await work.SaveChangesAsync();
+                set.Update(leaderboard);
+                await ctx.SaveChangesAsync();
                 Assert.True(leaderboard.IsActive);
 
                 // remove and refresh from the database.
-                repo.Remove(leaderboard);
-                await work.SaveChangesAsync();
+                set.Remove(leaderboard);
+                await ctx.SaveChangesAsync();
 
                 // IDbActive should set it to inactive rather than actually deleting it
-                work.Entry(leaderboard).State = EntityState.Detached;
-                leaderboard = await repo.FindAsync(leaderboard.Id);
+                ctx.Entry(leaderboard).State = EntityState.Detached;
+                leaderboard = await set.FindAsync(leaderboard.Id);
                 Assert.False(leaderboard.IsActive);
 
                 // Sinces it's inactive, this should return nothing
-                work.Entry(leaderboard).State = EntityState.Detached;
-                leaderboard = await repo.FindActiveAsync(leaderboard.Id);
+                ctx.Entry(leaderboard).State = EntityState.Detached;
+                leaderboard = await set.FindActiveAsync(leaderboard.Id);
                 Assert.Null(leaderboard);
             });
     }
