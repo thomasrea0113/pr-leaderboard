@@ -88,13 +88,6 @@ namespace Leaderboard.Data.SeedExtensions
                 {
                     Id = GuidUtility.Create(GuidUtility.UrlNamespace, $"u_{userName}").ToString(),
                     Gender = gender,
-                    Interests = new List<DivisionCategory>
-                    {
-                        new DivisionCategory
-                        {
-                            CategoryId = "642313a2-1f0c-4329-a676-7a9cdac045bd"
-                        }
-                    },
                     IsActive = true
                 };
                 await manager.CreateOrUpdateByNameAsync(user, "Password123");
@@ -135,6 +128,14 @@ namespace Leaderboard.Data.SeedExtensions
                 }
             }
         }
+
+        private static IEnumerable<UserCategory> GenerateUserCategories(string categoryId, params ApplicationUser[] users)
+            => users.Select(u => new UserCategory
+            {
+                Id = GuidUtility.Create(GuidUtility.UrlNamespace, $"uc{u.Id}{categoryId}").ToString(),
+                UserId = u.Id,
+                CategoryId = categoryId
+            });
 
         private static List<DivisionCategory> GenerateDivisionCategories(List<Division> divisions, string categoryId)
             => divisions.Select(d => new DivisionCategory
@@ -194,6 +195,9 @@ namespace Leaderboard.Data.SeedExtensions
                 users[0].BirthDate = DateTime.Parse("05/11/1993");
                 users[1].BirthDate = DateTime.Parse("01/12/2011");
                 users[2].BirthDate = DateTime.Parse("05/11/2099");
+
+                var userCats = GenerateUserCategories("642313a2-1f0c-4329-a676-7a9cdac045bd", users.ToArray());
+                await context.BulkInsertOrUpdateAsync(userCats.ToArray());
 
                 var userBoards = GenerateUserLeaderboards(boards.ToList(), users);
                 await context.BulkInsertOrUpdateAsync(e => new { e.UserId, e.LeaderboardId }, userBoards.ToArray());

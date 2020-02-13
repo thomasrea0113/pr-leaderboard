@@ -43,8 +43,8 @@ namespace Leaderboard.Tests.Models.Features
                 Assert.Equal("Powerlifting", lb.Leaderboard.Division.DivisionCategories.First().Category.Name);
             });
 
-            Assert.Single(user.Interests);
-            Assert.Equal("Powerlifting", user.Interests.Single().Category.Name);
+            Assert.Single(user.UserCategories);
+            Assert.Equal("Powerlifting", user.UserCategories.Single().Category.Name);
 
             var ages = await ctx.Users.AsQueryable().Select(u => new {
                 u.UserName,

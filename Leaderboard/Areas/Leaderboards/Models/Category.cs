@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Leaderboard.Models.Features;
+using Leaderboard.Models.Relationships;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Leaderboard.Areas.Leaderboards.Models
@@ -14,7 +15,8 @@ namespace Leaderboard.Areas.Leaderboards.Models
 
         public string Name { get; set; }
 
-        public virtual ICollection<DivisionCategory> DivisionCategories { get; set; }
+        public virtual ICollection<DivisionCategory> DivisionCategories { get; set; } = new List<DivisionCategory>();
+        public virtual ICollection<UserCategory> UserCategories { get; set; } = new List<UserCategory>();
 
         public void OnModelCreating(EntityTypeBuilder<Category> builder)
         {

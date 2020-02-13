@@ -301,9 +301,6 @@ namespace Leaderboard.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("text");
 
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("text");
-
                     b.Property<string>("CategoryId")
                         .IsRequired()
                         .HasColumnType("text");
@@ -313,8 +310,6 @@ namespace Leaderboard.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("DivisionId");
 
@@ -383,7 +378,7 @@ namespace Leaderboard.Migrations
                     b.HasIndex("DivisionId", "WeightClassId", "Name")
                         .IsUnique();
 
-                    b.ToTable("leaderboards");
+                    b.ToTable("Leaderboards");
                 });
 
             modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.ScoreModel", b =>
@@ -511,6 +506,30 @@ namespace Leaderboard.Migrations
                     b.ToTable("UploadedFiles");
                 });
 
+            modelBuilder.Entity("Leaderboard.Models.Relationships.UserCategory", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text");
+
+                    b.Property<string>("CategoryId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("CategoryId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("UserCategories");
+                });
+
             modelBuilder.Entity("Leaderboard.Models.Relationships.UserLeaderboard", b =>
                 {
                     b.Property<string>("Id")
@@ -586,10 +605,6 @@ namespace Leaderboard.Migrations
 
             modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.DivisionCategory", b =>
                 {
-                    b.HasOne("Leaderboard.Areas.Identity.Models.ApplicationUser", null)
-                        .WithMany("Interests")
-                        .HasForeignKey("ApplicationUserId");
-
                     b.HasOne("Leaderboard.Areas.Leaderboards.Models.Category", "Category")
                         .WithMany("DivisionCategories")
                         .HasForeignKey("CategoryId")
@@ -660,6 +675,21 @@ namespace Leaderboard.Migrations
                 {
                     b.HasOne("Leaderboard.Areas.Identity.Models.ApplicationUser", "CreatedBy")
                         .WithMany("UploadedFiles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Leaderboard.Models.Relationships.UserCategory", b =>
+                {
+                    b.HasOne("Leaderboard.Areas.Leaderboards.Models.Category", "Category")
+                        .WithMany("UserCategories")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Leaderboard.Areas.Identity.Models.ApplicationUser", "User")
+                        .WithMany("UserCategories")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

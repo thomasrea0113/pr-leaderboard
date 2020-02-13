@@ -35,6 +35,7 @@ namespace Leaderboard.Data
 
         public DbSet<UserLeaderboard> UserLeaderboards { get; set; }
         public DbSet<DivisionCategory> DivisionCategories { get; set; }
+        public DbSet<UserCategory> UserCategories { get; set; }
         public DbSet<DivisionWeightClass> DivisionWeightClasses { get; set; }
 
         #endregion

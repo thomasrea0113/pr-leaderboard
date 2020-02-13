@@ -19,6 +19,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Leaderboard.Data;
 using Leaderboard.Areas.Leaderboards.Models;
 using Microsoft.EntityFrameworkCore;
+using Leaderboard.Models.Relationships;
+using Microsoft.AspNetCore.Mvc.Filters;
+using System.Net.Http;
 
 namespace Leaderboard.Areas.Identity.Pages.Account
 {
@@ -83,23 +86,23 @@ namespace Leaderboard.Areas.Identity.Pages.Account
             public decimal? Weight { get; set; }
         }
 
+        private async Task InitModelAsync()
+        {
+            
+            Categories = new SelectList(await _ctx.Categories
+                .AsQueryable()
+                .ToArrayAsync(), nameof(Category.Name), nameof(Category.Name));
+        }
+
         public async Task OnGetAsync(string returnUrl = null)
         {
             ReturnUrl = returnUrl;
-            Categories = new SelectList(await _ctx.Categories.AsQueryable().ToArrayAsync(), nameof(Category.Name));
+            await InitModelAsync();
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
-            List<Category> categories;
-
-            if (ModelState.IsValid)
-            {
-                categories = await _ctx.Categories.AsQueryable()
-                    .Where(c => Input.Interests.Contains(c.Id))
-                    .ToListAsync();
-            }
 
             if (ModelState.IsValid)
             {
@@ -111,6 +114,7 @@ namespace Leaderboard.Areas.Identity.Pages.Account
                     BirthDate = Input.Age,
                     
                 };
+
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
@@ -136,11 +140,24 @@ namespace Leaderboard.Areas.Identity.Pages.Account
                     {
                         return RedirectToPage("RegisterConfirmation", new { email = Input.Email });
                     }
-                    else
+
+                    
+                    var categories = await _ctx.Categories.AsQueryable()
+                        .Where(c => Input.Interests.Contains(c.Name))
+                        .ToListAsync();
+
+                    if (categories.Any())
                     {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
+                        await _ctx.AddRangeAsync(categories.Select(c => new UserCategory
+                        {
+                            UserId = user.Id,
+                            CategoryId = c.Id
+                        }));
+                        await _ctx.SaveChangesAsync();
                     }
+
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    return LocalRedirect(returnUrl);
                 }
                 foreach (var error in result.Errors)
                 {
@@ -149,6 +166,7 @@ namespace Leaderboard.Areas.Identity.Pages.Account
             }
 
             // If we got this far, something failed, redisplay form
+            await InitModelAsync();
             return Page();
         }
     }

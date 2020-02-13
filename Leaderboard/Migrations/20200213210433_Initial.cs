@@ -231,23 +231,41 @@ namespace Leaderboard.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserCategories",
+                columns: table => new
+                {
+                    Id = table.Column<string>(nullable: false),
+                    UserId = table.Column<string>(nullable: false),
+                    CategoryId = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserCategories", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserCategories_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserCategories_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DivisionCategories",
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
                     DivisionId = table.Column<string>(nullable: false),
-                    CategoryId = table.Column<string>(nullable: false),
-                    ApplicationUserId = table.Column<string>(nullable: true)
+                    CategoryId = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DivisionCategories", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_DivisionCategories_AspNetUsers_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_DivisionCategories_Categories_CategoryId",
                         column: x => x.CategoryId,
@@ -288,7 +306,7 @@ namespace Leaderboard.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "leaderboards",
+                name: "Leaderboards",
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
@@ -300,21 +318,21 @@ namespace Leaderboard.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_leaderboards", x => x.Id);
+                    table.PrimaryKey("PK_Leaderboards", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_leaderboards_Divisions_DivisionId",
+                        name: "FK_Leaderboards_Divisions_DivisionId",
                         column: x => x.DivisionId,
                         principalTable: "Divisions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_leaderboards_UnitsOfMeasure_UOMId",
+                        name: "FK_Leaderboards_UnitsOfMeasure_UOMId",
                         column: x => x.UOMId,
                         principalTable: "UnitsOfMeasure",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_leaderboards_WeightClasses_WeightClassId",
+                        name: "FK_Leaderboards_WeightClasses_WeightClassId",
                         column: x => x.WeightClassId,
                         principalTable: "WeightClasses",
                         principalColumn: "Id",
@@ -336,9 +354,9 @@ namespace Leaderboard.Migrations
                 {
                     table.PrimaryKey("PK_Scores", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Scores_leaderboards_BoardId",
+                        name: "FK_Scores_Leaderboards_BoardId",
                         column: x => x.BoardId,
-                        principalTable: "leaderboards",
+                        principalTable: "Leaderboards",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -367,9 +385,9 @@ namespace Leaderboard.Migrations
                 {
                     table.PrimaryKey("PK_UserLeaderboards", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserLeaderboards_leaderboards_LeaderboardId",
+                        name: "FK_UserLeaderboards_Leaderboards_LeaderboardId",
                         column: x => x.LeaderboardId,
-                        principalTable: "leaderboards",
+                        principalTable: "Leaderboards",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -444,11 +462,6 @@ namespace Leaderboard.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_DivisionCategories_ApplicationUserId",
-                table: "DivisionCategories",
-                column: "ApplicationUserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_DivisionCategories_DivisionId",
                 table: "DivisionCategories",
                 column: "DivisionId");
@@ -477,18 +490,18 @@ namespace Leaderboard.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_leaderboards_UOMId",
-                table: "leaderboards",
+                name: "IX_Leaderboards_UOMId",
+                table: "Leaderboards",
                 column: "UOMId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_leaderboards_WeightClassId",
-                table: "leaderboards",
+                name: "IX_Leaderboards_WeightClassId",
+                table: "Leaderboards",
                 column: "WeightClassId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_leaderboards_DivisionId_WeightClassId_Name",
-                table: "leaderboards",
+                name: "IX_Leaderboards_DivisionId_WeightClassId_Name",
+                table: "Leaderboards",
                 columns: new[] { "DivisionId", "WeightClassId", "Name" },
                 unique: true);
 
@@ -523,6 +536,17 @@ namespace Leaderboard.Migrations
                 name: "IX_UploadedFiles_UserId",
                 table: "UploadedFiles",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserCategories_UserId",
+                table: "UserCategories",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserCategories_CategoryId_UserId",
+                table: "UserCategories",
+                columns: new[] { "CategoryId", "UserId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserLeaderboards_LeaderboardId",
@@ -569,19 +593,22 @@ namespace Leaderboard.Migrations
                 name: "Scores");
 
             migrationBuilder.DropTable(
+                name: "UserCategories");
+
+            migrationBuilder.DropTable(
                 name: "UserLeaderboards");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Categories");
-
-            migrationBuilder.DropTable(
                 name: "UploadedFiles");
 
             migrationBuilder.DropTable(
-                name: "leaderboards");
+                name: "Categories");
+
+            migrationBuilder.DropTable(
+                name: "Leaderboards");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
