@@ -47,7 +47,10 @@
 				"username": "postgres"
 			}
 		],
-		"omnisharp.enableRoslynAnalyzers": true
+		"omnisharp.enableRoslynAnalyzers": true,
+		"remote.extensionKind": {
+			"ms-azuretools.vscode-docker": "workspace"
+		}
 	},
 	"extensions": {
 		"recommendations": [
