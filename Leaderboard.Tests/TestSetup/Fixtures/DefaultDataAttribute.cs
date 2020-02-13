@@ -4,7 +4,7 @@ namespace Leaderboard.Tests.TestSetup.Fixtures
 {
     public class DefaultDataAttribute : AutoDataAttribute
     {
-        public DefaultDataAttribute(string dbName = default) : base(() => new DefaultFixture(dbName))
+        public DefaultDataAttribute() : base(() => new DefaultFixture())
         {
         }
     }

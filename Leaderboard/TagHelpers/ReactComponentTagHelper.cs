@@ -17,7 +17,7 @@ namespace Leaderboard.TagHelpers
         public object Props { get; set; }
         public string ElementId { get; set; }
 
-        public ReactComponentTagHelper(IWebHostEnvironment env, ISpaStaticFileProvider spaFiles) : base(env, spaFiles)
+        public ReactComponentTagHelper(ISpaStaticFileProvider spaFiles) : base(spaFiles)
         {
         }
 

@@ -23,8 +23,10 @@ namespace Leaderboard.Tests.Models.Features
         /// <param name="executionCount"></param>
         /// <returns></returns>
         [Fact]
-        public async Task TestSeed() => await WithScopeAsync(async scope =>
+        public async Task TestSeed()
         {
+            using var _ = CreateScope(out var scope);
+
             var ctx = scope.GetRequiredService<ApplicationDbContext>();
             var um = scope.GetRequiredService<AppUserManager>();
 
@@ -48,6 +50,6 @@ namespace Leaderboard.Tests.Models.Features
                 u.UserName,
                 u.Age
             }).ToListAsync();
-        });
+        }
     }
 }

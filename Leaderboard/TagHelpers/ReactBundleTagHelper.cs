@@ -13,7 +13,7 @@ using Microsoft.Extensions.FileProviders;
 namespace Leaderboard.TagHelpers
 {
     public class WebpackStats {
-        public string publicPath { get; set; }
+        public string PublicPath { get; set; }
         public string Hash { get; set; }
         public Dictionary<string, string[]> AssetsByChunkName { get; set; }
 
@@ -22,14 +22,14 @@ namespace Leaderboard.TagHelpers
             // TODO implement chunk support
 
         public string GetAssetPublicPath(string pathPattern)
-            => String.Join("/", publicPath, GetAssetPath(pathPattern));
+            => String.Join("/", PublicPath, GetAssetPath(pathPattern));
     }
 
     public class Asset {
         public string Name { get; private set; }
         public string Path { get; private set; }
 
-        public ValueTuple<string, string> deconstruct() => (Name, Path);
+        public ValueTuple<string, string> Deconstruct() => (Name, Path);
         public static implicit operator Asset(ValueTuple<string, string> tuple)
             => new Asset {
                 Name = tuple.Item1,
@@ -44,7 +44,7 @@ namespace Leaderboard.TagHelpers
         protected readonly WebpackStats _webpackStats;
         protected readonly List<Asset> _allAssets;
 
-        public ReactBundleTagHelper(IWebHostEnvironment env, ISpaStaticFileProvider spaFiles)
+        public ReactBundleTagHelper(ISpaStaticFileProvider spaFiles)
         {
             var provider = spaFiles.FileProvider
                     ?? throw new ArgumentNullException($"The SPA directory does not exist. Did you run 'npm run build' first?");

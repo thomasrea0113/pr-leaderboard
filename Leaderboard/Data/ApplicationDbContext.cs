@@ -23,7 +23,7 @@ namespace Leaderboard.Data
         ApplicationRoleClaim, ApplicationUserToken>
 
     {
-        public DbSet<LeaderboardModel> leaderboards { get; set; }
+        public DbSet<LeaderboardModel> Leaderboards { get; set; }
         public DbSet<Division> Divisions { get; set; }
         public DbSet<WeightClass> WeightClasses { get; set; }
         public DbSet<ScoreModel> Scores { get; set; }
@@ -39,12 +39,9 @@ namespace Leaderboard.Data
 
         #endregion
 
-        private readonly string _appConfiguration;
-
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IWebHostEnvironment env)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
-            _appConfiguration = env.EnvironmentName.ToLower();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -68,13 +65,13 @@ namespace Leaderboard.Data
                 .Cast<ApplicationUser>()
                 .ToArray();
 
-            await this.ProcessPreSaveFeaturesAsync(allEntries);
+            await allEntries.ProcessPreSaveFeaturesAsync();
 
             var added = allEntries.Where(s => s.State == EntityState.Added);
             
             var count = await base.SaveChangesAsync();
 
-            await this.ProcessPostSaveFeaturesAsync(allEntries);
+            await allEntries.ProcessPostSaveFeaturesAsync();
 
             return count;
         }

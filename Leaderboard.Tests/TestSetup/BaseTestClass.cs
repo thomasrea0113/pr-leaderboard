@@ -13,29 +13,22 @@ namespace Leaderboard.Tests.TestSetup
 {
     public class BaseTestClass : IClassFixture<WebOverrideFactory>
     {
-        protected WebOverrideFactory _factory { get; }
-        protected HttpClient _client { get; }
-        protected IServiceProvider _services { get; }
+        protected WebOverrideFactory Factory { get; }
+        protected HttpClient Client { get; }
+        protected IServiceProvider Services { get; }
 
         public BaseTestClass(WebOverrideFactory factory)
         {
-            _factory = factory;
+            Factory = factory;
         }
 
-        public void WithScope(Action<IServiceScope> test)
+        protected IServiceScope CreateScope(out IServiceProvider provider)
         {
-            using (var scope = _factory.Services.CreateScope())
-            {
-                test(scope);
-            }
+            var scope = Factory.Services.CreateScope();
+            provider = scope.ServiceProvider;
+            return scope;
         }
 
-        public async Task WithScopeAsync(Func<IServiceProvider, Task> testAsync)
-        {
-            using (var scope = _factory.Services.CreateScope())
-            {
-                await testAsync(scope.ServiceProvider);
-            }
-        }
+        protected IServiceScope CreateScope() => Factory.Services.CreateScope();
     }
 }

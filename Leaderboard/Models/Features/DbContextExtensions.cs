@@ -52,7 +52,7 @@ namespace Leaderboard.Models.Features
         // the type that implements the interface, we won't process it
         t => typeof(IDbEntity<>).MakeGenericType(t).IsAssignableFrom(t));
 
-        public static async Task ProcessPreSaveFeaturesAsync(this DbContext ctx, IEnumerable<EntityEntry> entries)
+        public static async Task ProcessPreSaveFeaturesAsync(this IEnumerable<EntityEntry> entries)
         {
             
             var added = entries.Where(t => t.State == EntityState.Added);
@@ -92,7 +92,7 @@ namespace Leaderboard.Models.Features
             }
         }
 
-        public static Task ProcessPostSaveFeaturesAsync(this DbContext ctx, IEnumerable<EntityEntry> entries)
+        public static Task ProcessPostSaveFeaturesAsync(this IEnumerable<EntityEntry> _)
         {
             // stubbed 
             return Task.CompletedTask;

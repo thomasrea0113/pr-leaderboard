@@ -17,7 +17,10 @@ namespace Leaderboard.Tests.Models.Identity.Validators
         }
 
         [Theory, DefaultData]
-        public async Task TestInvalidEmail(ApplicationUser user) => await WithScopeAsync(async scope => {
+        public async Task TestInvalidEmail(ApplicationUser user)
+        {
+            using var _ = CreateScope(out var scope);
+
             var manager = scope.GetRequiredService<AppUserManager>();
             var describer = scope.GetRequiredService<IdentityErrorDescriber>();
 
@@ -27,21 +30,25 @@ namespace Leaderboard.Tests.Models.Identity.Validators
             var result = await manager.CreateAsync(user);
 
             Assert.Contains(result.Errors, e => e.Description == describer.InvalidEmail(user.Email).Description);
-        });
+        }
 
         [Theory, DefaultData]
-        public async Task TestBlankEmail(ApplicationUser user) => await WithScopeAsync(async scope =>
+        public async Task TestBlankEmail(ApplicationUser user)
         {
+            using var _ = CreateScope(out var scope);
+
             user.Email = default;
 
             var manager = scope.GetRequiredService<AppUserManager>();
             var result = await manager.CreateAsync(user);
             Assert.True(result.Succeeded);
-        });
+        }
 
         [Theory, DefaultData]
-        public async Task TestExistingEmail(ApplicationUser[] users) => await WithScopeAsync(async scope =>
+        public async Task TestExistingEmail(ApplicationUser[] users)
         {
+            using var _ = CreateScope(out var scope);
+
             var manager = scope.GetRequiredService<AppUserManager>();
             var describer = scope.GetRequiredService<IdentityErrorDescriber>();
 
@@ -59,6 +66,6 @@ namespace Leaderboard.Tests.Models.Identity.Validators
             // email is a duplicate, so should contain the duplicate email identity error
             Assert.Contains(result.Errors, e => e.Description == describer.DuplicateEmail(users[1].Email).Description);
             Assert.False(result.Succeeded);
-        });
+        }
     }
 }

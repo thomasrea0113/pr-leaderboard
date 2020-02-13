@@ -23,7 +23,7 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
         // GET: Leaderboards/Leaderboard
         public async Task<IActionResult> Index()
         {
-            return View(await _context.leaderboards.AsQueryable().ToListAsync());
+            return View(await _context.Leaderboards.AsQueryable().ToListAsync());
         }
 
         // GET: Leaderboards/Leaderboard/Details/5
@@ -34,7 +34,7 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
                 return NotFound();
             }
 
-            var leaderboardModel = await _context.leaderboards.AsQueryable()
+            var leaderboardModel = await _context.Leaderboards.AsQueryable()
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (leaderboardModel == null)
             {
@@ -74,7 +74,7 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
                 return NotFound();
             }
 
-            var leaderboardModel = await _context.leaderboards.FindAsync(id);
+            var leaderboardModel = await _context.Leaderboards.FindAsync(id);
             if (leaderboardModel == null)
             {
                 return NotFound();
@@ -125,7 +125,7 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
                 return NotFound();
             }
 
-            var leaderboardModel = await _context.leaderboards.AsQueryable()
+            var leaderboardModel = await _context.Leaderboards.AsQueryable()
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (leaderboardModel == null)
             {
@@ -140,15 +140,15 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var leaderboardModel = await _context.leaderboards.FindAsync(id);
-            _context.leaderboards.Remove(leaderboardModel);
+            var leaderboardModel = await _context.Leaderboards.FindAsync(id);
+            _context.Leaderboards.Remove(leaderboardModel);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool LeaderboardModelExists(string id)
         {
-            return _context.leaderboards.Any(e => e.Id == id);
+            return _context.Leaderboards.Any(e => e.Id == id);
         }
     }
 }

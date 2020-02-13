@@ -27,7 +27,7 @@ namespace Leaderboard.Areas.Identity.Managers
     }
     public class AppUserManager : UserManager<ApplicationUser>
     {
-        private ApplicationDbContext _ctx { get; }
+        private readonly ApplicationDbContext _ctx;
 
         public AppUserManager(IUserStore<ApplicationUser> store,
             IOptions<IdentityOptions> optionsAccessor,

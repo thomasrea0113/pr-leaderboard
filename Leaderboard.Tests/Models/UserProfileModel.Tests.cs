@@ -42,8 +42,10 @@ namespace Leaderboard.Tests.Models
 
 
         [Theory, DefaultData]
-        public async Task TestCreateUsers(ApplicationUser[] users) => await WithScopeAsync(async scope =>
+        public async Task TestCreateUsers(ApplicationUser[] users)
         {
+            using var _ = CreateScope(out var scope);
+
             var manager = scope.GetRequiredService<AppUserManager>();
 
             // unsetting one of the emails to make sure it can be created
@@ -53,12 +55,13 @@ namespace Leaderboard.Tests.Models
             {
                 Assert.True(profile.IsActive);
             }
-        });
+        }
 
         [Theory, DefaultData]
         public async Task TestDuplicateLeaderboard(LeaderboardModel[] leaderboards, ApplicationUser user)
-            => await WithScopeAsync(async scope =>
         {
+            using var _ = CreateScope(out var scope);
+
             var manager = scope.GetRequiredService<AppUserManager>();
             var ctx = scope.GetRequiredService<ApplicationDbContext>();
 
@@ -72,7 +75,7 @@ namespace Leaderboard.Tests.Models
 
             // seed a user and some boards
             var profile = await AddUserAsync(manager, user, default);
-            await ctx.leaderboards.AddRangeAsync(leaderboards);
+            await ctx.Leaderboards.AddRangeAsync(leaderboards);
             await ctx.SaveChangesAsync();
 
             // create some test relationships
@@ -106,6 +109,6 @@ namespace Leaderboard.Tests.Models
             await ctx.SaveChangesAsync();
 
             Assert.Equal(2, profile.UserLeaderboards.Count);
-        });
+        }
     }
 }

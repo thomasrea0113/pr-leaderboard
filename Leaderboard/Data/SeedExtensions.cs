@@ -26,7 +26,7 @@ namespace Leaderboard.Data.SeedExtensions
         /// <summary>
         /// Loads all the data for the given type.
         /// </summary>
-        public static async Task<List<TEntity>> GetSeedDataFromFile<TEntity>(string environmentName, params string[] keyNames)
+        public static async Task<List<TEntity>> GetSeedDataFromFile<TEntity>(string environmentName)
         {
             var configuringType = typeof(TEntity);
 
@@ -51,15 +51,15 @@ namespace Leaderboard.Data.SeedExtensions
             foreach (var division in divisions)
                 foreach (var weightClass in weightClasses)
                 {
-                    Func<string, LeaderboardModel> generateBoard = name
-                        => new LeaderboardModel {
-                            Id = GuidUtility.Create(GuidUtility.UrlNamespace, $"lb_{weightClass.Id}{division.Id}{name}").ToString(),
-                            Name = name,
-                            IsActive = true,
-                            WeightClassId = weightClass.Id,
-                            DivisionId = division.Id,
-                            UOMId = "e362dd90-d6fe-459b-ba26-09db002bfff6"
-                        };
+                    LeaderboardModel generateBoard(string name) => new LeaderboardModel
+                    {
+                        Id = GuidUtility.Create(GuidUtility.UrlNamespace, $"lb_{weightClass.Id}{division.Id}{name}").ToString(),
+                        Name = name,
+                        IsActive = true,
+                        WeightClassId = weightClass.Id,
+                        DivisionId = division.Id,
+                        UOMId = "e362dd90-d6fe-459b-ba26-09db002bfff6"
+                    };
 
                     yield return generateBoard("Bench");
                     yield return generateBoard("Squat");

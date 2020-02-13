@@ -42,7 +42,7 @@ namespace Leaderboard.Data.BulkExtensions
             if (keyPropNames.Count != keyProps.Count)
                 throw new ArgumentException($"model type {typeof(T).FullName} did not contain all keys: {String.Join(", ", keyPropNames)}");
 
-            Func<List<T>, T, bool> equality = (elist, e) => elist.Any(e2 =>
+            bool equality(List<T> elist, T e) => elist.Any(e2 =>
             {
                 foreach (var prop in keyProps)
                     if (!prop.GetValue(e2).Equals(prop.GetValue(e)))

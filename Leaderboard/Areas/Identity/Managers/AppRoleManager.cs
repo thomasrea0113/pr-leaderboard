@@ -16,7 +16,7 @@ namespace Leaderboard.Areas.Identity.Managers
 
     public class AppRoleManager : RoleManager<ApplicationRole>
     {
-        private ApplicationDbContext _ctx { get; }
+        private readonly ApplicationDbContext _ctx;
 
         public AppRoleManager(IRoleStore<ApplicationRole> store,
             IEnumerable<IRoleValidator<ApplicationRole>> roleValidators,
