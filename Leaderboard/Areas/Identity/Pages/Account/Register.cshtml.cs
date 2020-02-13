@@ -71,7 +71,7 @@ namespace Leaderboard.Areas.Identity.Pages.Account
             [DataType(DataType.Date)]
             public DateTime? Age { get; set; }
 
-            public decimal Weight { get; set; }
+            public decimal? Weight { get; set; }
         }
 
         public async Task OnGetAsync(string returnUrl = null)
