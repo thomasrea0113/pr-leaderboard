@@ -46,7 +46,8 @@
 				"server": "db-unit",
 				"username": "postgres"
 			}
-		]
+		],
+		"omnisharp.enableRoslynAnalyzers": true
 	},
 	"extensions": {
 		"recommendations": [
