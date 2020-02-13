@@ -301,6 +301,9 @@ namespace Leaderboard.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("text");
 
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("text");
+
                     b.Property<string>("CategoryId")
                         .IsRequired()
                         .HasColumnType("text");
@@ -310,6 +313,8 @@ namespace Leaderboard.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("DivisionId");
 
@@ -581,6 +586,10 @@ namespace Leaderboard.Migrations
 
             modelBuilder.Entity("Leaderboard.Areas.Leaderboards.Models.DivisionCategory", b =>
                 {
+                    b.HasOne("Leaderboard.Areas.Identity.Models.ApplicationUser", null)
+                        .WithMany("Interests")
+                        .HasForeignKey("ApplicationUserId");
+
                     b.HasOne("Leaderboard.Areas.Leaderboards.Models.Category", "Category")
                         .WithMany("DivisionCategories")
                         .HasForeignKey("CategoryId")

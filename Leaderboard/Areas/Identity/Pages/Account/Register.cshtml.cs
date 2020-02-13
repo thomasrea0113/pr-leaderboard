@@ -15,6 +15,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Leaderboard.Data;
+using Leaderboard.Areas.Leaderboards.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Leaderboard.Areas.Identity.Pages.Account
 {
@@ -25,17 +29,20 @@ namespace Leaderboard.Areas.Identity.Pages.Account
         private readonly AppUserManager _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly ApplicationDbContext _ctx;
 
         public RegisterModel(
             AppUserManager userManager,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            ApplicationDbContext ctx)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _ctx = ctx;
         }
 
         [BindProperty]
@@ -43,7 +50,7 @@ namespace Leaderboard.Areas.Identity.Pages.Account
 
         public string ReturnUrl { get; set; }
 
-        public IList<AuthenticationScheme> ExternalLogins { get; set; }
+        public SelectList Categories { get; set; }
 
         public class InputModel
         {
@@ -66,6 +73,8 @@ namespace Leaderboard.Areas.Identity.Pages.Account
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
 
+            public List<string> Interests { get; set; }
+
             public GenderValues Gender { get; set; }
 
             [DataType(DataType.Date)]
@@ -77,13 +86,21 @@ namespace Leaderboard.Areas.Identity.Pages.Account
         public async Task OnGetAsync(string returnUrl = null)
         {
             ReturnUrl = returnUrl;
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            Categories = new SelectList(await _ctx.Categories.AsQueryable().ToArrayAsync(), nameof(Category.Name));
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl = returnUrl ?? Url.Content("~/");
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            List<Category> categories;
+
+            if (ModelState.IsValid)
+            {
+                categories = await _ctx.Categories.AsQueryable()
+                    .Where(c => Input.Interests.Contains(c.Id))
+                    .ToListAsync();
+            }
+
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser {
@@ -91,7 +108,8 @@ namespace Leaderboard.Areas.Identity.Pages.Account
                     Email = Input.Email,
                     Gender = Input.Gender,
                     Weight = Input.Weight,
-                    BirthDate = Input.Age
+                    BirthDate = Input.Age,
+                    
                 };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)

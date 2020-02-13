@@ -40,6 +40,12 @@
                 </h6>
                 <hr />
                 <div class="form-group">
+                    <label asp-for="Input.Interests"></label>
+                    <select asp-for="Input.Interests" class="form-control" asp-items="Model.Categories">
+                    </select>
+                    <span asp-validation-for="Input.Interests" class="text-danger"></span>
+                </div>
+                <div class="form-group">
                     <label asp-for="Input.Age"></label>
                     <input asp-for="Input.Age" class="form-control" />
                     <span asp-validation-for="Input.Age" class="text-danger"></span>

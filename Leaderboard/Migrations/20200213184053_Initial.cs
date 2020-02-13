@@ -236,11 +236,18 @@ namespace Leaderboard.Migrations
                 {
                     Id = table.Column<string>(nullable: false),
                     DivisionId = table.Column<string>(nullable: false),
-                    CategoryId = table.Column<string>(nullable: false)
+                    CategoryId = table.Column<string>(nullable: false),
+                    ApplicationUserId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DivisionCategories", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DivisionCategories_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_DivisionCategories_Categories_CategoryId",
                         column: x => x.CategoryId,
@@ -435,6 +442,11 @@ namespace Leaderboard.Migrations
                 table: "Categories",
                 column: "Name",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DivisionCategories_ApplicationUserId",
+                table: "DivisionCategories",
+                column: "ApplicationUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DivisionCategories_DivisionId",

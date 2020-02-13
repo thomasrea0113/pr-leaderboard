@@ -88,6 +88,13 @@ namespace Leaderboard.Data.SeedExtensions
                 {
                     Id = GuidUtility.Create(GuidUtility.UrlNamespace, $"u_{userName}").ToString(),
                     Gender = gender,
+                    Interests = new List<DivisionCategory>
+                    {
+                        new DivisionCategory
+                        {
+                            CategoryId = "642313a2-1f0c-4329-a676-7a9cdac045bd"
+                        }
+                    },
                     IsActive = true
                 };
                 await manager.CreateOrUpdateByNameAsync(user, "Password123");

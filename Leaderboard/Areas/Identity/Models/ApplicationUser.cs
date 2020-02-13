@@ -32,6 +32,8 @@ namespace Leaderboard.Areas.Identity.Models
         public virtual ICollection<UserLeaderboard> UserLeaderboards { get; set; } = new List<UserLeaderboard>();
         public virtual ICollection<ScoreModel> Scores { get; set; } = new List<ScoreModel>();
         public virtual ICollection<FileModel> UploadedFiles { get; set; } = new List<FileModel>();
+        
+        public virtual ICollection<DivisionCategory> Interests { get; set; } = new List<DivisionCategory>();
 
         public bool? IsActive { get; set; }
 
@@ -62,6 +64,9 @@ namespace Leaderboard.Areas.Identity.Models
 
             builder.Property(b => b.BirthDate)
                 .HasConversion(Conversions.LocalToUtcDateTime);
+
+            builder.HasMany(b => b.Interests)
+                .WithOne();
 
             // Each User can have many UserClaims
             builder.HasMany(e => e.Claims)
