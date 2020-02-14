@@ -1,4 +1,5 @@
 {
     "editor.formatOnSave": true,
-    "eslint.codeActionsOnSave.mode": "all"
+    "eslint.codeActionsOnSave.mode": "all",
+    "jest.pathToJest": "node_modules/.bin/jest"
 }
