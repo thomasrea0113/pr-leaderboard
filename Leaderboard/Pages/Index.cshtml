@@ -1,5 +1,7 @@
-﻿@{
-ViewData["Title"] = "Home Page";
+﻿@page
+
+@{
+  ViewData["Title"] = "Home Page";
 }
 
 @section styles {
@@ -15,5 +17,5 @@ ViewData["Title"] = "Home Page";
 </div>
 
 @section scripts {
-    <react-component src="js/home.[hash].js" props="@Model" element-id="root" />
+    <react-component src="js/home.[hash].js" element-id="root" />
 }
