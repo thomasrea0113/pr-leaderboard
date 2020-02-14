@@ -14,11 +14,15 @@
 		},
 		{
 			"path": ".devcontainer"
+		},
+		{
+			"path": "BlazorApp"
 		}
 	],
 	"settings": {
 		"jest.disabledWorkspaceFolders": [
 			"Leaderboard",
+			"BlazorApp",
 			"Leaderboard.Tests",
 			"Containers",
 			".devcontainer"
