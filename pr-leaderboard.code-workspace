@@ -1,10 +1,7 @@
 {
 	"folders": [
 		{
-			"path": "ClientApp"
-		},
-		{
-			"path": "Leaderboard"
+			"path": "BlazorApp"
 		},
 		{
 			"path": "Leaderboard.Tests"
@@ -14,14 +11,10 @@
 		},
 		{
 			"path": ".devcontainer"
-		},
-		{
-			"path": "BlazorApp"
 		}
 	],
 	"settings": {
 		"jest.disabledWorkspaceFolders": [
-			"Leaderboard",
 			"BlazorApp",
 			"Leaderboard.Tests",
 			"Containers",
