@@ -10,3 +10,4 @@ import 'jquery-validation-unobtrusive';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import './scss/site.scss';
+import '@fortawesome/fontawesome-free/js/all';
