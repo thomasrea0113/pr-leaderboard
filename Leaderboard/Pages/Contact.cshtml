@@ -1,4 +1,9 @@
 @page
 @model Contact
+@{
+    ViewData["Title"] = "Contact";
+    ViewData["FormIdPrefix"] = "Contact";
+}
 
 <h2>hello world</h2>
+<partial name="Forms/_ContactFormPartial" for="ContactModel" />

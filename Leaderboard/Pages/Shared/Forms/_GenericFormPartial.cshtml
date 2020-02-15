@@ -1,0 +1,21 @@
+@model object
+@{
+    var id = System.Guid.NewGuid().ToString();
+    var modelType = Model.GetType();
+}
+
+<div id="form-wrapper-@id">
+    <form id="form-@id" method="post" data-ajax="true" data-ajax-update="#form-@id" data-ajax-url="?handler=form" data-ajax-loading="#form-wrapper-@id">
+        @foreach (var prop in modelType.GetProperties()){
+        <div class="form-group">
+            @Html.Label(prop.Name)
+            @Html.Editor(prop.Name, new { HtmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessage(prop.Name, null, new { @class = "text-danger" }, "span")
+        </div>
+        }
+        <button type="submit" value="Submit" class="btn btn-primary">
+            <span style="display: none;" id="loading-@id"><i class="fas fa-circle-notch fa-spin"></i>&nbsp;</span>
+            Submit
+        </button>
+    </form>
+</div>
