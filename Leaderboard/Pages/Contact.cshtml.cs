@@ -11,14 +11,11 @@ namespace Leaderboard.Pages
     {
         private readonly AppUserManager _manager;
 
-        [BindProperty]
-        public bool EnableEmail { get; set; } = true;
+        [ViewData]
+        public bool EmailEnabled { get; set; } = true;
 
         [BindProperty]
         public ContactViewModel ContactModel { get; set; }
-
-        [ViewData]
-        public string FormIdPrefix { get; set; } = "Contact";
 
         public Contact(AppUserManager manager)
         {
@@ -36,8 +33,12 @@ namespace Leaderboard.Pages
             {
                 ContactModel ??= new ContactViewModel();
                 var user = await _manager.GetUserAsync(HttpContext.User);
-                ContactModel.Email ??= user?.Email;
-                EnableEmail = false;
+                var email = user?.Email;
+                if (email != null)
+                {
+                    ContactModel.Email = email;
+                    EmailEnabled = false;
+                }
             }
             return Partial("Forms/_ContactFormPartial", ContactModel);
         }

@@ -2,12 +2,13 @@
 
 @{
     var id = ViewData["FormIdPrefix"];
+    Boolean.TryParse(ViewData["EmailEnabled"]?.ToString(), out var emailEnabled);
 }
 
-<form id="form-@id" method="post" data-ajax="true" data-ajax-update="#form-@id" data-ajax-url="?handler=form" data-ajax-loading="#loading-@id">
+<form id="form-@id" method="post" data-ajax-initial-url="?handler=form" data-ajax="true" data-ajax-update="#form-@id" data-ajax-url="?handler=form" data-ajax-loading="#loading-@id">
     <div class="form-group">
         <label asp-for="Email"></label>
-        <input asp-for="Email" class="form-control" />
+        <input @if(!emailEnabled){ <text>readonly</text> } asp-for="Email" class="form-control" />
         <span asp-validation-for="Email" class="text-danger"></span>
     </div>
     <div class="form-group">
