@@ -8,7 +8,7 @@ module.exports = {
     mode: 'development',
     entry: {
         home: ['./src/pages/Home.tsx'],
-        site: ['./src/Site.tsx'],
+        site: ['./src/Site.ts'],
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
@@ -24,7 +24,7 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.tsx$/,
+                test: /\.ts(x|)$/,
                 loader: ['babel-loader', 'ts-loader'],
                 exclude: /node_modules/,
             },

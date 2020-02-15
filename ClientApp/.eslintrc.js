@@ -2,6 +2,7 @@ module.exports = {
     env: {
         browser: true,
         es6: true,
+        'jest/globals': true,
     },
     extends: [
         'airbnb',
@@ -54,9 +55,6 @@ module.exports = {
         'jest/no-identical-title': 'error',
         'jest/prefer-to-have-length': 'warn',
         'jest/valid-expect': 'error',
-    },
-    env: {
-        'jest/globals': true,
     },
     settings: {
         'import/extensions': ['.tsx'],
