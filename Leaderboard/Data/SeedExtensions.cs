@@ -191,6 +191,12 @@ namespace Leaderboard.Data.SeedExtensions
             {
                 users = await userManager.GetOrCreateUsers(GenderValues.Male, "LifterDuder", "LiftLife", "Lifter22").ToListAsync();
 
+                var llUser = users.Single(u => u.UserName == "LiftLife");
+                var email = $"thomasrea0113@gmail.com";
+                llUser.Email = email;
+                llUser.NormalizedEmail = email.ToUpper();
+                await userManager.UpdateAsync(llUser);
+                
                 // setting some birthdates
                 users[0].BirthDate = DateTime.Parse("05/11/1993");
                 users[1].BirthDate = DateTime.Parse("01/12/2011");

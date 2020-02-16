@@ -1,3 +1,5 @@
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Leaderboard.Areas.Identity.Managers;
 using Leaderboard.ViewModels;
@@ -9,49 +11,32 @@ namespace Leaderboard.Pages
 {
     public class Contact : PageModel
     {
-        private readonly AppUserManager _manager;
-
         [ViewData]
-        public bool EmailEnabled { get; set; } = true;
+        public bool EmailDisabled => HttpContext.User.Claims
+            .Any(c => c.Type == ClaimTypes.Email && c.Value != default);
+
+        public string Email => HttpContext.User.FindFirst(ClaimTypes.Email)?.Value;
 
         [BindProperty]
         public ContactViewModel ContactModel { get; set; }
 
-        public Contact(AppUserManager manager)
+        public IActionResult OnGetForm()
         {
-            _manager = manager;
-        }
-
-        public void OnGet()
-        {
-            ContactModel = new ContactViewModel();
-        }
-
-        public async Task<IActionResult> OnGetFormAsync()
-        {
-            if (HttpContext.User.Identity.IsAuthenticated)
-            {
-                ContactModel ??= new ContactViewModel();
-                var user = await _manager.GetUserAsync(HttpContext.User);
-                var email = user?.Email;
-                if (email != null)
-                {
-                    ContactModel.Email = email;
-                    EmailEnabled = false;
-                }
-            }
+            ContactModel ??= new ContactViewModel();
+            ContactModel.Email = Email;
             return Partial("Forms/_ContactFormPartial", ContactModel);
         }
 
-        public IActionResult OnPostFormAsync()
+        public async Task<IActionResult> OnPostFormAsync()
         {
             if (ModelState.IsValid)
             {
-
+                // TODO implement email
+                await Task.CompletedTask;
             }
 
-            ModelState.AddModelError("Email", "Well well well!");
-
+            ContactModel ??= new ContactViewModel();
+            ContactModel.Email = Email;
             return Partial("Forms/_ContactFormPartial", ContactModel);
         }
     }
