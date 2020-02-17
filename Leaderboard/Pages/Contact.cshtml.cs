@@ -15,28 +15,30 @@ namespace Leaderboard.Pages
         public bool EmailDisabled => HttpContext.User.Claims
             .Any(c => c.Type == ClaimTypes.Email && c.Value != default);
 
+        [ViewData]
+        public string FormIdPrefix => "Contact";
+
         public string Email => HttpContext.User.FindFirst(ClaimTypes.Email)?.Value;
 
         [BindProperty]
         public ContactViewModel ContactModel { get; set; }
 
-        public IActionResult OnGetForm()
+        public void OnGet()
         {
             ContactModel ??= new ContactViewModel();
             ContactModel.Email = Email;
-            return Partial("Forms/_ContactFormPartial", ContactModel);
         }
 
         public async Task<IActionResult> OnPostFormAsync()
         {
             if (ModelState.IsValid)
             {
+                // make sure the user didn't change the email on the client.
+                ContactModel.Email = Email ?? ContactModel.Email;
+
                 // TODO implement email
                 await Task.CompletedTask;
             }
-
-            ContactModel ??= new ContactViewModel();
-            ContactModel.Email = Email;
             return Partial("Forms/_ContactFormPartial", ContactModel);
         }
     }

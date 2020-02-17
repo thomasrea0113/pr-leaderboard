@@ -13,6 +13,7 @@ using Leaderboard.Data.SeedExtensions;
 using System;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
+using Leaderboard.Areas.Identity;
 
 namespace Leaderboard
 {
@@ -58,6 +59,9 @@ namespace Leaderboard
                 .AddUserValidator<EmailNotRequiredValidator>();
 
             services.AddScoped<AppUserManager>();
+
+            // for adding additional user claims
+            services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationClaimsPrincipalFactory>();
 
             
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();

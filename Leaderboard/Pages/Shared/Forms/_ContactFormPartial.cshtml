@@ -1,28 +1,38 @@
 @model Leaderboard.ViewModels.ContactViewModel
-
 @{
     var id = ViewData["FormIdPrefix"];
     var emailDisabled = Boolean.Parse(ViewData["EmailDisabled"]?.ToString());
 }
 
-<form id="form-@id" method="post" data-ajax-initial-url="?handler=form" data-ajax="true" data-ajax-update="#form-@id" data-ajax-url="?handler=form" data-ajax-loading="#loading-@id">
-    <div class="form-group">
-        <label asp-for="Email"></label>
-        <input readonly="@emailDisabled" asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Subject"></label>
-        <input asp-for="Subject" class="form-control" />
-        <span asp-validation-for="Subject" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Message"></label>
-        <input asp-for="Message" class="form-control" />
-        <span asp-validation-for="Message" class="text-danger"></span>
-    </div>
-    <button type="submit" value="Submit" class="btn btn-primary">
-        <span style="display: none;" id="loading-@id"><i class="fas fa-circle-notch fa-spin"></i>&nbsp;</span>
-        Submit
-    </button>
+<form
+  id="form-@id"
+  method="post"
+  data-ajax="true"
+  data-ajax-disable-on-load="true"
+  data-ajax-update="#form-@id"
+  data-ajax-url="?handler=form"
+  data-ajax-loading=".loading-indicator.loading-@id"
+>
+  <i class="loading-indiciator loading-@id"></i>
+  <div class="form-group">
+    <label asp-for="Email"></label>
+    <input readonly="@emailDisabled" asp-for="Email" class="form-control" />
+    <span asp-validation-for="Email" class="text-danger"></span>
+  </div>
+  <div class="form-group">
+    <label asp-for="Subject"></label>
+    <input asp-for="Subject" class="form-control" />
+    <span asp-validation-for="Subject" class="text-danger"></span>
+  </div>
+  <div class="form-group">
+    <label asp-for="Message"></label>
+    <input asp-for="Message" class="form-control" />
+    <span asp-validation-for="Message" class="text-danger"></span>
+  </div>
+  <button type="submit" value="Submit" class="btn btn-primary">
+    <span class="loading-indicator loading-@id"
+      ><i class="fas fa-circle-notch fa-spin"></i>&nbsp;</span
+    >
+    Submit
+  </button>
 </form>
