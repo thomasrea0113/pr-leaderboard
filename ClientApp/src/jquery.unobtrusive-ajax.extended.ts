@@ -40,7 +40,7 @@ export {};
         enable: boolean
     ): void => {
         if (element.is('[data-ajax-disable-on-load=true]')) {
-            const inputs = element.find('input,button[type=submit]');
+            const inputs = element.find('input,button[type=submit],select');
             if (enable) inputs.removeAttr('disabled');
             else inputs.attr('disabled', '');
         }
