@@ -51,7 +51,13 @@ namespace Leaderboard.Areas.Identity.Pages.Account
         [BindProperty]
         public InputModel Input { get; set; }
 
+        [FromQuery]
         public string ReturnUrl { get; set; }
+
+        [ViewData]
+        public string FormIdPrefix => "Register";
+        [ViewData]
+        public string SubmitButtonText => "Register";
 
         public SelectList Categories { get; set; }
 
@@ -86,23 +92,30 @@ namespace Leaderboard.Areas.Identity.Pages.Account
             public decimal? Weight { get; set; }
         }
 
+        /// <summary>
+        /// initializes the necessary data from the database for the form
+        /// </summary>
+        /// <returns></returns>
         private async Task InitModelAsync()
         {
-            
             Categories = new SelectList(await _ctx.Categories
                 .AsQueryable()
                 .ToArrayAsync(), nameof(Category.Name), nameof(Category.Name));
         }
 
-        public async Task OnGetAsync(string returnUrl = null)
+        public void OnGet()
         {
-            ReturnUrl = returnUrl;
-            await InitModelAsync();
         }
 
-        public async Task<IActionResult> OnPostAsync(string returnUrl = null)
+        public async Task<IActionResult> OnGetFormAsync()
         {
-            returnUrl ??= Url.Content("~/");
+            await InitModelAsync();
+            return Partial("Forms/_RegisterFormPartial", this);
+        }
+
+        public async Task<IActionResult> OnPostFormAsync()
+        {
+            ReturnUrl ??= Url.Content("~/");
 
             if (ModelState.IsValid)
             {
@@ -157,7 +170,7 @@ namespace Leaderboard.Areas.Identity.Pages.Account
                     }
 
                     await _signInManager.SignInAsync(user, isPersistent: false);
-                    return LocalRedirect(returnUrl);
+                    return LocalRedirect(ReturnUrl);
                 }
                 foreach (var error in result.Errors)
                 {
@@ -167,7 +180,7 @@ namespace Leaderboard.Areas.Identity.Pages.Account
 
             // If we got this far, something failed, redisplay form
             await InitModelAsync();
-            return Page();
+            return Partial("Forms/_RegisterFormPartial", this);
         }
     }
 }

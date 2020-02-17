@@ -1,0 +1,10 @@
+@{
+    var id = ViewData["FormIdPrefix"];
+    var text = ViewData["SubmitButtonText"];
+}
+<button type="submit" value="Submit" class="btn btn-primary">
+<span class="loading-indicator loading-@id"
+    ><i class="fas fa-circle-notch fa-spin"></i>&nbsp;</span
+>
+@text
+</button>

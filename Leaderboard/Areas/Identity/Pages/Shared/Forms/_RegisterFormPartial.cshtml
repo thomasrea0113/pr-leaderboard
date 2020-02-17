@@ -1,0 +1,76 @@
+@model Leaderboard.Areas.Identity.Pages.Account.RegisterModel
+@{
+    var id = Model.FormIdPrefix;
+}
+
+<form
+    id="form-@id"
+    asp-route-returnUrl="@Model.ReturnUrl"
+    asp-route-handler="form"
+    method="post"
+    data-ajax="true"
+    data-ajax-mode="replace-with"
+    data-ajax-initial-url="?handler=form&returnUrl=@Model.ReturnUrl"
+    data-ajax-disable-on-load="true"
+    data-ajax-update="#form-@id"
+    data-ajax-loading=".loading-indicator.loading-@id">
+    <h4>Create a new account.</h4>
+    <hr />
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="form-group">
+        <label asp-for="Input.Username"></label>
+        <input asp-for="Input.Username" class="form-control" />
+        <span asp-validation-for="Input.Username" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Input.Email"></label>
+        <span class="text-muted">(optional)</span>
+        <input asp-for="Input.Email" class="form-control" />
+        <span asp-validation-for="Input.Email" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Input.Password"></label>
+        <input asp-for="Input.Password" class="form-control" />
+        <span asp-validation-for="Input.Password" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Input.ConfirmPassword"></label>
+        <input asp-for="Input.ConfirmPassword" class="form-control" />
+        <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <h6>
+            Want to jump right into the competition? Provide us with some basic information
+            and we'll go ahead and recommend some boards to you.
+        </h6>
+        <hr />
+        <div class="form-group">
+            <label asp-for="Input.Interests"></label>
+            <select multiple asp-for="Input.Interests" class="form-control" asp-items="Model.Categories">
+            </select>
+            <span asp-validation-for="Input.Interests" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Input.Age"></label>
+            <input asp-for="Input.Age" class="form-control" />
+            <span asp-validation-for="Input.Age" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Input.Weight"></label>
+            <div class="input-group">
+                <input asp-for="Input.Weight" class="form-control" />
+                <div class="input-group-append">
+                    <span class="input-group-text" id="basic-addon2">kg</span>
+                </div>
+            </div>
+            <span asp-validation-for="Input.Weight" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Input.Gender"></label>
+            <select asp-for="Input.Gender" class="form-control" asp-items="Html.GetEnumSelectList<GenderValues>()">
+            </select>
+            <span asp-validation-for="Input.Gender" class="text-danger"></span>
+        </div>
+    </div>
+    <partial name="Forms/_LoadingButtonPartial" />
+</form>
