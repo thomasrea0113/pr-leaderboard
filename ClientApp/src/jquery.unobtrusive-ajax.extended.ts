@@ -34,6 +34,42 @@
 export {};
 
 (function($) {
+    // region my-additions
+    const enableForm = (
+        element: JQuery<HTMLElement>,
+        enable: boolean
+    ): void => {
+        if (element.is('[data-ajax-disable-on-load=true]')) {
+            const inputs = element.find('input,button[type=submit]');
+            if (enable) inputs.removeAttr('disabled');
+            else inputs.attr('disabled', '');
+        }
+    };
+
+    const ajaxFormSelector = '[data-ajax=true]';
+    const ajaxFormInitialSelector = `${ajaxFormSelector}[data-ajax-initial-url]`;
+
+    $(document).ready((): void => {
+        // when the page is ready, begin loading each form that has initial data
+        $(ajaxFormInitialSelector).each(function loadInitial(): void {
+            const loading = this.getAttribute('data-ajax-loading');
+            const url = String(this.getAttribute('data-ajax-initial-url'));
+            const $this = $(this);
+
+            enableForm($this, false);
+
+            const loadingElement: JQuery<HTMLElement> | null =
+                loading != null ? $(loading) : null;
+
+            loadingElement?.show();
+            $this.load(url, function callback(): void {
+                enableForm($this, true);
+                loadingElement?.hide();
+            });
+        });
+    });
+    // end region
+
     const data_click = 'unobtrusiveAjaxClick';
     const data_target = 'unobtrusiveAjaxClickTarget';
     const data_validation = 'unobtrusiveValidation';
@@ -121,11 +157,13 @@ export {};
                 ]).apply(element, arguments);
                 if (result !== false) {
                     loading.show(duration);
+                    enableForm($(element), false);
                 }
                 return result;
             },
-            complete() {
+            complete(xhr: JQuery.jqXHR<any>) {
                 loading.hide(duration);
+                enableForm($(element), true);
                 getFunction(element.getAttribute('data-ajax-complete'), [
                     'xhr',
                     'status',

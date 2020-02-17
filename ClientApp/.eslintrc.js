@@ -37,6 +37,7 @@ module.exports = {
                 extensions: ['.tsx'],
             },
         ],
+        '@typescript-eslint/indent': 0,
         'import/no-unresolved': [2, { commonjs: true, amd: true }],
         'import/named': 2,
         'import/namespace': 2,
