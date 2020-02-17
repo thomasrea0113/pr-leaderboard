@@ -31,7 +31,7 @@
 /* jslint white: true, browser: true, onevar: true, undef: true, nomen: true, eqeqeq: true, plusplus: true, bitwise: true, regexp: true, newcap: true, immed: true, strict: false */
 /* global window: false, jQuery: false */
 
-export {};
+import 'jquery-validation-unobtrusive';
 
 (function($) {
     // region my-additions
@@ -44,6 +44,20 @@ export {};
             if (enable) inputs.removeAttr('disabled');
             else inputs.attr('disabled', '');
         }
+    };
+
+    const handleResponse = (
+        element: JQuery<HTMLElement>,
+        data: any,
+        xhr: JQuery.jqXHR
+    ): JQuery<HTMLElement> => {
+        if (xhr.status >= 200 && xhr.status <= 299) {
+            return element.replaceWith(data);
+        }
+        // TODO redirect
+
+        // TODO display error
+        return element;
     };
 
     const ajaxFormSelector = '[data-ajax=true]';
@@ -62,9 +76,9 @@ export {};
                 loading != null ? $(loading) : null;
 
             loadingElement?.show();
-            $this.load(url, function callback(): void {
-                enableForm($this, true);
-                loadingElement?.hide();
+            $.when($.ajax(url)).then(function callback(data, _, jqXHR): void {
+                handleResponse($this, data, jqXHR);
+                $.validator.unobtrusive.parse(ajaxFormInitialSelector);
             });
         });
     });
@@ -168,6 +182,10 @@ export {};
                     'xhr',
                     'status',
                 ]).apply(element, arguments);
+
+                // we re-parse all the forms on the page just in case
+                // mode replace-with was used on the current form
+                $.validator.unobtrusive.parse(ajaxFormSelector);
             },
             success(data: any, status: any, xhr: any) {
                 asyncOnSuccess(

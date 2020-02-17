@@ -8,8 +8,6 @@ import 'expose-loader?ReactDOM!react-dom';
 // jQuery
 import 'expose-loader?jQuery!jquery';
 import 'jquery-validation';
-import 'jquery-validation-unobtrusive';
-import 'jquery-ajax-unobtrusive';
 import './jquery.unobtrusive-ajax.extended';
 
 // Styles
