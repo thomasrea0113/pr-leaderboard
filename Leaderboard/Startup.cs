@@ -15,6 +15,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Leaderboard.Areas.Identity;
 using Leaderboard.Services;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace Leaderboard
 {
@@ -65,6 +66,7 @@ namespace Leaderboard
             services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationClaimsPrincipalFactory>();
 
             services.AddScoped<IMessageQueue, TempDataMessageQueue>();
+            services.AddScoped<IEmailSender, SmtpEmailSender>();
 
             services.AddControllersWithViews();
             services.AddRazorPages();
