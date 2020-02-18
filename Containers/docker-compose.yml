@@ -16,7 +16,7 @@ services:
       - backend
 
   web:
-    image: web
+    image: leaderboard-web
     build: ../
     networks:
       - backend
