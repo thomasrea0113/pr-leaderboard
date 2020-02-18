@@ -57,7 +57,8 @@ namespace Leaderboard.Services
             }
             else if (messagesObject is IEnumerable<string> messages)
             {
-                _tempData[MESSAGE_QUEUE_KEY] = messages.Append(message);
+                // Need to evaluate the appended enumerable so that it can be serialized
+                _tempData[MESSAGE_QUEUE_KEY] = messages.Append(message).ToArray();
             }
             else
             {

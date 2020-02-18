@@ -7,6 +7,7 @@ using Leaderboard.Areas.Identity.Managers;
 using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Areas.Leaderboards.Models;
 using Leaderboard.Data;
+using Leaderboard.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -23,22 +24,23 @@ namespace Leaderboard.Areas.Identity.Pages.Account.Manage
         public IndexModel(
             ApplicationDbContext ctx,
             AppUserManager userManager,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager,
+            IMessageQueue messages)
         {
             _ctx = ctx;
             _userManager = userManager;
             _signInManager = signInManager;
+            Messages = messages;
         }
 
         public string Username { get; set; }
 
         public ICollection<LeaderboardModel> Leaderboards { get; set; }
 
-        [TempData]
-        public string StatusMessage { get; set; }
-
         [BindProperty]
         public InputModel Input { get; set; }
+
+        public IMessageQueue Messages { get; set; }
 
         public class InputModel
         {
@@ -106,7 +108,7 @@ namespace Leaderboard.Areas.Identity.Pages.Account.Manage
             }
 
             await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Your profile has been updated";
+            Messages.PushMessage("Your profile has been updated");
             return RedirectToPage();
         }
     }

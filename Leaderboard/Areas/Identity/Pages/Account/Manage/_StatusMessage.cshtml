@@ -1,0 +1,4 @@
+﻿@model string
+@* Need to provide an absolute path to the statusmessage partial
+because otherwise it will circularly refernce this partial *@
+<partial name="/Pages/Shared/_StatusMessage.cshtml" model="Model" />
