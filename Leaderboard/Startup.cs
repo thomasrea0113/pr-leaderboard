@@ -14,6 +14,7 @@ using System;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Leaderboard.Areas.Identity;
+using Leaderboard.Services;
 
 namespace Leaderboard
 {
@@ -63,8 +64,7 @@ namespace Leaderboard
             // for adding additional user claims
             services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationClaimsPrincipalFactory>();
 
-            
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddScoped<IMessageQueue, TempDataMessageQueue>();
 
             services.AddControllersWithViews();
             services.AddRazorPages();

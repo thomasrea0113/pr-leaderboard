@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
-using System;
 using Microsoft.Extensions.Hosting;
-using Npgsql.Logging;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.AspNetCore.Http;
 
 namespace Leaderboard.Tests.TestSetup
 {
@@ -22,7 +22,13 @@ namespace Leaderboard.Tests.TestSetup
             var dbContextType = typeof(DbContextOptions<ApplicationDbContext>);
             builder.ConfigureServices(services =>
             {
+                // replacing the current HttpAccessor, so that we can inject a fake Context only if
+                // the current context is null
+                services.AddSingleton<HttpContextAccessor>();
+                var accessor = services.Single(s => s.ServiceType == typeof(IHttpContextAccessor));
+                var fakeAccessor = new ServiceDescriptor(accessor.ServiceType, typeof(FakeHttpContextAccess), accessor.Lifetime);
 
+                services.Replace(fakeAccessor);
             })
                 .ConfigureAppConfiguration(c =>
                     // without overriding base path, we'd still be pointing to the Leaderboard
