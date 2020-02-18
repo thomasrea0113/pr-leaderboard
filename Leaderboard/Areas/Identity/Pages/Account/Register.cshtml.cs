@@ -20,8 +20,7 @@ using Leaderboard.Data;
 using Leaderboard.Areas.Leaderboards.Models;
 using Microsoft.EntityFrameworkCore;
 using Leaderboard.Models.Relationships;
-using Microsoft.AspNetCore.Mvc.Filters;
-using System.Net.Http;
+using Leaderboard.Extensions.PageModelExtensions;
 
 namespace Leaderboard.Areas.Identity.Pages.Account
 {
@@ -133,12 +132,11 @@ namespace Leaderboard.Areas.Identity.Pages.Account
                 {
                     _logger.LogInformation("User created a new account with password.");
 
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-
-
                     if (Input.Email != default)
                     {
+                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+
                         var callbackUrl = Url.Page(
                             "/Account/ConfirmEmail",
                             pageHandler: null,
@@ -151,26 +149,28 @@ namespace Leaderboard.Areas.Identity.Pages.Account
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
-                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email });
+                        return this.JavascriptRedirect(Url.Page("RegisterConfirmation", new { email = Input.Email }));
                     }
 
                     
-                    var categories = await _ctx.Categories.AsQueryable()
-                        .Where(c => Input.Interests.Contains(c.Name))
-                        .ToListAsync();
-
-                    if (categories.Any())
+                    if (Input.Interests != null && Input.Interests.Any())
                     {
-                        await _ctx.AddRangeAsync(categories.Select(c => new UserCategory
-                        {
-                            UserId = user.Id,
-                            CategoryId = c.Id
-                        }));
-                        await _ctx.SaveChangesAsync();
-                    }
+                        var categories = await _ctx.Categories.AsQueryable()
+                            .Where(c => Input.Interests.Contains(c.Name))
+                            .ToListAsync();
 
+                        if (categories.Any())
+                        {
+                            await _ctx.AddRangeAsync(categories.Select(c => new UserCategory
+                            {
+                                UserId = user.Id,
+                                CategoryId = c.Id
+                            }));
+                            await _ctx.SaveChangesAsync();
+                        }
+                    }
                     await _signInManager.SignInAsync(user, isPersistent: false);
-                    return LocalRedirect(ReturnUrl);
+                    return this.JavascriptRedirect(ReturnUrl);
                 }
                 foreach (var error in result.Errors)
                 {
