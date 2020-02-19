@@ -2,7 +2,6 @@
     "recommendations": [
         "formulahendry.dotnet-test-explorer",
         "k--kato.docomment",
-        "jchannon.csharpextensions",
-        "dotjoshjohnson.xml"
+        "dotjoshjohnson.xml",
     ]
 }
