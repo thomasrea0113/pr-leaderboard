@@ -1,0 +1,4 @@
+The Omnisharp extension won't pickup the solution in this folder if there is not a csproj file in the same directory.
+With multiroot workspaces, it also won't pick up solution files in the workspace root, so it has to be in a project folder.
+Similarly, the 'Solution Explorer' extension doesn't pickup solutions in the root either. It only finds solutions in the
+FIRST project folder, so we list 'Solution' as the first project in the workspace

@@ -1,10 +1,13 @@
 {
 	"folders": [
 		{
-			"path": "Leaderboard.Tests"
+			"path": "Solution"
 		},
 		{
 			"path": "Leaderboard"
+		},
+		{
+			"path": "Leaderboard.Tests"
 		},
 		{
 			"path": "ClientApp"
@@ -18,6 +21,7 @@
 	],
 	"settings": {
 		"jest.disabledWorkspaceFolders": [
+			"Solution",
 			"Leaderboard",
 			"Leaderboard.Tests",
 			"Containers",
@@ -55,7 +59,7 @@
 		"omnisharp.minFindSymbolsFilterLength": 2,
 		"omnisharp.projectLoadTimeout": 20,
 		"vssolution.trackActiveItem": true,
-		"omnisharp.defaultLaunchSolution": "Leaderboard.Tests/pr-leaderboard.sln",
+		"omnisharp.defaultLaunchSolution": "Solution/pr-leaderboard.sln",
 	},
 	"extensions": {
 		"recommendations": [
