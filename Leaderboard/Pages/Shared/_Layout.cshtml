@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@inject Leaderboard.Services.IMessageQueue Messages
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -34,6 +36,7 @@
     </header>
     <div class="container">
         <main role="main" class="pb-3">
+            <partial name="_StatusMessages" model="Messages.GetAllMessages()" />
             @RenderBody()
         </main>
     </div>

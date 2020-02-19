@@ -44,12 +44,13 @@ namespace Leaderboard.Tests.Services
             using var _ = CreateScope(out var scope);
             var mailer = scope.GetRequiredService<IEmailSender>();
 
-            // TODO idealy we'd setup a postfix server, and use and send mail
+            // TODO idealy we'd setup a postfix server, and use send mail
             // locally to the root mailbox, but that bloats our docker container
             // for little benefit
 
+            // send the email. If no exception is throw, then all is well
             var to = $"thomasrea0113@gmail.com";
-            await mailer.SendEmailAsync(to, "Testing Send", "Here's a test!");
+            await mailer.SendEmailAsync(to, "PR Leaderboard Unit Test", "This email was generated as part of the Leaderboard Unit Tests. You can ignore this message.");
         }
     }
 }

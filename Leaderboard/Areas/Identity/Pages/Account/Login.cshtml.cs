@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using Leaderboard.Areas.Identity.Managers;
 using Leaderboard.Areas.Identity.Models;
+using Leaderboard.Services;
 
 namespace Leaderboard.Areas.Identity.Pages.Account
 {
@@ -18,12 +19,14 @@ namespace Leaderboard.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly IMessageQueue _messages;
 
         public LoginModel(SignInManager<ApplicationUser> signInManager, 
-            ILogger<LoginModel> logger)
+            ILogger<LoginModel> logger, IMessageQueue messages)
         {
             _signInManager = signInManager;
             _logger = logger;
+            _messages = messages;
         }
 
         [BindProperty]
@@ -78,6 +81,7 @@ namespace Leaderboard.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
+                    _messages.PushMessage("You've been logged in successfully!");
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)

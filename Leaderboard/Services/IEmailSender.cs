@@ -28,11 +28,15 @@ namespace Leaderboard.Services
             _logger = logger;
 
             config.Bind("Mail", _config);
+            
+            if (_config.Password == null)
+                throw new ArgumentNullException("No mail password specified. Did you run 'dotnet user-secrets set \"Mail:Password\" \"<PASSWORD>\"' from the project root?");
+
             _mailer = new SmtpClient(_config.Host, _config.Port)
             {
                 Credentials = new NetworkCredential(
                     _config.FromAddress,
-                    _config.Password ?? throw new ArgumentNullException("No mail password specified. Did you run 'dotnet user-secrets set \"Mail:Password\" \"<PASSWORD>\"' from the project root?")
+                    _config.Password
                 ),
                 EnableSsl = true,
             };
@@ -40,7 +44,10 @@ namespace Leaderboard.Services
 
         public async Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
-            await _mailer.SendMailAsync(new MailMessage(_config.FromAddress, email, subject, htmlMessage));
+            await _mailer.SendMailAsync(new MailMessage(_config.FromAddress, email, subject, htmlMessage)
+            {
+                IsBodyHtml = true,
+            });
             _logger.LogInformation("mail send to {email}", email);
         }
 

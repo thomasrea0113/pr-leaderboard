@@ -48,7 +48,7 @@ namespace Leaderboard
 
                 options.Password.RequireNonAlphanumeric = false;
 
-                options.SignIn.RequireConfirmedEmail = true;
+                options.SignIn.RequireConfirmedEmail = false;
                 options.SignIn.RequireConfirmedAccount = false;
                 options.SignIn.RequireConfirmedPhoneNumber = false;
             })
