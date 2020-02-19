@@ -32,6 +32,7 @@ namespace Leaderboard.Services
             
             config.Bind("Mail", _config);
             _mailer = new SmtpClient(_config.Host, _config.Port);
+            _mailer.SendMailAsync()
         }
 
         public async Task SendEmailAsync(string email, string subject, string htmlMessage)

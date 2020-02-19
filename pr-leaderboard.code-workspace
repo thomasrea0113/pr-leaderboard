@@ -50,7 +50,11 @@
 		"omnisharp.enableRoslynAnalyzers": true,
 		"remote.extensionKind": {
 			"ms-azuretools.vscode-docker": "workspace"
-		}
+		},
+		"omnisharp.enableMsBuildLoadProjectsOnDemand": true,
+		"omnisharp.loggingLevel": "warning",
+		"omnisharp.minFindSymbolsFilterLength": 2,
+		"omnisharp.projectLoadTimeout": 20,
 	},
 	"extensions": {
 		"recommendations": [

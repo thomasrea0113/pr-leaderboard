@@ -20,10 +20,12 @@ services:
     build: ../
     networks:
       - backend
-    expose:
-      - 5000
+    ports:
+      - 5000:5000
     volumes:
       - npm-cache:/root/.npm
+    # needed for rsyslog to work  
+    # privileged: true
 
 networks:
   backend:

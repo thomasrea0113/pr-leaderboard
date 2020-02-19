@@ -3,13 +3,18 @@ FROM mcr.microsoft.com/dotnet/core/sdk:3.1-bionic
 RUN wget -q -O - https://deb.nodesource.com/setup_13.x | bash
 
 RUN apt update && apt upgrade -y && \
-    bash -c "debconf-set-selections <<< 'postfix postfix/mailname string pr.com'" && \
-    bash -c "debconf-set-selections <<< 'postfix postfix/main_mailer_type string '\''Internet Site'\'''" && \
+    # To preconfigure postfix
+    # bash -c "debconf-set-selections <<< 'postfix postfix/mailname string pr.com'" && \
+    # bash -c "debconf-set-selections <<< 'postfix postfix/main_mailer_type string '\''Internet Site'\'''" && \
     apt install -y \
     nodejs \
     #
     # Other general depencencies
-    iproute2 net-tools mailutils \
+    #
+    # For postfix
+    # libsasl2-modules rsyslog mailutils \
+    #
+    # iproute2 net-tools \
     #
     # Install Docker CE CLI
     apt-transport-https ca-certificates curl gnupg-agent software-properties-common lsb-release \
@@ -38,4 +43,5 @@ RUN dotnet tool restore
 
 # RUN dotnet build /p:BuildClient=true
 
-CMD [ "sh", "-c", "postfix start && dotnet run 0.0.0.0:5000" ]
+# CMD [ "sh", "-c", "service rsyslog start && /etc/init.d/postfix start && dotnet run 0.0.0.0:5000" ]
+CMD [ "sh", "-c", "dotnet run 0.0.0.0:5000" ]
