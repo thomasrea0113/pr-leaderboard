@@ -50,8 +50,6 @@ namespace Leaderboard.Tests.Services
 
             var to = $"thomasrea0113@gmail.com";
             await mailer.SendEmailAsync(to, "Testing Send", "Here's a test!");
-            await mailer.SendEmailAsync(to, "Testing Send", "Here's a test 2!");
-            await mailer.SendEmailAsync(to, "Testing Send", "Here's a test 3!");
         }
     }
 }

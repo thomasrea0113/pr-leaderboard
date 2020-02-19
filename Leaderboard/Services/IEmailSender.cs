@@ -1,9 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
+using System.Net;
 using System.Net.Mail;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Configuration;
@@ -16,7 +13,7 @@ namespace Leaderboard.Services
         public string Host { get; set; }
         public int Port { get; set; }
         public string FromAddress { get; set; }
-        public string FromName { get; set; }
+        public string Password { get; set; }
 
     }
 
@@ -29,10 +26,16 @@ namespace Leaderboard.Services
         public SmtpEmailSender(ILogger<SmtpEmailSender> logger, IConfiguration config)
         {
             _logger = logger;
-            
+
             config.Bind("Mail", _config);
-            _mailer = new SmtpClient(_config.Host, _config.Port);
-            _mailer.SendMailAsync()
+            _mailer = new SmtpClient(_config.Host, _config.Port)
+            {
+                Credentials = new NetworkCredential(
+                    _config.FromAddress,
+                    _config.Password ?? throw new ArgumentNullException("No mail password specified. Did you run 'dotnet user-secrets set \"Mail:Password\" \"<PASSWORD>\"' from the project root?")
+                ),
+                EnableSsl = true,
+            };
         }
 
         public async Task SendEmailAsync(string email, string subject, string htmlMessage)
