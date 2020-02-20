@@ -33,9 +33,12 @@ namespace Leaderboard.TagHelpers
 
             var publicPath = _webpackStats.GetAssetPublicPath(Src);
             
-            var props = "[]";
+            var props = "{}";
             if (Props != null)
-                props = JsonSerializer.Serialize(Props, Props.GetType());
+                props = JsonSerializer.Serialize(Props, Props.GetType(), new JsonSerializerOptions()
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                });
 
             output.PreElement.AppendHtml($"<script src=\"{publicPath}\"></script>");
 

@@ -17,7 +17,7 @@
            "type": "chrome",
            "request": "launch",
            "name": "Launch Chrome",
-           "url": "http://localhost:5000",
+           "url": "http://localhost:5000/Identity/Account/Manage/Recommendations",
            "webRoot": "${workspaceFolder}/wwwroot",
            "sourceMapPathOverrides": {
                "webpack:///*": "${workspaceFolder}/../ClientApp/*",

@@ -17,6 +17,7 @@ using Leaderboard.Areas.Identity;
 using Leaderboard.Services;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using System.Text.Json;
 
 namespace Leaderboard
 {
@@ -76,8 +77,10 @@ namespace Leaderboard
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddTransient<IPartialRenderer, PartialRenderer>();
 
-            services.AddControllersWithViews();
-            services.AddRazorPages();
+            services.AddRazorPages().AddJsonOptions(options => {
+                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
+            });
 
             services.AddSpaStaticFiles(cnf =>
             {

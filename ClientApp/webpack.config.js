@@ -7,6 +7,7 @@ const { StatsWriterPlugin } = require('webpack-stats-plugin');
 module.exports = {
     mode: 'development',
     entry: {
+        recommendations: ['./src/pages/Recommendations.tsx'],
         home: ['./src/pages/Home.tsx'],
         site: ['./src/Site.ts'],
     },
