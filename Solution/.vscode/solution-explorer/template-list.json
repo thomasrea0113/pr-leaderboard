@@ -19,6 +19,12 @@
             "parameters": "./template-parameters.js"
         },
         {
+            "name": "Static Class",
+            "extension": "cs",
+            "file": "./static-class.cs-template",
+            "parameters": "./template-parameters.js"
+        },
+        {
             "name": "Interface",
             "extension": "cs",
             "file": "./interface.cs-template",
