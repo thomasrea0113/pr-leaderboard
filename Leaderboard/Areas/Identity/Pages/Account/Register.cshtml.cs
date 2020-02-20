@@ -21,6 +21,7 @@ using Leaderboard.Areas.Leaderboards.Models;
 using Microsoft.EntityFrameworkCore;
 using Leaderboard.Models.Relationships;
 using Leaderboard.Extensions.PageModelExtensions;
+using Leaderboard.Services;
 
 namespace Leaderboard.Areas.Identity.Pages.Account
 {
@@ -32,19 +33,25 @@ namespace Leaderboard.Areas.Identity.Pages.Account
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
         private readonly ApplicationDbContext _ctx;
+        private readonly IMessageQueue _messages;
+        private readonly IPartialRenderer _renderer;
 
         public RegisterModel(
             AppUserManager userManager,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender,
-            ApplicationDbContext ctx)
+            ApplicationDbContext ctx,
+            IMessageQueue messages,
+            IPartialRenderer renderer)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
             _ctx = ctx;
+            _messages = messages;
+            _renderer = renderer;
         }
 
         [BindProperty]
@@ -114,7 +121,7 @@ namespace Leaderboard.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostFormAsync()
         {
-            ReturnUrl ??= Url.Content("~/");
+            ReturnUrl ??= Url.Page("/Account/Manage/Index");
 
             if (ModelState.IsValid)
             {
@@ -170,6 +177,7 @@ namespace Leaderboard.Areas.Identity.Pages.Account
                         }
                     }
                     await _signInManager.SignInAsync(user, isPersistent: false);
+                    _messages.PushMessage(await _renderer.RenderPartialToStringAsync("_RegisterSuccessPartial", user));
                     return this.JavascriptRedirect(ReturnUrl);
                 }
                 foreach (var error in result.Errors)

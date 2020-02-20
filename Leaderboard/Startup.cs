@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Http;
 using Leaderboard.Areas.Identity;
 using Leaderboard.Services;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace Leaderboard
 {
@@ -65,8 +66,15 @@ namespace Leaderboard
             // for adding additional user claims
             services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationClaimsPrincipalFactory>();
 
+            // for persisting user messages across requests
             services.AddScoped<IMessageQueue, TempDataMessageQueue>();
+
             services.AddScoped<IEmailSender, SmtpEmailSender>();
+
+            // for rendering partial views in emails. PartialRenderer depends on
+            // ActionContextAccessor
+            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+            services.AddTransient<IPartialRenderer, PartialRenderer>();
 
             services.AddControllersWithViews();
             services.AddRazorPages();
