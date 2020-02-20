@@ -125,13 +125,14 @@ namespace Leaderboard.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser {
+                var user = new ApplicationUser
+                {
                     UserName = Input.Username,
                     Email = Input.Email,
                     Gender = Input.Gender,
                     Weight = Input.Weight,
                     BirthDate = Input.Age,
-                    
+
                 };
 
                 var result = await _userManager.CreateAsync(user, Input.Password);
@@ -139,27 +140,6 @@ namespace Leaderboard.Areas.Identity.Pages.Account
                 {
                     _logger.LogInformation("User created a new account with password.");
 
-                    if (Input.Email != default)
-                    {
-                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-
-                        var callbackUrl = Url.Page(
-                            "/Account/ConfirmEmail",
-                            pageHandler: null,
-                            values: new { area = "Identity", userId = user.Id, code },
-                            protocol: Request.Scheme);
-
-                        await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-                    }
-
-                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                    {
-                        return this.JavascriptRedirect(Url.Page("RegisterConfirmation", new { email = Input.Email }));
-                    }
-
-                    
                     if (Input.Interests != null && Input.Interests.Any())
                     {
                         var categories = await _ctx.Categories.AsQueryable()
@@ -176,6 +156,28 @@ namespace Leaderboard.Areas.Identity.Pages.Account
                             await _ctx.SaveChangesAsync();
                         }
                     }
+
+                    if (Input.Email != default)
+                    {
+                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+
+                        var callbackUrl = Url.Page(
+                            "/Account/ConfirmEmail",
+                            pageHandler: null,
+                            values: new { area = "Identity", userId = user.Id, code },
+                            protocol: Request.Scheme);
+
+                        await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
+                            await _renderer.RenderPartialToStringAsync("_EmailConfirmationPartial", user, new { callbackUrl }));
+
+                        if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                        {
+                            // TODO if I ever decide to enable required accounts, I should probably push a message
+                            return this.JavascriptRedirect(Url.Page("RegisterConfirmation", new { email = Input.Email }));
+                        }
+                    }
+
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     _messages.PushMessage(await _renderer.RenderPartialToStringAsync("_RegisterSuccessPartial", user));
                     return this.JavascriptRedirect(ReturnUrl);

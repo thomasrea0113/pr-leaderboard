@@ -18,7 +18,7 @@ namespace Leaderboard.Services
 {
     public interface IPartialRenderer
     {
-        Task<string> RenderPartialToStringAsync<TModel>(string partialName, TModel model, HtmlHelperOptions options = null);
+        Task<string> RenderPartialToStringAsync<TModel>(string partialName, TModel model, object additionalViewData = null, HtmlHelperOptions options = null);
     }
 
     public class PartialRenderer : IPartialRenderer
@@ -40,19 +40,28 @@ namespace Leaderboard.Services
             _tempData = _factory.GetTempData(_context.HttpContext);
         }
 
-        public async Task<string> RenderPartialToStringAsync<TModel>(string partialName, TModel model, HtmlHelperOptions options = null)
+        public async Task<string> RenderPartialToStringAsync<TModel>(string partialName, TModel model, object additionalViewData = null, HtmlHelperOptions options = null)
         {
             var partial = FindView(_context, partialName);
 
             var writer = new StringWriter();
 
+            var viewData = new ViewDataDictionary(_metadataProvider, _context.ModelState)
+            {
+                Model = model
+            };
+
+            // if additional view data was provided, add each property
+            if(additionalViewData != default)
+            {
+                foreach (var prop in additionalViewData.GetType().GetProperties())
+                    viewData[prop.Name] = prop.GetValue(additionalViewData);
+            }
+
             var _viewContext = new ViewContext(
                 _context,
                 partial,
-                new ViewDataDictionary(_metadataProvider, _context.ModelState)
-                {
-                    Model = model
-                },
+                viewData,
                 _tempData,
                 writer,
                 options ?? new HtmlHelperOptions()
