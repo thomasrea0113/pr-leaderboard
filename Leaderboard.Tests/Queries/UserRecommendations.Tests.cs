@@ -26,7 +26,12 @@ namespace Leaderboard.Tests.Queries
 
             // this user is in the powerlifting divisions, which have a weight and an age
             var user = await um.FindByNameAsync("LifterDuder");
+
+            Assert.NotEmpty(user.UserCategories);
+
             var recommendations = await um.GetRecommendedBoardsAsync(user);
+
+            Assert.NotEmpty(recommendations);
         }
     }
 }

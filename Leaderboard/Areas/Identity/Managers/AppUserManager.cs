@@ -81,21 +81,35 @@ namespace Leaderboard.Areas.Identity.Managers
         /// <returns></returns>
         public async Task<List<LeaderboardModel>> GetRecommendedBoardsAsync(ApplicationUser user)
         {
-            var userAge = user.Age;
-            var userWeight = user.Weight;
-            var userGender = user.Gender;
-
             // LINQ to Queries is quite powerful! The key to remember is to NEVER use a navigation
             // property in your query. Always use the DbSet on the context, and then use joins
-            var recommendations = from dc in _ctx.DivisionCategories.AsQueryable()
-                from b in _ctx.Leaderboards
-                from d in _ctx.Divisions
+            var recommendations = from b in _ctx.Leaderboards.AsQueryable()
                 from wc in _ctx.WeightClasses
-                join uc in _ctx.UserCategories on dc.CategoryId equals uc.CategoryId
-                where uc.UserId == user.Id
-                where d.AgeLowerBound < userAge && userAge <= d.AgeUpperBound
-                where d.Gender == userGender
-                where wc.WeightLowerBound < userWeight && userWeight <= wc.WeightUpperBound
+                from d in _ctx.Divisions
+
+                // getting only divisions that overlap with the users categories
+                join uc in _ctx.UserCategories on user.Id equals uc.UserId
+                join dc in _ctx.DivisionCategories on d.Id equals dc.DivisionId
+                where dc.CategoryId == uc.CategoryId &&
+                    // // if the gender/age on the division is null, then this user automatically qualifies
+                    (
+                        b.DivisionId == null ||
+                        (
+                            (d.Gender == null || user.Gender == d.Gender) &&
+                            (d.AgeLowerBound == null || d.AgeLowerBound < user.Age) &&
+                            (d.AgeUpperBound == null || user.Age <= d.AgeUpperBound)
+                        )
+                    ) &&
+
+                    // if the board has no weight class, the user automatically qualifies
+                    (
+                        b.WeightClassId == null ||
+                        (
+                            wc.WeightLowerBound < user.Weight &&
+                            user.Weight <= wc.WeightUpperBound
+                        )
+                    )
+
                 select b;
             return await recommendations.ToListAsync();
         }

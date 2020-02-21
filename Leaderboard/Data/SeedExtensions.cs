@@ -63,22 +63,29 @@ namespace Leaderboard.Data.SeedExtensions
             divisions ??= new List<Division> { null };
             weightClasses ??= new List<WeightClass> { null };
 
-            foreach (var division in divisions)
-                foreach (var weightClass in weightClasses)
-                {
-                    LeaderboardModel generateBoard(string name) => new LeaderboardModel
-                    {
-                        Id = GuidUtility.Create(GuidUtility.UrlNamespace, $"lb_{weightClass?.Id}{division?.Id}{name}").ToString(),
-                        Name = name,
-                        IsActive = true,
-                        WeightClassId = weightClass?.Id,
-                        DivisionId = division?.Id,
-                        UOMId = uomId
-                    };
+            var allCombinations = from d in divisions
+                from wc in weightClasses
+                select (d, wc);
 
-                    foreach(var boardName in boardNames)
-                        yield return generateBoard(boardName);
-                }
+            var count = allCombinations.Count();
+
+            LeaderboardModel generateBoard(
+                string name,
+                string divisionId,
+                string weightClassId
+            ) => new LeaderboardModel
+            {
+                Id = GuidUtility.Create(GuidUtility.UrlNamespace, $"lb_{weightClassId}{divisionId}{name}").ToString(),
+                Name = name,
+                IsActive = true,
+                WeightClassId = weightClassId,
+                DivisionId = divisionId,
+                UOMId = uomId
+            };
+
+            foreach ((var division, var weightClass) in allCombinations.Distinct())
+                foreach(var boardName in boardNames)
+                    yield return generateBoard(boardName, division?.Id, weightClass?.Id);
         }
 
         private static async IAsyncEnumerable<ApplicationRole> GetOrCreateRoles(this AppRoleManager manager, params string[] roleNames)
@@ -209,6 +216,7 @@ namespace Leaderboard.Data.SeedExtensions
                 // TODO determine real age/weight groups for sprinting and add more races
                 var sprintBoards = GenerateLeaderboards("12c7c15a-db13-4912-a7c8-fc86db54849b", null, weightClasses, "100-Metre Dash", "40-Yard Dash");
                 sprintBoards.Concat(GenerateLeaderboards("12c7c15a-db13-4912-a7c8-fc86db54849b", divisions, null, "100-Metre Dash", "40-Yard Dash"));
+                sprintBoards.Concat(GenerateLeaderboards("12c7c15a-db13-4912-a7c8-fc86db54849b", null, null, "100-Metre Dash", "40-Yard Dash"));
                 await context.BulkInsertOrUpdateAsync(sprintBoards.ToArray());
 
                 await context.SaveChangesAsync();
