@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { useTable } from 'react-table';
 
 interface RecommendationsState {
+    isLoading: boolean;
     user: {
         userName: string;
         email: string;
@@ -17,9 +18,11 @@ interface RecommendationsState {
 
 interface RecommendationsProps {
     initialUrl: string;
+    loadingSelector: string;
 }
 
 const initialState: RecommendationsState = {
+    isLoading: false,
     user: {
         userName: '',
         email: '',
@@ -31,16 +34,18 @@ const RecommendationsComponent = (props: RecommendationsProps) => {
     const [
         {
             user: { interests },
+            isLoading,
         },
         setState,
     ] = useState(initialState);
 
+    const { initialUrl } = props;
+
     // load initial data
     useEffect(() => {
-        const { initialUrl } = props;
         fetch(initialUrl)
             .then(response => response.json())
-            .then(json => setState(json));
+            .then(json => setState({ isLoading: false, ...json }));
     }, []);
 
     const columns = [
@@ -70,9 +75,15 @@ const RecommendationsComponent = (props: RecommendationsProps) => {
         data: interests,
     });
 
+    const message = (loading: boolean): string => {
+        if (loading)
+            return "Hang tight! We're gathering some information for you.";
+        return "All done! Here's what we've got for you";
+    };
+
     return (
         <div>
-            <div>We think you&apos;ll find this information useful!</div>
+            <div>{message(isLoading)}</div>
             <table {...getTableProps()}>
                 <thead>
                     {headerGroups.map(headerGroup => (

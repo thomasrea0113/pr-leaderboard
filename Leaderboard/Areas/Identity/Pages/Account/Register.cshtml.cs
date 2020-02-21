@@ -90,7 +90,7 @@ namespace Leaderboard.Areas.Identity.Pages.Account
 
             public List<string> Interests { get; set; }
 
-            public GenderValues Gender { get; set; }
+            public GenderValues? Gender { get; set; }
 
             [DataType(DataType.Date)]
             public DateTime? Age { get; set; }

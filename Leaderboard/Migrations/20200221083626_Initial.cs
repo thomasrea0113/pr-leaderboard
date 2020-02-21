@@ -41,7 +41,7 @@ namespace Leaderboard.Migrations
                     LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
                     LockoutEnabled = table.Column<bool>(nullable: false),
                     AccessFailedCount = table.Column<int>(nullable: false),
-                    Gender = table.Column<int>(nullable: false, defaultValue: 2),
+                    Gender = table.Column<int>(nullable: true),
                     Weight = table.Column<decimal>(type: "decimal(13,3)", nullable: true),
                     BirthDate = table.Column<DateTime>(nullable: true),
                     IsActive = table.Column<bool>(nullable: true, defaultValue: true)
@@ -70,8 +70,8 @@ namespace Leaderboard.Migrations
                     Id = table.Column<string>(nullable: false),
                     Gender = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: false),
-                    AgeLowerBound = table.Column<int>(nullable: false),
-                    AgeUpperBound = table.Column<int>(nullable: false)
+                    AgeLowerBound = table.Column<int>(nullable: true),
+                    AgeUpperBound = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -311,7 +311,7 @@ namespace Leaderboard.Migrations
                 {
                     Id = table.Column<string>(nullable: false),
                     Name = table.Column<string>(nullable: false),
-                    DivisionId = table.Column<string>(nullable: false),
+                    DivisionId = table.Column<string>(nullable: true),
                     WeightClassId = table.Column<string>(nullable: true),
                     IsActive = table.Column<bool>(nullable: true, defaultValue: true),
                     UOMId = table.Column<string>(nullable: false)
@@ -324,7 +324,7 @@ namespace Leaderboard.Migrations
                         column: x => x.DivisionId,
                         principalTable: "Divisions",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Leaderboards_UnitsOfMeasure_UOMId",
                         column: x => x.UOMId,

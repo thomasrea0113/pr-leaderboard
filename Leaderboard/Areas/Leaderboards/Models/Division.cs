@@ -21,9 +21,9 @@ namespace Leaderboard.Areas.Leaderboards.Models
         public string Name { get; set; }
 
         [Range(0, 500)]
-        public int AgeLowerBound { get; set; }
+        public int? AgeLowerBound { get; set; }
         [Range(0, 500)]
-        public int AgeUpperBound { get; set; }
+        public int? AgeUpperBound { get; set; }
 
         public virtual ICollection<DivisionWeightClass> WeightClasses { get; set; }
         public virtual ICollection<LeaderboardModel> Boards { get; set; }

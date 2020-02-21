@@ -68,6 +68,7 @@
         <div class="form-group">
             <label asp-for="Input.Gender"></label>
             <select asp-for="Input.Gender" class="form-control" asp-items="Html.GetEnumSelectList<GenderValues>()">
+                <option value="">-- Select One --</option>
             </select>
             <span asp-validation-for="Input.Gender" class="text-danger"></span>
         </div>

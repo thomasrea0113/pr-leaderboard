@@ -56,10 +56,6 @@ namespace Leaderboard.Areas.Identity.Models
 
         public void OnModelCreating(EntityTypeBuilder<ApplicationUser> builder)
         {
-            builder.Property(b => b.Gender)
-                .HasDefaultValue(GenderValues.Other)
-                .IsRequired();
-
             builder.Property(b => b.Weight).HasColumnType("decimal(13,3)");
 
             builder.Property(b => b.BirthDate)

@@ -91,10 +91,8 @@ namespace Leaderboard.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
 
-                    b.Property<int>("Gender")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(2);
+                    b.Property<int?>("Gender")
+                        .HasColumnType("integer");
 
                     b.Property<bool?>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -274,10 +272,10 @@ namespace Leaderboard.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("text");
 
-                    b.Property<int>("AgeLowerBound")
+                    b.Property<int?>("AgeLowerBound")
                         .HasColumnType("integer");
 
-                    b.Property<int>("AgeUpperBound")
+                    b.Property<int?>("AgeUpperBound")
                         .HasColumnType("integer");
 
                     b.Property<string>("Gender")
@@ -350,7 +348,6 @@ namespace Leaderboard.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("DivisionId")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool?>("IsActive")
@@ -637,9 +634,7 @@ namespace Leaderboard.Migrations
                 {
                     b.HasOne("Leaderboard.Areas.Leaderboards.Models.Division", "Division")
                         .WithMany("Boards")
-                        .HasForeignKey("DivisionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("DivisionId");
 
                     b.HasOne("Leaderboard.Areas.Leaderboards.Models.UnitOfMeasureModel", "UOM")
                         .WithMany("Boards")

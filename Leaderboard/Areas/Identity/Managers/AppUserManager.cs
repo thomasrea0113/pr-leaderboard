@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Areas.Identity.ViewModels;
+using Leaderboard.Areas.Leaderboards.Models;
 using Leaderboard.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -71,6 +72,33 @@ namespace Leaderboard.Areas.Identity.Managers
             => await GetUserAsync(identity, user => user
                 .Include(u => u.UserCategories).ThenInclude(uc => uc.Category)
                 .Include(u => u.UserLeaderboards).ThenInclude(ul => ul.Leaderboard));
+
+        /// <summary>
+        /// Joins all the divisions on the users categories. This will not filter out
+        /// divisions that the user is already a part of
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public async Task<List<LeaderboardModel>> GetRecommendedBoardsAsync(ApplicationUser user)
+        {
+            var userAge = user.Age;
+            var userWeight = user.Weight;
+            var userGender = user.Gender;
+
+            // LINQ to Queries is quite powerful! The key to remember is to NEVER use a navigation
+            // property in your query. Always use the DbSet on the context, and then use joins
+            var recommendations = from dc in _ctx.DivisionCategories.AsQueryable()
+                from b in _ctx.Leaderboards
+                from d in _ctx.Divisions
+                from wc in _ctx.WeightClasses
+                join uc in _ctx.UserCategories on dc.CategoryId equals uc.CategoryId
+                where uc.UserId == user.Id
+                where d.AgeLowerBound < userAge && userAge <= d.AgeUpperBound
+                where d.Gender == userGender
+                where wc.WeightLowerBound < userWeight && userWeight <= wc.WeightUpperBound
+                select b;
+            return await recommendations.ToListAsync();
+        }
 
         public async Task<bool> CreateOrUpdateByNameAsync(ApplicationUser user, string password)
         {

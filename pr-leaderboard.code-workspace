@@ -60,6 +60,7 @@
 		"omnisharp.projectLoadTimeout": 20,
 		"vssolution.trackActiveItem": true,
 		"omnisharp.defaultLaunchSolution": "Solution/pr-leaderboard.sln",
+		"dotnet-test-explorer.testProjectPath": "**/*.Tests.csproj",
 	},
 	"extensions": {
 		"recommendations": [

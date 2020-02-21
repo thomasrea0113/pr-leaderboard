@@ -67,8 +67,7 @@ namespace Leaderboard.Areas.Leaderboards.Models
             // a board has one division, but a division has many boards
             builder.HasOne(b => b.Division)
                 .WithMany(b => b.Boards)
-                .HasForeignKey(b => b.DivisionId)
-                .IsRequired();
+                .HasForeignKey(b => b.DivisionId);
 
             // a board has one weight class, but a weight class has many boards
             builder.HasOne(b => b.WeightClass)

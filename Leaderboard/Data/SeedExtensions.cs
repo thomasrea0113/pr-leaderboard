@@ -46,24 +46,38 @@ namespace Leaderboard.Data.SeedExtensions
             return objects;
         }
 
-        private static IEnumerable<LeaderboardModel> GenerateLeaderboards(List<Division> divisions, List<WeightClass> weightClasses)
+        /// <summary>
+        /// If either divisions/weightclasses are null, will add a single board with a null value for that property
+        /// </summary>
+        /// <param name="uomId"></param>
+        /// <param name="divisions"></param>
+        /// <param name="weightClasses"></param>
+        /// <param name="boardNames"></param>
+        /// <returns></returns>
+        private static IEnumerable<LeaderboardModel> GenerateLeaderboards(
+            string uomId,
+            List<Division> divisions,
+            List<WeightClass> weightClasses,
+            params string[] boardNames)
         {
+            divisions ??= new List<Division> { null };
+            weightClasses ??= new List<WeightClass> { null };
+
             foreach (var division in divisions)
                 foreach (var weightClass in weightClasses)
                 {
                     LeaderboardModel generateBoard(string name) => new LeaderboardModel
                     {
-                        Id = GuidUtility.Create(GuidUtility.UrlNamespace, $"lb_{weightClass.Id}{division.Id}{name}").ToString(),
+                        Id = GuidUtility.Create(GuidUtility.UrlNamespace, $"lb_{weightClass?.Id}{division?.Id}{name}").ToString(),
                         Name = name,
                         IsActive = true,
-                        WeightClassId = weightClass.Id,
-                        DivisionId = division.Id,
-                        UOMId = "e362dd90-d6fe-459b-ba26-09db002bfff6"
+                        WeightClassId = weightClass?.Id,
+                        DivisionId = division?.Id,
+                        UOMId = uomId
                     };
 
-                    yield return generateBoard("Bench");
-                    yield return generateBoard("Squat");
-                    yield return generateBoard("Deadlift");
+                    foreach(var boardName in boardNames)
+                        yield return generateBoard(boardName);
                 }
         }
 
@@ -177,7 +191,8 @@ namespace Leaderboard.Data.SeedExtensions
             var divisionWeightClasses = await GetSeedDataFromFile<DivisionWeightClass>(environmentName);
             await context.BulkInsertOrUpdateAsync(divisionWeightClasses.ToArray());
 
-            var boards = GenerateLeaderboards(divisions, weightClasses);
+            // adding bench/squat/deadlift to all divisions/weightclasses
+            var boards = GenerateLeaderboards("e362dd90-d6fe-459b-ba26-09db002bfff6", divisions, weightClasses, "Bench", "Squat", "Deadlift");
             await context.BulkInsertOrUpdateAsync(boards.ToArray());
 
             await context.SaveChangesAsync();
@@ -189,6 +204,15 @@ namespace Leaderboard.Data.SeedExtensions
             // if not in productions, we want some dummy users and scores
             if (environmentName != "production")
             {
+
+                // adding some null data for division/weight class. Important for testing.
+                // TODO determine real age/weight groups for sprinting and add more races
+                var sprintBoards = GenerateLeaderboards("12c7c15a-db13-4912-a7c8-fc86db54849b", null, weightClasses, "100-Metre Dash", "40-Yard Dash");
+                sprintBoards.Concat(GenerateLeaderboards("12c7c15a-db13-4912-a7c8-fc86db54849b", divisions, null, "100-Metre Dash", "40-Yard Dash"));
+                await context.BulkInsertOrUpdateAsync(sprintBoards.ToArray());
+
+                await context.SaveChangesAsync();
+
                 users = await userManager.GetOrCreateUsers(GenderValues.Male, "LifterDuder", "LiftLife", "Lifter22").ToListAsync();
 
                 var llUser = users.Single(u => u.UserName == "LiftLife");
