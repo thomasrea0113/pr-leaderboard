@@ -3,7 +3,7 @@
         {
             "name": "Razor Page (Code)",
             "extension": "cs",
-            "file": "./razor.cshtml.cs-template",
+            "file": "./class-razor.cshtml.cs-template",
             "parameters": "./template-parameters.js"
         },
         {
@@ -21,7 +21,13 @@
         {
             "name": "Static Class",
             "extension": "cs",
-            "file": "./static-class.cs-template",
+            "file": "./class-static.cs-template",
+            "parameters": "./template-parameters.js"
+        },
+        {
+            "name": "XUnit Test Class",
+            "extension": "cs",
+            "file": "./class-test.cs-template",
             "parameters": "./template-parameters.js"
         },
         {

@@ -13,6 +13,8 @@ module.exports = function(filename, projectPath, folderPath) {
     return {
         namespace: namespace,
         // for razor pages, we need to remove the .cshtml extension
-        name: path.basename(filename, path.extname(filename)).replace(/\.cshtml$/, '')
+        name: path.basename(filename, path.extname(filename))
+            .replace(/\.cshtml$/, '')
+            .replace('.', '')
     };
 };

@@ -1,0 +1,25 @@
+using System;
+using System.Threading.Tasks;
+using Leaderboard.Data;
+using Leaderboard.Tests.TestSetup;
+using Microsoft.Extensions.DependencyInjection;
+using Xunit;
+
+namespace {{namespace}}
+{
+    public class {{name}} : BaseTestClass
+    {
+        public {{name}}(WebOverrideFactory factory) : base(factory)
+        {
+        }
+
+        [Fact]
+        public async Task Test1()
+        {
+            using var _ = CreateScope(out var scope);
+            var ctx = scope.GetRequiredService<ApplicationDbContext>();
+            await Task.CompletedTask;
+            throw new NotImplementedException();
+        }
+    }
+}
