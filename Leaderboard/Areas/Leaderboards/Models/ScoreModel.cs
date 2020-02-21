@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Text.Json.Serialization;
 using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Data.SeedExtensions;
 using Leaderboard.Models;
@@ -16,12 +17,17 @@ namespace Leaderboard.Areas.Leaderboards.Models
 
         public bool? IsApproved { get; set; }
 
+        [JsonIgnore]
         public virtual FileModel VideoProof { get; set; }
 
         public string BoardId { get; set; }
+        
+        [JsonIgnore]
         public virtual LeaderboardModel Board { get; set; }
 
         public string UserId { get; set; }
+        
+        [JsonIgnore]
         public virtual ApplicationUser User { get; set; }
 
         public decimal Value { get; set; }

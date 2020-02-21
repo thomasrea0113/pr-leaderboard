@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using Leaderboard.Models.Features;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -12,9 +13,13 @@ namespace Leaderboard.Areas.Leaderboards.Models
         public string Id { get; set; }
 
         public string DivisionId { get; set; }
+
+        [JsonIgnore]
         public virtual Division Division { get; set; }
 
         public string CategoryId { get; set; }
+        
+        [JsonIgnore]
         public virtual Category Category { get; set; }
 
         public void OnModelCreating(EntityTypeBuilder<DivisionCategory> builder)

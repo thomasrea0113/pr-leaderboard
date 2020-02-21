@@ -1,12 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Leaderboard.Areas.Identity.Models;
+using Leaderboard.Areas.Identity.ViewModels;
 using Leaderboard.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -25,6 +28,7 @@ namespace Leaderboard.Areas.Identity.Managers
             return default;
         }
     }
+
     public class AppUserManager : UserManager<ApplicationUser>
     {
         private readonly ApplicationDbContext _ctx;
@@ -41,6 +45,32 @@ namespace Leaderboard.Areas.Identity.Managers
         {
             _ctx = services.GetRequiredService<ApplicationDbContext>();
         }
+
+        /// <summary>
+        /// Gets the user, but also loads the properties specified by include
+        /// </summary>
+        /// <param name="identity"></param>
+        /// <param name="Func<IQueryable<ApplicationUser>"></param>
+        /// <param name="include"></param>
+        /// <typeparam name="TProp"></typeparam>
+        /// <returns></returns>
+        public async Task<ApplicationUser> GetUserAsync<TProp>(ClaimsPrincipal identity,
+            Func<IQueryable<ApplicationUser>, IIncludableQueryable<ApplicationUser, TProp>> include)
+        {
+            // will be the user id
+            var id = identity.FindFirst(ClaimTypes.NameIdentifier).Value;
+            return await include(Users).SingleAsync(u => u.Id == id);
+        }
+
+        /// <summary>
+        /// Get the user, and also load all of the relavent navigation properties
+        /// </summary>
+        /// <param name="identity"></param>
+        /// <returns></returns>
+        public async Task<ApplicationUser> GetCompleteUser(ClaimsPrincipal identity)
+            => await GetUserAsync(identity, user => user
+                .Include(u => u.UserCategories).ThenInclude(uc => uc.Category)
+                .Include(u => u.UserLeaderboards).ThenInclude(ul => ul.Leaderboard));
 
         public async Task<bool> CreateOrUpdateByNameAsync(ApplicationUser user, string password)
         {

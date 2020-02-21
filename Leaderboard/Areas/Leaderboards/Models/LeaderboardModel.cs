@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using Leaderboard.Models.Features;
 using Leaderboard.Models.Relationships;
 using Microsoft.EntityFrameworkCore;
@@ -19,9 +20,13 @@ namespace Leaderboard.Areas.Leaderboards.Models
         public string Name { get; set; }
 
         public string DivisionId { get; set; }
+
+        [JsonIgnore]
         public virtual Division Division { get; set; }
 
         public string WeightClassId { get; set; }
+        
+        [JsonIgnore]
         public virtual WeightClass WeightClass { get; set; }
 
 
@@ -32,6 +37,8 @@ namespace Leaderboard.Areas.Leaderboards.Models
         public virtual ICollection<ScoreModel> Scores { get; set; }
 
         public virtual string UOMId { get; set; }
+        
+        [JsonIgnore]
         public virtual UnitOfMeasureModel UOM { get; set; }
 
         public void OnModelCreating(EntityTypeBuilder<LeaderboardModel> builder)

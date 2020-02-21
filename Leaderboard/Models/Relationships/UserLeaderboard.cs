@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Areas.Leaderboards.Models;
 using Leaderboard.Models.Features;
@@ -14,10 +15,13 @@ namespace Leaderboard.Models.Relationships
         public string Id { get; set; }
 
         public string UserId { get; set; }
+        
+        [JsonIgnore]
         public virtual ApplicationUser User { get; set; }
 
         public string LeaderboardId { get; set; }
 
+        [JsonIgnore]
         public virtual LeaderboardModel Leaderboard { get; set; }
 
         public static UserLeaderboard Create(ApplicationUser user, LeaderboardModel board)

@@ -15,6 +15,7 @@ namespace Leaderboard.Areas.Leaderboards.Models
 
         public string Name { get; set; }
 
+
         public virtual ICollection<DivisionCategory> DivisionCategories { get; set; } = new List<DivisionCategory>();
         public virtual ICollection<UserCategory> UserCategories { get; set; } = new List<UserCategory>();
 
