@@ -5,6 +5,7 @@ using Leaderboard.Areas.Identity.ViewModels;
 using Leaderboard.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 
 namespace Leaderboard.Areas.Identity.Pages.Account.Manage
 {
@@ -37,7 +38,7 @@ namespace Leaderboard.Areas.Identity.Pages.Account.Manage
         public async Task<JsonResult> OnGetInitialAsync()
             => new JsonResult(new ReactState
         {
-            User = (await _manager.GetUserAsync(User)).ToObject<UserViewModel>()
+            User = new UserViewModel(await _manager.GetCompleteUser(User))
         });
     }
 }
