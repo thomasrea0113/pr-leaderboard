@@ -51,7 +51,9 @@ module.exports = {
                 extensions: ['.js', '.json', '.jsx', '.ts', '.tsx', 'css'],
             },
         ],
+
         'react/static-property-placement': ['error', 'static getter'],
+        'react/jsx-props-no-spreading': 0,
 
         'jest/no-disabled-tests': 'warn',
         'jest/no-focused-tests': 'error',

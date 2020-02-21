@@ -14,6 +14,8 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'js/[name].[hash].js',
+
+        // exposing all components in a global Componentes variable
         library: ['Components', '[name]'],
         libraryTarget: 'var',
         libraryExport: 'default',
@@ -64,15 +66,61 @@ module.exports = {
                     'css-loader',
                 ],
             },
+            {
+                test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+                use: [
+                    {
+                        loader: 'file-loader',
+                        options: {
+                            name: '[name].[ext]',
+                            outputPath: '/fonts/',
+                        },
+                    },
+                ],
+            },
+            {
+                test: require.resolve('react'),
+                use: [
+                    {
+                        loader: 'expose-loader',
+                        options: 'React',
+                    },
+                ],
+            },
+            {
+                test: require.resolve('react-dom'),
+                use: [
+                    {
+                        loader: 'expose-loader',
+                        options: 'ReactDOM',
+                    },
+                ],
+            },
+            {
+                test: require.resolve('jquery'),
+                use: [
+                    {
+                        loader: 'expose-loader',
+                        options: 'jQuery',
+                    },
+                    {
+                        loader: 'expose-loader',
+                        options: '$',
+                    },
+                ],
+            },
         ],
     },
     plugins: [
+        // instead of using devtool, we will build the source pags automatically
         new webpack.SourceMapDevToolPlugin({
             filename: '[file].map',
         }),
         new MiniCssExtractPlugin({
             filename: 'css/[name].[hash].css',
         }),
+        // used by the Razor Page TagHelper. The helper reads the stats file to
+        // figured out the virtual path of the bundles
         new StatsWriterPlugin({
             stats: {
                 all: false,

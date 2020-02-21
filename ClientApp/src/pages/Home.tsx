@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import 'react-dom';
 
 // eslint-disable-next-line react/prefer-stateless-function
 export default class HomeComponent extends Component {

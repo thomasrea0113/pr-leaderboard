@@ -1,49 +1,113 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React, { useState, useEffect } from 'react';
+import 'react-dom';
 
-interface User {
-    userName: string;
-    email: string;
-}
+import PropTypes from 'prop-types';
+import { useTable } from 'react-table';
 
 interface RecommendationsState {
-    user: User;
+    user: {
+        userName: string;
+        email: string;
+        interests: {
+            id: string;
+            name: string;
+        }[];
+    };
 }
 
 interface RecommendationsProps {
     initialUrl: string;
 }
 
-// eslint-disable-next-line react/prefer-stateless-function
-export default class RecommendationsComponent extends Component<
-    RecommendationsProps,
-    RecommendationsState
-> {
-    public static get displayName(): string {
-        return 'Recommendations';
-    }
+const initialState: RecommendationsState = {
+    user: {
+        userName: '',
+        email: '',
+        interests: [],
+    },
+};
 
-    public static get propTypes() {
-        return {
-            initialUrl: PropTypes.string.isRequired,
-        };
-    }
+const RecommendationsComponent = (props: RecommendationsProps) => {
+    const [
+        {
+            user: { interests },
+        },
+        setState,
+    ] = useState(initialState);
 
-    public async componentDidMount() {
-        const { initialUrl } = this.props;
-        const response: RecommendationsState = await (
-            await fetch(initialUrl)
-        ).json();
-        this.setState(response);
-    }
+    // load initial data
+    useEffect(() => {
+        const { initialUrl } = props;
+        fetch(initialUrl)
+            .then(response => response.json())
+            .then(json => setState(json));
+    }, []);
 
-    public render(): JSX.Element {
-        if (this.state != null) {
-            const {
-                user: { userName },
-            } = this.state;
-            return <div>Here are your recommendations, {userName}</div>;
-        }
-        return <div>loading...</div>;
-    }
-}
+    const columns = [
+        {
+            Header: 'Interests',
+            columns: [
+                {
+                    Header: 'Name',
+                    accessor: 'name',
+                },
+                {
+                    Header: 'Id',
+                    accessor: 'id',
+                },
+            ],
+        },
+    ];
+
+    const {
+        getTableProps,
+        getTableBodyProps,
+        headerGroups,
+        rows,
+        prepareRow,
+    } = useTable({
+        columns,
+        data: interests,
+    });
+
+    return (
+        <div>
+            <div>We think you&apos;ll find this information useful!</div>
+            <table {...getTableProps()}>
+                <thead>
+                    {headerGroups.map(headerGroup => (
+                        <tr {...headerGroup.getHeaderGroupProps()}>
+                            {headerGroup.headers.map(column => (
+                                <th {...column.getHeaderProps()}>
+                                    {column.render('Header')}
+                                </th>
+                            ))}
+                        </tr>
+                    ))}
+                </thead>
+                <tbody {...getTableBodyProps()}>
+                    {rows.map(row => {
+                        prepareRow(row);
+                        return (
+                            <tr {...row.getRowProps()}>
+                                {row.cells.map(cell => {
+                                    return (
+                                        <td {...cell.getCellProps()}>
+                                            {cell.render('Cell')}
+                                        </td>
+                                    );
+                                })}
+                            </tr>
+                        );
+                    })}
+                </tbody>
+            </table>
+        </div>
+    );
+};
+
+RecommendationsComponent.propTypes = {
+    initialUrl: PropTypes.string.isRequired,
+};
+
+export default RecommendationsComponent;
