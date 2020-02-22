@@ -40,7 +40,7 @@ namespace Leaderboard
                     .UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
 
             // adding the default user models
-            services.AddDefaultIdentity<ApplicationUser>(options =>
+            services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = true;
 
@@ -53,15 +53,15 @@ namespace Leaderboard
                 options.SignIn.RequireConfirmedAccount = false;
                 options.SignIn.RequireConfirmedPhoneNumber = false;
             })
-                .AddRoles<ApplicationRole>()
-                .AddUserManager<AppUserManager>()
-                .AddRoleManager<AppRoleManager>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddUserStore<AppUserStore>()
+                .AddRoleStore<AppRoleStore>()
                 .AddDefaultUI()
                 .AddDefaultTokenProviders()
                 .AddUserValidator<EmailNotRequiredValidator>();
 
             services.AddScoped<AppUserManager>();
+            services.AddScoped<AppRoleManager>();
 
             // for adding additional user claims
             services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationClaimsPrincipalFactory>();

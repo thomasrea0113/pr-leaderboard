@@ -28,11 +28,13 @@ namespace Leaderboard.Models.Relationships
         {
             builder.HasOne(b => b.User)
                 .WithMany(b => b.UserCategories)
-                .HasForeignKey(b => b.UserId);
+                .HasForeignKey(b => b.UserId)
+                .IsRequired();
 
             builder.HasOne(b => b.Category)
                 .WithMany(b => b.UserCategories)
-                .HasForeignKey(b => b.CategoryId);
+                .HasForeignKey(b => b.CategoryId)
+                .IsRequired();
 
             builder.Property(b => b.UserId).IsRequired();
             builder.Property(b => b.CategoryId).IsRequired();

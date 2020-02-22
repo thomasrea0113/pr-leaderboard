@@ -16,45 +16,18 @@ namespace Leaderboard.Areas.Identity.Managers
 
     public class AppRoleManager : RoleManager<ApplicationRole>
     {
-        private readonly ApplicationDbContext _ctx;
+        private readonly AppRoleStore _store;
 
         public AppRoleManager(IRoleStore<ApplicationRole> store,
             IEnumerable<IRoleValidator<ApplicationRole>> roleValidators,
             ILookupNormalizer keyNormalizer, IdentityErrorDescriber errors,
-            ILogger<RoleManager<ApplicationRole>> logger, ApplicationDbContext context) :
+            ILogger<RoleManager<ApplicationRole>> logger) :
                 base(store, roleValidators, keyNormalizer, errors, logger)
         {
-            _ctx = context;
+            _store = store as AppRoleStore ??
+                throw new ArgumentException($"type {store.GetType()} was not an instance of {typeof(AppRoleStore)}. You must register this service first to use the app role manager.");
         }
 
-        public async Task<bool> TryCreateByNameAsync(ApplicationRole role)
-        {
-            role.NormalizedName = role.Name.ToUpper();
-            var existingRole = await FindByNameAsync(role.NormalizedName);
-            if (existingRole == default)
-            {
-                await CreateAsync(role);
-                return true;
-            }
-
-            // the passed in user may having a matching name, but the IDs may not match.
-            // We also need to overwrite the tracked entity with the passed in entity,
-            // so we detach both and update the id of the new one.
-            role.Id = existingRole.Id;
-
-            var tracked = _ctx.ChangeTracker.Entries()
-                .Where(e => e.Entity is ApplicationRole)
-                .SingleOrDefault(e => (e.Entity as ApplicationRole)?.Id == role.Id);
-
-            // if we're already tracking this entity, then we simply need to overwrite the values
-            if (tracked != default)
-            {
-                tracked.CurrentValues.SetValues(role);
-                await _ctx.SaveChangesAsync();
-            }
-            else
-                await UpdateAsync(role);
-            return false;
-        }
+        public async Task<IdentityResult> TryCreateByNameAsync(ApplicationRole role) => await _store.CreateOrFindByNameAsync(role);
     }
 }
