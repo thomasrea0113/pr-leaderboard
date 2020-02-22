@@ -311,7 +311,7 @@ namespace Leaderboard.Migrations
                 {
                     Id = table.Column<string>(nullable: false),
                     Name = table.Column<string>(nullable: false),
-                    DivisionId = table.Column<string>(nullable: true),
+                    DivisionId = table.Column<string>(nullable: false),
                     WeightClassId = table.Column<string>(nullable: true),
                     IsActive = table.Column<bool>(nullable: true, defaultValue: true),
                     UOMId = table.Column<string>(nullable: false)
@@ -324,7 +324,7 @@ namespace Leaderboard.Migrations
                         column: x => x.DivisionId,
                         principalTable: "Divisions",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Leaderboards_UnitsOfMeasure_UOMId",
                         column: x => x.UOMId,

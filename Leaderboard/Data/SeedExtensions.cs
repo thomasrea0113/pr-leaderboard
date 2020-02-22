@@ -216,9 +216,7 @@ namespace Leaderboard.Data.SeedExtensions
 
                 // adding some null data for division/weight class. Important for testing.
                 // TODO determine real age/weight groups for sprinting and add more races
-                var sprintBoards = GenerateLeaderboards("12c7c15a-db13-4912-a7c8-fc86db54849b", null, weightClasses, "100-Metre Dash", "40-Yard Dash");
-                sprintBoards.Concat(GenerateLeaderboards("12c7c15a-db13-4912-a7c8-fc86db54849b", divisions, null, "100-Metre Dash", "40-Yard Dash"));
-                sprintBoards.Concat(GenerateLeaderboards("12c7c15a-db13-4912-a7c8-fc86db54849b", null, null, "100-Metre Dash", "40-Yard Dash"));
+                var sprintBoards = GenerateLeaderboards("12c7c15a-db13-4912-a7c8-fc86db54849b", divisions, null, "100-Metre Dash", "40-Yard Dash");
                 await context.BulkInsertOrUpdateAsync(sprintBoards.ToArray());
 
                 await context.SaveChangesAsync();

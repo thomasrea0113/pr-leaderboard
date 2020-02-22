@@ -344,6 +344,7 @@ namespace Leaderboard.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("DivisionId")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool?>("IsActive")
@@ -630,7 +631,9 @@ namespace Leaderboard.Migrations
                 {
                     b.HasOne("Leaderboard.Areas.Leaderboards.Models.Division", "Division")
                         .WithMany("Boards")
-                        .HasForeignKey("DivisionId");
+                        .HasForeignKey("DivisionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Leaderboard.Areas.Leaderboards.Models.UnitOfMeasureModel", "UOM")
                         .WithMany("Boards")
