@@ -1,8 +1,13 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Leaderboard.Areas.Identity.Managers;
+using Leaderboard.Areas.Identity.Models;
+using Leaderboard.Areas.Leaderboards.Models;
 using Leaderboard.Data;
 using Leaderboard.Tests.TestSetup;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -26,6 +31,7 @@ namespace Leaderboard.Tests.Queries
         {
             using var _ = CreateScope(out var scope);
             var um = scope.GetRequiredService<AppUserManager>();
+            var ctx = scope.GetRequiredService<ApplicationDbContext>();
 
             // this user is in the powerlifting divisions, which have a weight and an age
             var user = await um.FindByNameAsync("LifterDuder");
@@ -33,8 +39,10 @@ namespace Leaderboard.Tests.Queries
             Assert.NotEmpty(user.UserCategories);
 
             var recommendations = await um.GetRecommendedBoardsAsync(user);
-
             Assert.NotEmpty(recommendations);
+
+            // TODO determine correct recommendation count
+            Assert.Equal(2, recommendations.Count);
         }
     }
 }

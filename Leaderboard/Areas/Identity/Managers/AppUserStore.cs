@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Areas.Leaderboards.Models;
 using Leaderboard.Data;
+using Leaderboard.Extensions;
 using Leaderboard.Models.Relationships;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -36,32 +37,33 @@ namespace Leaderboard.Areas.Identity.Managers
         /// <returns></returns>
         public async Task<List<LeaderboardModel>> GetRecommendedBoardsAsync(ApplicationUser user)
         {
+            // TODO Should I join on the user table rather than explicitly passing the weight/age/id values?
             // LINQ to Queries is quite powerful! The key to remember is to NEVER use a navigation
             // property in your query. Always use the DbSet on the context, and then use joins
             var recommendations = from b in Context.Leaderboards.AsQueryable()
                 from wc in Context.WeightClasses
                 from d in Context.Divisions
 
+                // TODO don't return inactive tables
+
                 // getting only divisions that overlap with the users categories
                 join uc in Context.UserCategories on user.Id equals uc.UserId
                 join dc in Context.DivisionCategories on d.Id equals dc.DivisionId
                 where dc.CategoryId == uc.CategoryId &&
+
                     // if the gender/age on the division is null, then this user automatically qualifies
                     (
-                        b.DivisionId == null ||
-                        (
-                            (d.Gender == null || user.Gender == d.Gender) &&
-                            (d.AgeLowerBound == null || d.AgeLowerBound < user.Age) &&
-                            (d.AgeUpperBound == null || user.Age <= d.AgeUpperBound)
-                        )
+                        (d.Gender == null || user.Gender == d.Gender) &&
+                        (d.AgeLowerBound == null || d.AgeLowerBound < user.Age) &&
+                        (d.AgeUpperBound == null || user.Age <= d.AgeUpperBound)
                     ) &&
 
                     // if the board has no weight class, the user automatically qualifies
                     (
                         b.WeightClassId == null ||
                         (
-                            (wc.WeightLowerBound == null || wc.WeightLowerBound < user.Weight) &&
-                            (wc.WeightUpperBound == null || user.Weight <= wc.WeightUpperBound)
+                            (wc.WeightLowerBound == null || wc.WeightLowerBound <= user.Weight) &&
+                            (wc.WeightUpperBound == null || user.Weight < wc.WeightUpperBound)
                         )
                     )
 
