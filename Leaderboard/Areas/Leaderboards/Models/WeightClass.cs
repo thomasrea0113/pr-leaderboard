@@ -17,14 +17,14 @@ namespace Leaderboard.Areas.Leaderboards.Models
         /// </summary>
         /// <value></value>
         /// [Range(0, 500)]
-        public int WeightLowerBound { get; set; }
+        public int? WeightLowerBound { get; set; }
 
         /// <summary>
         /// weight class upper bound in kgs
         /// </summary>
         /// <value></value>
         /// [Range(0, 500)]
-        public int WeightUpperBound { get; set; }
+        public int? WeightUpperBound { get; set; }
 
         public virtual ICollection<DivisionWeightClass> Divisions { get; set; }
         public virtual ICollection<LeaderboardModel> Boards { get; set; }

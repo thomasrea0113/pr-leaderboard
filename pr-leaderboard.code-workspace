@@ -65,7 +65,8 @@
 	"extensions": {
 		"recommendations": [
 			"gruntfuggly.todo-tree",
-			"fernandoescolar.vscode-solution-explorer"
+			"fernandoescolar.vscode-solution-explorer",
+			"eamodio.gitlens"
 		]
 	}
 }

@@ -14,6 +14,9 @@ namespace Leaderboard.Tests.Queries
         {
         }
 
+        // FIXME for some reason, tests have to be rerun a few times for them to work.
+        // this issue has something to do with the fact that the database is created/migrated/seeded
+        // on initial startup if there are pending migrations
         /// <summary>
         /// Tests the recommendations for a user with both a weight and an age
         /// </summary>

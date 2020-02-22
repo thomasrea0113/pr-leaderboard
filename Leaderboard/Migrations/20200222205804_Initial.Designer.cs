@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Leaderboard.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200221083626_Initial")]
+    [Migration("20200222205804_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -176,12 +176,10 @@ namespace Leaderboard.Migrations
             modelBuilder.Entity("Leaderboard.Areas.Identity.Models.ApplicationUserLogin", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("character varying(128)")
-                        .HasMaxLength(128);
+                        .HasColumnType("text");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("character varying(128)")
-                        .HasMaxLength(128);
+                        .HasColumnType("text");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("text");
@@ -218,12 +216,10 @@ namespace Leaderboard.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("character varying(128)")
-                        .HasMaxLength(128);
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
-                        .HasColumnType("character varying(128)")
-                        .HasMaxLength(128);
+                        .HasColumnType("text");
 
                     b.Property<string>("Value")
                         .HasColumnType("text");
@@ -464,10 +460,10 @@ namespace Leaderboard.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("text");
 
-                    b.Property<int>("WeightLowerBound")
+                    b.Property<int?>("WeightLowerBound")
                         .HasColumnType("integer");
 
-                    b.Property<int>("WeightUpperBound")
+                    b.Property<int?>("WeightUpperBound")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");

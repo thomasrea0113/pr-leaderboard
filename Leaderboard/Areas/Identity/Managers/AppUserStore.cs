@@ -46,7 +46,7 @@ namespace Leaderboard.Areas.Identity.Managers
                 join uc in Context.UserCategories on user.Id equals uc.UserId
                 join dc in Context.DivisionCategories on d.Id equals dc.DivisionId
                 where dc.CategoryId == uc.CategoryId &&
-                    // // if the gender/age on the division is null, then this user automatically qualifies
+                    // if the gender/age on the division is null, then this user automatically qualifies
                     (
                         b.DivisionId == null ||
                         (
@@ -60,8 +60,8 @@ namespace Leaderboard.Areas.Identity.Managers
                     (
                         b.WeightClassId == null ||
                         (
-                            wc.WeightLowerBound < user.Weight &&
-                            user.Weight <= wc.WeightUpperBound
+                            (wc.WeightLowerBound == null || wc.WeightLowerBound < user.Weight) &&
+                            (wc.WeightUpperBound == null || user.Weight <= wc.WeightUpperBound)
                         )
                     )
 

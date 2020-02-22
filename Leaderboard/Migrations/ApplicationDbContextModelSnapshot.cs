@@ -174,12 +174,10 @@ namespace Leaderboard.Migrations
             modelBuilder.Entity("Leaderboard.Areas.Identity.Models.ApplicationUserLogin", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("character varying(128)")
-                        .HasMaxLength(128);
+                        .HasColumnType("text");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("character varying(128)")
-                        .HasMaxLength(128);
+                        .HasColumnType("text");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("text");
@@ -216,12 +214,10 @@ namespace Leaderboard.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("character varying(128)")
-                        .HasMaxLength(128);
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
-                        .HasColumnType("character varying(128)")
-                        .HasMaxLength(128);
+                        .HasColumnType("text");
 
                     b.Property<string>("Value")
                         .HasColumnType("text");
@@ -462,10 +458,10 @@ namespace Leaderboard.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("text");
 
-                    b.Property<int>("WeightLowerBound")
+                    b.Property<int?>("WeightLowerBound")
                         .HasColumnType("integer");
 
-                    b.Property<int>("WeightUpperBound")
+                    b.Property<int?>("WeightUpperBound")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
