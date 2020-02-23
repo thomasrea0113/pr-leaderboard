@@ -1,0 +1,22 @@
+{
+    "Servers": {
+        "1": {
+            "Name": "Development Database",
+            "Group": "Leaderboard App",
+            "Port": 5432,
+            "Username": "postgres",
+            "Host": "db",
+            "MaintenanceDB": "postgres",
+            "SSLMode": "disable"
+        },
+        "2": {
+            "Name": "Unit Test Database",
+            "Group": "Leaderboard App",
+            "Port": 5432,
+            "Username": "postgres",
+            "Host": "db-unit",
+            "MaintenanceDB": "postgres",
+            "SSLMode": "disable"
+        }
+    }
+}

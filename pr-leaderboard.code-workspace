@@ -61,6 +61,7 @@
 		"vssolution.trackActiveItem": true,
 		"omnisharp.defaultLaunchSolution": "Solution/pr-leaderboard.sln",
 		"dotnet-test-explorer.testProjectPath": "**/*.Tests.csproj",
+		"jest.autoEnable": false,
 	},
 	"extensions": {
 		"recommendations": [

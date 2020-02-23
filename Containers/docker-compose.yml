@@ -1,6 +1,14 @@
 version: "3.7"
 
 services:
+  pgadmin:
+    image: leaderboard-pgadmin
+    build: ./pgadmin
+    ports:
+      - '6552:80'
+    networks:
+      - backend
+      - default
   db:
     image: db
     build: db
@@ -20,8 +28,9 @@ services:
     build: ../
     networks:
       - backend
-    expose:
-      - 5000
+      - default
+    ports:
+      - '5000:5000'
     volumes:
       - npm-cache:/root/.npm
     # needed for rsyslog to work  
