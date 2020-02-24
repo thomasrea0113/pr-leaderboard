@@ -1,5 +1,6 @@
 using System;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
 using Leaderboard.Data;
@@ -7,6 +8,7 @@ using Leaderboard.Tests.TestSetup.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using Xunit;
 
 namespace Leaderboard.Tests.TestSetup
@@ -16,6 +18,8 @@ namespace Leaderboard.Tests.TestSetup
         protected WebOverrideFactory Factory { get; }
         protected HttpClient Client { get; }
         protected IServiceProvider Services { get; }
+
+        public const string Environment = "Integration";
 
         public BaseTestClass(WebOverrideFactory factory)
         {

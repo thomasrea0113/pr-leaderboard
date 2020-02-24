@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Net.Http;
+using System.Threading.Tasks;
 using Leaderboard.Services;
 using Leaderboard.Tests.TestSetup;
 using Leaderboard.Tests.TestSetup.Fixtures;
@@ -19,21 +20,20 @@ namespace Leaderboard.Tests.Services
         public void TestEnqueue()
         {
             using var _ = CreateScope(out var scope);
-            // using (var _ = CreateScope(out var scope))
-            // {
-                var queue = scope.GetRequiredService<IMessageQueue>();
 
-                Assert.Empty(queue.GetAllMessages());
+            var queue = scope.GetRequiredService<IMessageQueue>();
 
-                queue.PushMessage("here we go!");
+            Assert.Empty(queue.GetAllMessages());
 
-                Assert.Equal("here we go!", queue.GetAllMessages(true).Single());
-                Assert.Equal("here we go!", queue.GetAllMessages().Single());
+            queue.PushMessage("here we go!");
 
-                // TempData only gets cleared after the HttpContext processes a successful
-                // request (status code 200-299). So the read doesn't clear the messages.
-                // TODO implement test to actually clear the TempData
-                Assert.Equal("here we go!", queue.GetAllMessages().Single());
+            Assert.Equal("here we go!", queue.GetAllMessages(true).Single());
+            Assert.Equal("here we go!", queue.GetAllMessages().Single());
+
+            // TempData only gets cleared after the HttpContext processes a successful
+            // request (status code 200-299). So the read doesn't clear the messages.
+            // TODO implement test to actually clear the TempData
+            Assert.Equal("here we go!", queue.GetAllMessages().Single());
 
             queue.PushMessage("here we go 1!");
             queue.PushMessage("here we go 2!");

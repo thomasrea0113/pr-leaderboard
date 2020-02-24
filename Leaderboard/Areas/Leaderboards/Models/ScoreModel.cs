@@ -1,11 +1,7 @@
-using System;
-using System.Linq;
 using System.Text.Json.Serialization;
 using Leaderboard.Areas.Identity.Models;
-using Leaderboard.Data.SeedExtensions;
 using Leaderboard.Models;
 using Leaderboard.Models.Features;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

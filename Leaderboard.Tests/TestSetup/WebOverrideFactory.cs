@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.TestHost;
 
 namespace Leaderboard.Tests.TestSetup
 {
@@ -20,7 +21,7 @@ namespace Leaderboard.Tests.TestSetup
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             var dbContextType = typeof(DbContextOptions<ApplicationDbContext>);
-            builder.ConfigureServices(services =>
+            builder.ConfigureTestServices(services =>
             {
                 // replacing the current HttpAccessor, so that we can inject a fake Context only if
                 // the current context is null
@@ -35,12 +36,8 @@ namespace Leaderboard.Tests.TestSetup
                 var testContext = new ServiceDescriptor(context.ServiceType, typeof(TestDbContext), context.Lifetime);
                 services.Replace(testContext);
             })
-                .ConfigureAppConfiguration(c =>
-                    // without overriding base path, we'd still be pointing to the Leaderboard
-                    // bin directory, not the Leaderboard.Tests bin directory
-                    c.SetBasePath(System.IO.Directory.GetCurrentDirectory())
-                        .AddJsonFile("appsettings.Development.json")
-                        .AddJsonFile("appsettings.unittest.json"));
+                .ConfigureAppConfiguration(c => c.SetBasePath(System.IO.Directory.GetCurrentDirectory())
+                    .AddJsonFile("appsettings.unittest.json", false));
         }
     }
 }

@@ -1,4 +1,3 @@
-using System;
 using Leaderboard.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +10,9 @@ namespace Leaderboard.Tests.TestSetup
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.EnableDetailedErrors().EnableSensitiveDataLogging();
+        {
+            base.OnConfiguring(optionsBuilder);
+            optionsBuilder.EnableDetailedErrors().EnableSensitiveDataLogging();
+        }
     }
 }

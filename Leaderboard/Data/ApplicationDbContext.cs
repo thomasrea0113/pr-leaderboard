@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Leaderboard.Models.Features;
 using Leaderboard.Models.Relationships;
 using System.Threading.Tasks;
@@ -10,10 +9,6 @@ using System.Threading;
 using Leaderboard.Areas.Leaderboards.Models;
 using Leaderboard.Models;
 using Leaderboard.Areas.Identity.Models;
-using Microsoft.Extensions.Configuration;
-using Leaderboard.Data.SeedExtensions;
-using Leaderboard.Areas.Identity.Managers;
-using Microsoft.AspNetCore.Hosting;
 
 namespace Leaderboard.Data
 {

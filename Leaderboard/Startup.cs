@@ -9,7 +9,6 @@ using Microsoft.Extensions.Hosting;
 using Leaderboard.Areas.Identity.Validators;
 using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Areas.Identity.Managers;
-using Leaderboard.Data.SeedExtensions;
 using System;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
@@ -18,6 +17,7 @@ using Leaderboard.Services;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using System.Text.Json;
+using Leaderboard.Data.SeedExtensions;
 
 namespace Leaderboard
 {
