@@ -4,16 +4,23 @@ import 'react-dom';
 import PropTypes from 'prop-types';
 import { useTable } from 'react-table';
 
+interface Board {
+    id: string;
+    name: string;
+}
+
 interface RecommendationsState {
     isLoading: boolean;
     user: {
         userName: string;
         email: string;
-        interests: {
+        recommendations: {
             id: string;
             name: string;
         }[];
     };
+    userBoards: Board[];
+    recommendations: Board[];
 }
 
 interface RecommendationsProps {
@@ -22,22 +29,20 @@ interface RecommendationsProps {
 }
 
 const initialState: RecommendationsState = {
-    isLoading: false,
+    isLoading: true,
     user: {
         userName: '',
         email: '',
-        interests: [],
+        recommendations: [],
     },
+    userBoards: [],
+    recommendations: [],
 };
 
 const RecommendationsComponent = (props: RecommendationsProps) => {
-    const [
-        {
-            user: { interests },
-            isLoading,
-        },
-        setState,
-    ] = useState(initialState);
+    const [{ userBoards, recommendations, isLoading }, setState] = useState(
+        initialState
+    );
 
     const { initialUrl } = props;
 
@@ -50,7 +55,7 @@ const RecommendationsComponent = (props: RecommendationsProps) => {
 
     const columns = [
         {
-            Header: 'Interests',
+            Header: 'Recommendations',
             columns: [
                 {
                     Header: 'Name',
@@ -64,6 +69,10 @@ const RecommendationsComponent = (props: RecommendationsProps) => {
         },
     ];
 
+    // TODO add boolean indication of whether or no the user is currently a member
+    // of that board
+    const data = [...recommendations, ...userBoards];
+
     const {
         getTableProps,
         getTableBodyProps,
@@ -72,7 +81,7 @@ const RecommendationsComponent = (props: RecommendationsProps) => {
         prepareRow,
     } = useTable({
         columns,
-        data: interests,
+        data,
     });
 
     const message = (loading: boolean): string => {
