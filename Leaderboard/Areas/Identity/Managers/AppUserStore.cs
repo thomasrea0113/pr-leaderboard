@@ -40,34 +40,51 @@ namespace Leaderboard.Areas.Identity.Managers
             // TODO Should I join on the user table rather than explicitly passing the weight/age/id values?
             // LINQ to Queries is quite powerful! The key to remember is to NEVER use a navigation
             // property in your query. Always use the DbSet on the context, and then use joins
-            var recommendations = from b in Context.Leaderboards.AsQueryable()
-                from wc in Context.WeightClasses
-                from d in Context.Divisions
+            // var recommendations = from b in Context.Leaderboards.AsQueryable()
+            //     join d in Context.Divisions on dc.DivisionId equals d.Id
+            //     join dwc in Context.DivisionWeightClasses on d.Id equals dwc.DivisionId
+            //     join wc in Context.WeightClasses on dwc.WeightClassId equals wc.Id
 
-                // TODO don't return inactive tables
+            //     // getting only divisions that overlap with the users categories
+            //     (
+            //             (d.Gender == null || user.Gender == d.Gender) &&
+            //             (d.AgeLowerBound == null || d.AgeLowerBound < user.Age) &&
+            //             (d.AgeUpperBound == null || user.Age <= d.AgeUpperBound)
+            //         ) &&
 
-                // getting only divisions that overlap with the users categories
-                join uc in Context.UserCategories on user.Id equals uc.UserId
-                join dc in Context.DivisionCategories on d.Id equals dc.DivisionId
-                where dc.CategoryId == uc.CategoryId &&
+            //         // if the board has no weight class, the user automatically qualifies
+            //         (
+            //             b.WeightClassId == null ||
+            //             (
+            //                 (wc.WeightLowerBound == null || wc.WeightLowerBound <= user.Weight) &&
+            //                 (wc.WeightUpperBound == null || user.Weight < wc.WeightUpperBound)
+            //             )
+            //         )
 
-                    // if the gender/age on the division is null, then this user automatically qualifies
-                    (
-                        (d.Gender == null || user.Gender == d.Gender) &&
-                        (d.AgeLowerBound == null || d.AgeLowerBound < user.Age) &&
-                        (d.AgeUpperBound == null || user.Age <= d.AgeUpperBound)
-                    ) &&
+            //     select b;
 
-                    // if the board has no weight class, the user automatically qualifies
-                    (
-                        b.WeightClassId == null ||
-                        (
-                            (wc.WeightLowerBound == null || wc.WeightLowerBound <= user.Weight) &&
-                            (wc.WeightUpperBound == null || user.Weight < wc.WeightUpperBound)
-                        )
-                    )
-
-                select b;
+            var recommendations = Context.Leaderboards.AsQueryable()
+                .Where(b => b.IsActive == true)
+                .Join(Context.Divisions, b => b.DivisionId, d => d.Id, (b, d) => new { b, d })
+                .Where(bd => Context.UserCategories.AsQueryable().Where(uc => uc.UserId == user.Id)
+                    .Join(Context.DivisionCategories.AsQueryable().Where(dc => dc.DivisionId == bd.d.Id),
+                        uc => uc.CategoryId,
+                        dc => dc.CategoryId,
+                        (_, _2) => 1)
+                    .Any()
+                )
+                .Where(bd => bd.d.Gender == null || bd.d.Gender == user.Gender)
+                .Where(bd =>
+                    !Context.DivisionWeightClasses.AsQueryable()
+                        .Where(dwc => dwc.DivisionId == bd.d.Id).Any() ||
+                    Context.DivisionWeightClasses.AsQueryable()
+                        .Where(dwc => dwc.DivisionId == bd.d.Id)
+                        .Join(Context.WeightClasses, dwc => dwc.WeightClassId, wc => wc.Id, (_, wc) => wc)
+                        .Where(wc => wc.WeightLowerBound == null || wc.WeightLowerBound <= user.Weight)
+                        .Where(wc => wc.WeightUpperBound == null || wc.WeightUpperBound > user.Weight)
+                        .Any()
+                )
+                .Select(bd => bd.b);
             return await recommendations.ToListAsync();
         }
 

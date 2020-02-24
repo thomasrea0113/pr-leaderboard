@@ -16,7 +16,7 @@ namespace Leaderboard.Tests.TestSetup.Fixtures
             });
 
             this.Register(() => new LeaderboardModel {
-                Name = $"Leaderboard {this.Create<string>()}"
+                Name = $"Leaderboard {this.Create<string>()}",
             });
 
             this.Register(() => new ApplicationUser {

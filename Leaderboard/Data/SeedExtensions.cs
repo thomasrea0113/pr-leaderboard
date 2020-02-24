@@ -192,7 +192,14 @@ namespace Leaderboard.Data.SeedExtensions
             await context.SaveChangesAsync();
 
             // categoryId from Category.cs call to HasData()
-            var divisionCategories = GenerateDivisionCategories(divisions, "642313a2-1f0c-4329-a676-7a9cdac045bd");
+            var divisionCategories = GenerateDivisionCategories(
+                divisions.Where(d => d.Id != "61a38bd5-49f1-4717-bd65-ab795da6fe26").ToList(),
+                "642313a2-1f0c-4329-a676-7a9cdac045bd");
+            await context.BulkInsertOrUpdateAsync(divisionCategories.ToArray());
+
+            // adding the one running division to the running category
+            var runningDivisions = divisions.Where(d => d.Id == "61a38bd5-49f1-4717-bd65-ab795da6fe26").ToList();
+            divisionCategories = GenerateDivisionCategories(runningDivisions, "6772a358-e5b7-49dd-a49b-9d855ed46c5e");
             await context.BulkInsertOrUpdateAsync(divisionCategories.ToArray());
 
             var divisionWeightClasses = await GetSeedDataFromFile<DivisionWeightClass>(environmentName);
@@ -216,12 +223,16 @@ namespace Leaderboard.Data.SeedExtensions
 
                 // adding some null data for division/weight class. Important for testing.
                 // TODO determine real age/weight groups for sprinting and add more races
-                var sprintBoards = GenerateLeaderboards("12c7c15a-db13-4912-a7c8-fc86db54849b", divisions, null, "100-Metre Dash", "40-Yard Dash");
+                var sprintBoards = GenerateLeaderboards("12c7c15a-db13-4912-a7c8-fc86db54849b", runningDivisions, null, "100-Metre Dash", "40-Yard Dash");
                 await context.BulkInsertOrUpdateAsync(sprintBoards.ToArray());
 
                 await context.SaveChangesAsync();
 
                 users = await userManager.GetOrCreateUsers(GenderValues.Male, "LifterDuder", "LiftLife", "Lifter22").ToListAsync();
+
+                var ld = users.First();
+                ld.Weight = 75;
+                await userManager.UpdateAsync(ld);
 
                 var llUser = users.Single(u => u.UserName == "LiftLife");
                 var email = $"thomasrea0113@gmail.com";

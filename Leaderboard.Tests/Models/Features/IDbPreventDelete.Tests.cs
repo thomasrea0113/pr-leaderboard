@@ -24,7 +24,7 @@ namespace Leaderboard.Tests.Models.Features
             var set = ctx.Leaderboards;
 
             // we don't care which division/uom we use for the purpose of this test
-            leaderboard.DivisionId = (await ctx.Divisions.FirstAsync()).Id;
+            leaderboard.DivisionId = (await ctx.Divisions.AsQueryable().SingleAsync(d => d.Id == "11a38bd5-49f1-4718-bd65-ab795da6fe26")).Id;
             leaderboard.UOMId = (await ctx.UnitsOfMeasure.FirstAsync()).Id;
 
             // add board

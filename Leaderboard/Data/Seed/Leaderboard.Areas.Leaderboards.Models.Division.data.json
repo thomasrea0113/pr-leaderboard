@@ -17,5 +17,19 @@
         "Name": "Junior",
         "AgeUpperBound": 23,
         "AgeLowerBound": 19
+    },
+    {
+        "Id": "61a38bd5-49f1-4717-bd65-ab795da6fe26",
+        "Gender": 1,
+        "Name": "Running Division",
+        "AgeUpperBound": 23,
+        "AgeLowerBound": 31
+    },
+    {
+        "Id": "11a38bd5-49f1-4718-bd65-ab795da6fe26",
+        "Gender": 1,
+        "Name": "Other",
+        "AgeUpperBound": 23,
+        "AgeLowerBound": 31
     }
 ]

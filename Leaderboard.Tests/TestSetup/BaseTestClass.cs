@@ -25,6 +25,10 @@ namespace Leaderboard.Tests.TestSetup
         public BaseTestClass(WebOverrideFactory factory)
         {
             Factory = factory;
+
+            // Ensure the Host is created by resolving a service
+            using var scope = Factory.Services.CreateScope();
+            using var _ = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         }
 
         protected IServiceScope CreateScope(out IServiceProvider provider)
