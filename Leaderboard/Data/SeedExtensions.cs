@@ -251,6 +251,11 @@ namespace Leaderboard.Data.SeedExtensions
                 var userBoards = GenerateUserLeaderboards(boards.ToList(), users);
                 await context.BulkInsertOrUpdateAsync(e => new { e.UserId, e.LeaderboardId }, userBoards.ToArray());
 
+                boards = GenerateLeaderboards("e362dd90-d6fe-459b-ba26-09db002bfff6", divisions, null, "Null board weight 1", "Null weight board 2");
+                await context.BulkInsertOrUpdateAsync(boards.ToArray());
+
+                await context.SaveChangesAsync();
+
                 var scores = GenerateScores(userBoards.ToList());
                 await context.BulkInsertOrUpdateAsync(scores.ToArray());
             }

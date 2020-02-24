@@ -41,8 +41,10 @@ namespace Leaderboard.Tests.Queries
             var recommendations = await um.GetRecommendedBoardsAsync(user);
             Assert.NotEmpty(recommendations);
 
-            // TODO determine correct recommendation count
-            Assert.Equal(2, recommendations.Count);
+            // TODO implement more robust tests.
+            // 5 was determined by reviewing the search criteria and the seeded database. This number will
+            // change as the seeded data changes
+            Assert.Equal(5, recommendations.Count);
         }
     }
 }
