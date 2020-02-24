@@ -18,26 +18,40 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using System.Text.Json;
 using Leaderboard.Data.SeedExtensions;
+using System.Reflection;
+using Microsoft.Extensions.Logging;
 
 namespace Leaderboard
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
+            _envName = env.EnvironmentName;
         }
 
         public IConfiguration Configuration { get; }
+
+        private readonly string _envName;
+
+        private readonly ILoggerFactory Factory = LoggerFactory.Create(builder => builder.AddDebug());
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             // FIXME need to seed the database Before the database context is available for injection
             services.AddDbContext<ApplicationDbContext>(options =>
+            {
                 options
                     .UseLazyLoadingProxies()
-                    .UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
+                    .UseNpgsql(Configuration.GetConnectionString("DefaultConnection"));
+
+                if (_envName != "Production")
+                    options.EnableDetailedErrors()
+                        .UseLoggerFactory(Factory)
+                        .EnableSensitiveDataLogging();
+            });
 
             // adding the default user models
             services.AddIdentity<ApplicationUser, ApplicationRole>(options =>

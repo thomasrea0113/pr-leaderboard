@@ -32,11 +32,6 @@ namespace Leaderboard.Tests.TestSetup
                 var accessor = services.Single(s => s.ServiceType == typeof(IHttpContextAccessor));
                 var fakeAccessor = new ServiceDescriptor(accessor.ServiceType, typeof(FakeHttpContextAccess), accessor.Lifetime);
                 services.Replace(fakeAccessor);
-
-                // replacing the DbContext will a test version, which includes a few exact debug options
-                var context = services.Single(s => s.ServiceType == typeof(ApplicationDbContext));
-                var testContext = new ServiceDescriptor(context.ServiceType, typeof(TestDbContext), context.Lifetime);
-                services.Replace(testContext);
             })
                 .ConfigureAppConfiguration(c => c.SetBasePath(System.IO.Directory.GetCurrentDirectory())
                     .AddJsonFile("appsettings.unittest.json", false));
