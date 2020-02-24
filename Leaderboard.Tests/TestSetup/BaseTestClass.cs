@@ -1,5 +1,7 @@
 using System;
+using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
@@ -13,13 +15,12 @@ using Xunit;
 
 namespace Leaderboard.Tests.TestSetup
 {
-    public class BaseTestClass : IClassFixture<WebOverrideFactory>
+    [Collection("seed")]
+    public class BaseTestClass
     {
         protected WebOverrideFactory Factory { get; }
         protected HttpClient Client { get; }
         protected IServiceProvider Services { get; }
-
-        public const string Environment = "Integration";
 
         public BaseTestClass(WebOverrideFactory factory)
         {
@@ -32,7 +33,5 @@ namespace Leaderboard.Tests.TestSetup
             provider = scope.ServiceProvider;
             return scope;
         }
-
-        protected IServiceScope CreateScope() => Factory.Services.CreateScope();
     }
 }

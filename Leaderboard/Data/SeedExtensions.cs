@@ -211,7 +211,7 @@ namespace Leaderboard.Data.SeedExtensions
             await context.SaveChangesAsync();
 
             // if not in productions, we want some dummy users and scores
-            if (environmentName != "production")
+            if (environmentName != "Production")
             {
 
                 // adding some null data for division/weight class. Important for testing.

@@ -9,6 +9,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.TestHost;
+using Leaderboard.Extensions;
+using System;
 
 namespace Leaderboard.Tests.TestSetup
 {
@@ -38,6 +40,20 @@ namespace Leaderboard.Tests.TestSetup
             })
                 .ConfigureAppConfiguration(c => c.SetBasePath(System.IO.Directory.GetCurrentDirectory())
                     .AddJsonFile("appsettings.unittest.json", false));
+        }
+
+        /// <summary>
+        /// Make sure we seed the database BEFORE the host is made available.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <returns></returns>
+        protected override IHost CreateHost(IHostBuilder builder)
+        {
+            var host = builder.Build();
+            var env = host.Services.GetRequiredService<IWebHostEnvironment>().EnvironmentName;
+            if (!host.MigrateAsync(env, true).Wait(8000))
+                throw new TimeoutException("seed timeout");
+            return host;
         }
     }
 }
