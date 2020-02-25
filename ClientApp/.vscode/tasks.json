@@ -1,0 +1,15 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "lint-fix",
+            "type": "shell",
+            "command": "npm",
+            "args": [
+                "run",
+                "lint-fix"
+            ],
+            "problemMatcher": []
+        }
+    ]
+}
