@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using Leaderboard.Models.Features;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -26,7 +27,10 @@ namespace Leaderboard.Areas.Leaderboards.Models
         /// [Range(0, 500)]
         public int? WeightUpperBound { get; set; }
 
+        [JsonIgnore]
         public virtual ICollection<DivisionWeightClass> Divisions { get; set; }
+        
+        [JsonIgnore]
         public virtual ICollection<LeaderboardModel> Boards { get; set; }
 
         public void OnModelCreating(EntityTypeBuilder<WeightClass> builder)

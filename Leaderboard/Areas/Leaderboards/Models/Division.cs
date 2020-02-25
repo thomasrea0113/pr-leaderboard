@@ -8,6 +8,7 @@ using Leaderboard.Models;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Leaderboard.Areas.Identity.Models;
+using System.Text.Json.Serialization;
 
 namespace Leaderboard.Areas.Leaderboards.Models
 {
@@ -25,8 +26,13 @@ namespace Leaderboard.Areas.Leaderboards.Models
         [Range(0, 500)]
         public int? AgeUpperBound { get; set; }
 
+        [JsonIgnore]
         public virtual ICollection<DivisionWeightClass> WeightClasses { get; set; }
+        
+        [JsonIgnore]
         public virtual ICollection<LeaderboardModel> Boards { get; set; }
+        
+        [JsonIgnore]
         public virtual ICollection<DivisionCategory> DivisionCategories { get; set; }
 
         public void OnModelCreating(EntityTypeBuilder<Division> builder)

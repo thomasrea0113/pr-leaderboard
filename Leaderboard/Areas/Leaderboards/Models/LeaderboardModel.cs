@@ -30,10 +30,12 @@ namespace Leaderboard.Areas.Leaderboards.Models
         public virtual WeightClass WeightClass { get; set; }
 
 
+        [JsonIgnore]
         public virtual ICollection<UserLeaderboard> UserLeaderboards { get; set; } = new List<UserLeaderboard>();
 
         public bool? IsActive { get; set; }
 
+        [JsonIgnore]
         public virtual ICollection<ScoreModel> Scores { get; set; }
 
         public virtual string UOMId { get; set; }

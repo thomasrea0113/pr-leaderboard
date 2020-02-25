@@ -8,10 +8,10 @@ namespace Leaderboard.Areas.Identity.ViewModels
 {
     public class UserViewModel
     {
-        public string UserName { get; set; }
-        public string Email { get; set; }
-        public List<Category> Interests { get; set; }
-        public List<LeaderboardModel> Leaderboards { get; set; }
+        public string UserName { get; private set; }
+        public string Email { get; private set; }
+        public List<Category> Interests { get; private set; }
+        public List<LeaderboardModel> Leaderboards { get; private set; }
 
         public UserViewModel(ApplicationUser user)
         {

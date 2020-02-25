@@ -116,12 +116,11 @@ namespace Leaderboard.Data.SeedExtensions
             }
         }
 
-        private static IEnumerable<UserLeaderboard> GenerateUserLeaderboards(
-            List<LeaderboardModel> boards,
-            List<ApplicationUser> users)
+        private static async IAsyncEnumerable<UserLeaderboard> GenerateUserLeaderboards(
+            IAsyncEnumerable<ValueTuple<ApplicationUser, List<LeaderboardModel>>> users)
         {
-            foreach (var board in boards)
-                foreach (var user in users)
+            await foreach ((var user, var boards) in users)
+                foreach (var board in boards)
                     yield return new UserLeaderboard
                     {
                         Id = GuidUtility.Create(GuidUtility.UrlNamespace, $"ub_{board.Id}{user.Id}").ToString(),
@@ -198,7 +197,8 @@ namespace Leaderboard.Data.SeedExtensions
             await context.BulkInsertOrUpdateAsync(divisionCategories.ToArray());
 
             // adding the one running division to the running category
-            var runningDivisions = divisions.Where(d => d.Id == "61a38bd5-49f1-4717-bd65-ab795da6fe26").ToList();
+            var runningDivisions = divisions.Where(d => d.Id == "61a38bd5-49f1-4717-bd65-ab795da6fe26" ||
+            d.Id == "47a6f903-e450-45a3-8793-15856c9bc88f").ToList();
             divisionCategories = GenerateDivisionCategories(runningDivisions, "6772a358-e5b7-49dd-a49b-9d855ed46c5e");
             await context.BulkInsertOrUpdateAsync(divisionCategories.ToArray());
 
@@ -245,16 +245,28 @@ namespace Leaderboard.Data.SeedExtensions
                 users[1].BirthDate = DateTime.Parse("01/12/2011");
                 users[2].BirthDate = DateTime.Parse("05/11/2099");
 
-                var userCats = GenerateUserCategories("642313a2-1f0c-4329-a676-7a9cdac045bd", users.ToArray());
+                var userCats = GenerateUserCategories("642313a2-1f0c-4329-a676-7a9cdac045bd", users.SkipLast(1).ToArray());
+                userCats = userCats.Concat(GenerateUserCategories("6772a358-e5b7-49dd-a49b-9d855ed46c5e", users.TakeLast(1).ToArray()));
                 await context.BulkInsertOrUpdateAsync(userCats.ToArray());
-
-                var userBoards = GenerateUserLeaderboards(boards.ToList(), users);
-                await context.BulkInsertOrUpdateAsync(e => new { e.UserId, e.LeaderboardId }, userBoards.ToArray());
 
                 boards = GenerateLeaderboards("e362dd90-d6fe-459b-ba26-09db002bfff6", divisions, null, "Null board weight 1", "Null weight board 2");
                 await context.BulkInsertOrUpdateAsync(boards.ToArray());
 
                 await context.SaveChangesAsync();
+
+                // only add the user to half of there recommendations
+                var recommendations = users.ToAsyncEnumerable()
+                    .SelectAwait(async u =>
+                    {
+                        var recommendations = await userManager.GetRecommendedBoardsAsync(u);
+                        if (recommendations.Any())
+                            return (u, recommendations.Skip(recommendations.Count / 2).ToList());
+                        return default;
+                    })
+                    .Where(ub => ub != default);
+                    
+                var userBoards = await GenerateUserLeaderboards(recommendations).ToArrayAsync();
+                await context.BulkInsertOrUpdateAsync(e => new { e.UserId, e.LeaderboardId }, userBoards);
 
                 var scores = GenerateScores(userBoards.ToList());
                 await context.BulkInsertOrUpdateAsync(scores.ToArray());

@@ -5,6 +5,7 @@ using Leaderboard.Areas.Identity.Managers;
 using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Areas.Identity.ViewModels;
 using Leaderboard.Areas.Leaderboards.Models;
+using Leaderboard.Areas.Leaderboards.ViewModels;
 using Leaderboard.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -22,8 +23,8 @@ namespace Leaderboard.Areas.Identity.Pages.Account.Manage
 
         public class ReactState {
             public UserViewModel User { get; set; }
-            public IEnumerable<LeaderboardModel> UserBoards { get; set; }
-            public IEnumerable<LeaderboardModel> Recommendations { get; set; }
+            public IEnumerable<LeaderboardViewModel> UserBoards { get; set; }
+            public IEnumerable<LeaderboardViewModel> Recommendations { get; set; }
         }
 
         public ReactProps Props { get; set; } = new ReactProps();
@@ -44,12 +45,12 @@ namespace Leaderboard.Areas.Identity.Pages.Account.Manage
         {
             var user = await _manager.GetCompleteUser(User);
             var userBoards = user.UserLeaderboards.Select(ub => ub.Leaderboard);
-            var recommendations = await _manager.GetRecommendedBoardsAsync(user);
+            var recommendations = (await _manager.GetRecommendedBoardsAsync(user)).Except(userBoards);
             return new JsonResult(new ReactState
             {
                 User = new UserViewModel(user),
-                UserBoards = userBoards,
-                Recommendations = recommendations.Except(userBoards)
+                UserBoards = LeaderboardViewModel.Create(userBoards.ToArray()),
+                Recommendations = LeaderboardViewModel.Create(recommendations.ToArray())
             });
         }
     }

@@ -15,7 +15,8 @@ namespace Leaderboard.Extensions
     {
         public static async Task<IHost> MigrateAsync(this IHost host, string env, bool seed = false)
         {
-            var provider = host.Services.CreateScope().ServiceProvider;
+            using var scope = host.Services.CreateScope();
+            var provider = scope.ServiceProvider;
             using var ctx = provider.GetRequiredService<ApplicationDbContext>();
             
             var pending = await ctx.Database.GetPendingMigrationsAsync();
@@ -30,7 +31,7 @@ namespace Leaderboard.Extensions
                         await provider.SeedDataAsync(env);
                     } catch
                     {
-                        // if the seed failed, then we want to remove the migration we just added
+                        // if the seed failed, then we want to remove the migration(s) we just added
                         await migrator.MigrateAsync(current ?? "0");
                         throw;
                     }
