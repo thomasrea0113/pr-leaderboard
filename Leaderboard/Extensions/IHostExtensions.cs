@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using Leaderboard.Data;
 using Leaderboard.Data.SeedExtensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -14,13 +16,24 @@ namespace Leaderboard.Extensions
         public static async Task<IHost> MigrateAsync(this IHost host, string env, bool seed = false)
         {
             var provider = host.Services.CreateScope().ServiceProvider;
-            var ctx = provider.GetRequiredService<ApplicationDbContext>();
+            using var ctx = provider.GetRequiredService<ApplicationDbContext>();
             
-            if ((await ctx.Database.GetPendingMigrationsAsync()).Any())
+            var pending = await ctx.Database.GetPendingMigrationsAsync();
+            var current = (await ctx.Database.GetAppliedMigrationsAsync()).LastOrDefault();
+            if (pending.Any())
             {
+                var migrator = ctx.Database.GetService<IMigrator>();
                 await ctx.Database.MigrateAsync();
                 if (seed)
-                    await provider.SeedDataAsync(env);
+                    try
+                    {
+                        await provider.SeedDataAsync(env);
+                    } catch
+                    {
+                        // if the seed failed, then we want to remove the migration we just added
+                        await migrator.MigrateAsync(current ?? "0");
+                        throw;
+                    }
             }
 
             return host;

@@ -18,7 +18,7 @@ namespace Leaderboard
             var config = services.GetRequiredService<IConfiguration>();
             var env = services.GetRequiredService<IWebHostEnvironment>().EnvironmentName;
 
-            // TODO log seed
+            // TODO log seed, catch Migrate exception and notify user that no changes to the database were applied
             if (config.GetValue("AutoMigrate:Enabled", false))
                 await host.MigrateAsync(env, config.GetValue("AutoMigrate:AutoSeed", false));
 
