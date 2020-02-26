@@ -2,30 +2,32 @@ import React, { useState, useEffect } from 'react';
 import 'react-dom';
 
 import PropTypes from 'prop-types';
-import { useTable } from 'react-table';
+import { useTable, TableOptions } from 'react-table';
 
-interface Board {
-    id: string;
-    name: string;
+import flow from 'lodash/fp/flow';
+import groupBy from 'lodash/fp/groupBy';
+
+import Leaderboard from '../serverTypes/Leaderboard';
+import User from '../serverTypes/User';
+import Division from '../serverTypes/Divisiond';
+
+interface LeaderboardUserView extends Leaderboard {
+    isMember: boolean;
 }
-
-interface RecommendationsState {
-    isLoading: boolean;
-    user: {
-        userName: string;
-        email: string;
-        recommendations: {
-            id: string;
-            name: string;
-        }[];
-    };
-    userBoards: Board[];
-    recommendations: Board[];
+interface DivisionUserView extends Division {
+    boards: LeaderboardUserView[];
 }
 
 interface RecommendationsProps {
     initialUrl: string;
     loadingSelector: string;
+}
+
+interface RecommendationsState {
+    isLoading: boolean;
+    user: User;
+    userBoards: Leaderboard[];
+    recommendations: Leaderboard[];
 }
 
 const initialState: RecommendationsState = {
@@ -37,6 +39,29 @@ const initialState: RecommendationsState = {
     },
     userBoards: [],
     recommendations: [],
+};
+const fn: (
+    numbers: Leaderboard[],
+    isMember: boolean
+) => DivisionUserView[] = flow(groupBy((b: Leaderboard) => b.divisionId));
+
+const RecommendationsTable: TableOptions<DivisionUserView> = {
+    columns: [
+        {
+            Header: 'Division',
+            columns: [
+                {
+                    Header: 'Name',
+                    accessor: 'division.name',
+                },
+                {
+                    Header: 'Is Member',
+                    accessor: '.isMember',
+                },
+            ],
+        },
+    ],
+    data: [],
 };
 
 const RecommendationsComponent = (props: RecommendationsProps) => {
@@ -53,25 +78,11 @@ const RecommendationsComponent = (props: RecommendationsProps) => {
             .then(json => setState({ isLoading: false, ...json }));
     }, []);
 
-    const columns = [
-        {
-            Header: 'Recommendations',
-            columns: [
-                {
-                    Header: 'Name',
-                    accessor: 'name',
-                },
-                {
-                    Header: 'Id',
-                    accessor: 'id',
-                },
-            ],
-        },
-    ];
-
-    // TODO add boolean indication of whether or no the user is currently a member
-    // of that board
-    const data = [...recommendations, ...userBoards];
+    // if (!isLoading)
+    //     RecommendationsTable.data = [
+    //         ...fn(recommendations, false),
+    //         ...fn(userBoards, true),
+    //     ];
 
     const {
         getTableProps,
@@ -79,10 +90,7 @@ const RecommendationsComponent = (props: RecommendationsProps) => {
         headerGroups,
         rows,
         prepareRow,
-    } = useTable({
-        columns,
-        data,
-    });
+    } = useTable(RecommendationsTable);
 
     const message = (loading: boolean): string => {
         if (loading)
