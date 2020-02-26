@@ -38,7 +38,7 @@ namespace Leaderboard.Tests.Queries
 
             Assert.NotEmpty(user.UserCategories);
 
-            var recommendations = await um.GetRecommendedBoardsAsync(user);
+            var recommendations = await um.GetRecommendedBoardsQuery(user).ToListAsync();
             Assert.NotEmpty(recommendations);
 
             // TODO implement more robust tests.

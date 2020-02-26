@@ -67,20 +67,23 @@ namespace Leaderboard.Areas.Identity.Managers
             Expression<Func<IQueryable<ApplicationUser>, IIncludableQueryable<ApplicationUser, TProp>>> include)
             => await include.Compile()(Users).FirstOrDefaultAsync(equality);
 
-        private readonly Expression<Func<IQueryable<ApplicationUser>, IIncludableQueryable<ApplicationUser, LeaderboardModel>>> _allNavProps =
+        private readonly Expression<Func<IQueryable<ApplicationUser>, IIncludableQueryable<ApplicationUser, Division>>> _allNavProps =
             user => user
-                .Include(u => u.UserCategories).ThenInclude(uc => uc.Category)
-                .Include(u => u.UserLeaderboards).ThenInclude(ul => ul.Leaderboard);
+                .Include(u => u.UserCategories)
+                    .ThenInclude(uc => uc.Category)
+                .Include(u => u.UserLeaderboards)
+                    .ThenInclude(ul => ul.Leaderboard)
+                    .ThenInclude(ul => ul.Division);
 
         /// <summary>
         /// Get the user, and also load all of the relavent navigation properties
         /// </summary>
         /// <param name="identity"></param>
         /// <returns></returns>
-        public async Task<ApplicationUser> GetCompleteUser(ClaimsPrincipal identity)
-            => await GetCompleteUser(GetIdClaim(identity));
+        public async Task<ApplicationUser> GetCompleteUserAsync(ClaimsPrincipal identity)
+            => await GetCompleteUserAsync(GetIdClaim(identity));
 
-        public async Task<ApplicationUser> GetCompleteUser(string id)
+        public async Task<ApplicationUser> GetCompleteUserAsync(string id)
             => await GetUserAsync(id, _allNavProps);
 
         public async Task<ApplicationUser> GetCompleteUser(Expression<Func<ApplicationUser, bool>> equality)
@@ -91,8 +94,8 @@ namespace Leaderboard.Areas.Identity.Managers
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        public async Task<List<LeaderboardModel>> GetRecommendedBoardsAsync(ApplicationUser user)
-            => await _store.GetRecommendedBoardsAsync(user);
+        public IQueryable<LeaderboardModel> GetRecommendedBoardsQuery(ApplicationUser user)
+            => _store.GetRecommendedBoardsQuery(user);
 
         public async Task<IdentityResult> CreateOrUpdateByNameAsync(ApplicationUser user, string password)
         {

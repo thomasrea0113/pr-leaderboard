@@ -13,17 +13,18 @@ namespace Leaderboard.Areas.Leaderboards.ViewModels
     /// </summary>
     public class LeaderboardViewModel
     {
-        public LeaderboardModel Board { get; private set; }
-        public DivisionViewModel Division { get; private set; }
-        public WeightClass WeightClass { get; private set; }
+        public LeaderboardModel Board { get; set; }
+        public DivisionViewModel Division { get; set; }
+        public WeightClassViewModel WeightClass { get; set; }
         public LeaderboardViewModel(LeaderboardModel model)
         {
             Board = model;
             Division = new DivisionViewModel(model.Division);
-            WeightClass = model.WeightClass;
+            if (model.WeightClass != null)
+                WeightClass = new WeightClassViewModel(model.WeightClass);
         }
 
-        public static IEnumerable<LeaderboardViewModel> Create(params LeaderboardModel[] models)
+        public static IEnumerable<LeaderboardViewModel> Create(IEnumerable<LeaderboardModel> models)
         {
             foreach (var model in models)
                 yield return new LeaderboardViewModel(model);

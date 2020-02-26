@@ -12,6 +12,7 @@ using Leaderboard.Data.BulkExtensions;
 using Leaderboard.Models.Relationships;
 using Leaderboard.Utilities;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Leaderboard.Data.SeedExtensions
@@ -258,7 +259,7 @@ namespace Leaderboard.Data.SeedExtensions
                 var recommendations = users.ToAsyncEnumerable()
                     .SelectAwait(async u =>
                     {
-                        var recommendations = await userManager.GetRecommendedBoardsAsync(u);
+                        var recommendations = await userManager.GetRecommendedBoardsQuery(u).ToListAsync();
                         if (recommendations.Any())
                             return (u, recommendations.Skip(recommendations.Count / 2).ToList());
                         return default;

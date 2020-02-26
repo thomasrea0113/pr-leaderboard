@@ -10,6 +10,7 @@ using Leaderboard.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Leaderboard.Areas.Identity.Pages.Account.Manage
 {
@@ -23,7 +24,7 @@ namespace Leaderboard.Areas.Identity.Pages.Account.Manage
 
         public class ReactState {
             public UserViewModel User { get; set; }
-            public IEnumerable<LeaderboardViewModel> UserBoards { get; set; }
+            public IEnumerable<DivisionViewModel> Divisions { get; set; }
             public IEnumerable<LeaderboardViewModel> Recommendations { get; set; }
         }
 
@@ -43,14 +44,37 @@ namespace Leaderboard.Areas.Identity.Pages.Account.Manage
 
         public async Task<JsonResult> OnGetInitialAsync()
         {
-            var user = await _manager.GetCompleteUser(User);
-            var userBoards = user.UserLeaderboards.Select(ub => ub.Leaderboard);
-            var recommendations = (await _manager.GetRecommendedBoardsAsync(user)).Except(userBoards);
+            var user = await _manager.GetCompleteUserAsync(User);
+            var userBoardIds = user.UserLeaderboards.Select(ub => ub.Leaderboard.Id);
+
+            // want to exclude the boards that the user is already in
+            var recommendations = await _manager.GetRecommendedBoardsQuery(user)
+                .Include(b => b.Division)
+                .Where(rb => !userBoardIds.Any(ub => ub == rb.Id))
+                .ToArrayAsync();
+
+            var divisions = recommendations
+                .Select(d => d.Division)
+                .Distinct()
+                .ToDictionary(d => d.Id);
+
+            var recommendationsByDivision = recommendations
+                .GroupBy(rb => rb.DivisionId)
+                .ToDictionary(rb => rb.Key, rb => LeaderboardViewModel.Create(rb.AsEnumerable()).ToList());
+
+            var divisionViewModels = recommendationsByDivision.Select(d =>
+            {
+                return new DivisionViewModel(divisions[d.Key])
+                {
+                    Boards = d.Value
+                };
+            });
+
             return new JsonResult(new ReactState
             {
                 User = new UserViewModel(user),
-                UserBoards = LeaderboardViewModel.Create(userBoards.ToArray()),
-                Recommendations = LeaderboardViewModel.Create(recommendations.ToArray())
+                Recommendations = LeaderboardViewModel.Create(recommendations),
+                Divisions = divisionViewModels
             });
         }
     }

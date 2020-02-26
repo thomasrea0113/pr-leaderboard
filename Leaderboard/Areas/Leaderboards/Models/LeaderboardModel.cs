@@ -77,5 +77,15 @@ namespace Leaderboard.Areas.Leaderboards.Models
                 .WithMany(b => b.Boards)
                 .HasForeignKey(b => b.WeightClassId);
         }
+
+        #region equality
+        
+        // 2 instances are equal if they have the same Id
+        # nullable enable
+        public override int GetHashCode() => Id.GetHashCode();
+        public override bool Equals(object? obj) => Id.Equals(obj);
+        # nullable disable
+
+        #endregion
     }
 }

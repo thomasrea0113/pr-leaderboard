@@ -35,7 +35,7 @@ namespace Leaderboard.Areas.Identity.Managers
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        public async Task<List<LeaderboardModel>> GetRecommendedBoardsAsync(ApplicationUser user)
+        public IQueryable<LeaderboardModel> GetRecommendedBoardsQuery(ApplicationUser user)
         {
             // LINQ to Queries is quite powerful! The key to remember is to NEVER use a navigation
             // property in your query. Always use the DbSet on the context, and then use joins
@@ -69,7 +69,7 @@ namespace Leaderboard.Areas.Identity.Managers
                 // selecting the board
                 select b;
 
-            return await recommendations.ToListAsync();
+            return recommendations;
         }
 
         public async Task<IdentityResult> CreateOrFindByIdAsync(ApplicationUser user)
