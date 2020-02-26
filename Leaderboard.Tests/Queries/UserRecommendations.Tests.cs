@@ -8,6 +8,7 @@ using Leaderboard.Areas.Leaderboards.Models;
 using Leaderboard.Data;
 using Leaderboard.Tests.TestSetup;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -30,11 +31,13 @@ namespace Leaderboard.Tests.Queries
         public async Task TestWithAgeAndWeight()
         {
             using var _ = CreateScope(out var scope);
-            var um = scope.GetRequiredService<AppUserManager>();
-            var ctx = scope.GetRequiredService<ApplicationDbContext>();
+            using var um = scope.GetRequiredService<AppUserManager>();
+            using var ctx = scope.GetRequiredService<ApplicationDbContext>();
 
             // this user is in the powerlifting divisions, which have a weight and an age
             var user = await um.FindByNameAsync("LifterDuder");
+            await ctx.Entry(user).Collection(u => u.UserCategories).LoadAsync();
+
 
             Assert.NotEmpty(user.UserCategories);
 
@@ -44,7 +47,7 @@ namespace Leaderboard.Tests.Queries
             // TODO implement more robust tests.
             // 5 was determined by reviewing the search criteria and the seeded database. This number will
             // change as the seeded data changes
-            Assert.Equal(5, recommendations.Count);
+            Assert.Equal(17, recommendations.Count);
         }
     }
 }

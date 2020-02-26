@@ -43,9 +43,7 @@ namespace Leaderboard
             // FIXME need to seed the database Before the database context is available for injection
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options
-                    .UseLazyLoadingProxies()
-                    .UseNpgsql(Configuration.GetConnectionString("DefaultConnection"));
+                options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"));
 
                 if (_envName != "Production")
                     options.EnableDetailedErrors()
