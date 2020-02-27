@@ -2,67 +2,66 @@ import React, { useState, useEffect } from 'react';
 import 'react-dom';
 
 import PropTypes from 'prop-types';
-import { useTable, TableOptions } from 'react-table';
-
-import Leaderboard from '../serverTypes/Leaderboard';
+import { useTable, Column } from 'react-table';
 import User from '../serverTypes/User';
-import Division from '../serverTypes/Division';
+import UserView from '../serverTypes/UserView';
 
-interface LeaderboardUserView extends Leaderboard {
-    isMember: boolean;
-}
-interface DivisionUserView extends Division {
-    boards: LeaderboardUserView[];
-}
-
-interface RecommendationsProps {
+export interface ReactProps {
     initialUrl: string;
-    loadingSelector: string;
+    userName: string;
 }
 
-interface RecommendationsState {
-    isLoading: boolean;
+interface ReactState {
     user: User;
-    userBoards: Leaderboard[];
-    recommendations: Leaderboard[];
+    recommendations: UserView[];
+
+    // This is not loaded from the server. Only used in this component
+    isLoading: boolean;
 }
 
-const initialState: RecommendationsState = {
+const initialState: ReactState = {
     isLoading: true,
     user: {
         userName: '',
         email: '',
-        recommendations: [],
+        interests: [],
+        leaderboards: [],
     },
-    userBoards: [],
     recommendations: [],
 };
 
-const RecommendationsTable: TableOptions<DivisionUserView> = {
-    columns: [
-        {
-            Header: 'Division',
-            columns: [
-                {
-                    Header: 'Name',
-                    accessor: 'division.name',
-                },
-                {
-                    Header: 'Is Member',
-                    accessor: '.isMember',
-                },
-            ],
-        },
-    ],
-    data: [],
-};
+const infiniteIcon = <i className="fas fa-infinity" />;
 
-const RecommendationsComponent = (props: RecommendationsProps) => {
-    const [{ userBoards, recommendations, isLoading }, setState] = useState(
-        initialState
-    );
+const columns: Column<UserView>[] = [
+    {
+        Header: 'Division',
+        accessor: r => r.division,
+        columns: [
+            {
+                Header: 'Name',
+                accessor: r => r.division.name,
+            },
+            {
+                Header: 'Gender',
+                accessor: r => r.division.gender ?? '(any)',
+            },
+            {
+                Header: 'Age Range',
+                accessor: r => (
+                    <span>
+                        {r.division.ageLowerBound ?? infiniteIcon} -{' '}
+                        {r.division.ageUpperBound ?? infiniteIcon}
+                    </span>
+                ),
+            },
+        ],
+    },
+];
 
-    const { initialUrl } = props;
+const RecommendationsComponent = (props: ReactProps) => {
+    const [{ recommendations, isLoading }, setState] = useState(initialState);
+
+    const { initialUrl, userName } = props;
 
     // load initial data
     useEffect(() => {
@@ -71,23 +70,17 @@ const RecommendationsComponent = (props: RecommendationsProps) => {
             .then(json => setState({ isLoading: false, ...json }));
     }, []);
 
-    // if (!isLoading)
-    //     RecommendationsTable.data = [
-    //         ...fn(recommendations, false),
-    //         ...fn(userBoards, true),
-    //     ];
-
     const {
         getTableProps,
         getTableBodyProps,
         headerGroups,
         rows,
         prepareRow,
-    } = useTable(RecommendationsTable);
+    } = useTable({ columns, data: recommendations });
 
     const message = (loading: boolean): string => {
         if (loading)
-            return "Hang tight! We're gathering some information for you.";
+            return `Hang tight, ${userName}! We're gathering some information for you.`;
         return "All done! Here's what we've got for you";
     };
 

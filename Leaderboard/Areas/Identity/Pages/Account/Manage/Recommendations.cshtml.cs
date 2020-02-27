@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Leaderboard.Areas.Identity.Managers;
 using Leaderboard.Areas.Identity.Models;
@@ -20,6 +21,7 @@ namespace Leaderboard.Areas.Identity.Pages.Account.Manage
 
         public class ReactProps {
             public string InitialUrl { get; set; }
+            public string UserName { get; set; }
         }
 
         public class ReactState {
@@ -39,6 +41,7 @@ namespace Leaderboard.Areas.Identity.Pages.Account.Manage
         public void OnGet()
         {
             Props.InitialUrl = GetInitialUrl();
+            Props.UserName = User.FindFirst(ClaimTypes.Name).Value;
         }
 
         public async Task<JsonResult> OnGetInitialAsync()

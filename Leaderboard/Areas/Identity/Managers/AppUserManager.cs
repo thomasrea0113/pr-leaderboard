@@ -71,10 +71,10 @@ namespace Leaderboard.Areas.Identity.Managers
             user => user
                 .Include(u => u.UploadedFiles)
                 .Include(u => u.UserLeaderboards)
-                    .ThenInclude(ul => ul.Leaderboard)
-                        .ThenInclude(ub => new { ub.UOM, ub.WeightClass, ub.Division } )
-                            .ThenInclude(c => c.Division.DivisionCategories)
-                                .ThenInclude(dc => dc.Category)
+                .Include(u => u.UserLeaderboards).ThenInclude(u => u.Leaderboard).ThenInclude(u => u.UOM)
+                .Include(u => u.UserLeaderboards).ThenInclude(u => u.Leaderboard).ThenInclude(u => u.WeightClass)
+                .Include(u => u.UserLeaderboards).ThenInclude(u => u.Leaderboard).ThenInclude(u => u.Division)
+                    .ThenInclude(u => u.DivisionCategories).ThenInclude(u => u.Category)
                 .Include(u => u.UserCategories)
                     .ThenInclude(uc => uc.Category);
 

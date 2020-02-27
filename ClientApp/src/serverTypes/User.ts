@@ -1,7 +1,9 @@
 import Category from './Category';
+import Leaderboard from './Leaderboard';
 
-export default interface User {
+export default interface UserViewModel {
     userName: string;
     email: string;
-    recommendations: Category[];
+    interests: Category[];
+    leaderboards: Leaderboard[];
 }
