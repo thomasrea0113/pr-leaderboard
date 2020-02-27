@@ -4,12 +4,9 @@ import 'react-dom';
 import PropTypes from 'prop-types';
 import { useTable, TableOptions } from 'react-table';
 
-import flow from 'lodash/fp/flow';
-import groupBy from 'lodash/fp/groupBy';
-
 import Leaderboard from '../serverTypes/Leaderboard';
 import User from '../serverTypes/User';
-import Division from '../serverTypes/Divisiond';
+import Division from '../serverTypes/Division';
 
 interface LeaderboardUserView extends Leaderboard {
     isMember: boolean;
@@ -40,10 +37,6 @@ const initialState: RecommendationsState = {
     userBoards: [],
     recommendations: [],
 };
-const fn: (
-    numbers: Leaderboard[],
-    isMember: boolean
-) => DivisionUserView[] = flow(groupBy((b: Leaderboard) => b.divisionId));
 
 const RecommendationsTable: TableOptions<DivisionUserView> = {
     columns: [

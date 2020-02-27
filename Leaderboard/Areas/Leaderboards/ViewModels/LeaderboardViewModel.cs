@@ -13,13 +13,16 @@ namespace Leaderboard.Areas.Leaderboards.ViewModels
     /// </summary>
     public class LeaderboardViewModel
     {
-        public LeaderboardModel Board { get; set; }
+        public string Name { get; set; }
+        public UnitOfMeasureViewModel UOM { get; set; }
         public DivisionViewModel Division { get; set; }
         public WeightClassViewModel WeightClass { get; set; }
+
         public LeaderboardViewModel(LeaderboardModel model)
         {
-            Board = model;
+            Name = model.Name;
             Division = new DivisionViewModel(model.Division);
+            UOM = new UnitOfMeasureViewModel(model.UOM);
             if (model.WeightClass != null)
                 WeightClass = new WeightClassViewModel(model.WeightClass);
         }

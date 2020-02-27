@@ -67,13 +67,16 @@ namespace Leaderboard.Areas.Identity.Managers
             Expression<Func<IQueryable<ApplicationUser>, IIncludableQueryable<ApplicationUser, TProp>>> include)
             => await include.Compile()(Users).FirstOrDefaultAsync(equality);
 
-        private readonly Expression<Func<IQueryable<ApplicationUser>, IIncludableQueryable<ApplicationUser, Division>>> _allNavProps =
+        private readonly Expression<Func<IQueryable<ApplicationUser>, IIncludableQueryable<ApplicationUser, Category>>> _allNavProps =
             user => user
-                .Include(u => u.UserCategories)
-                    .ThenInclude(uc => uc.Category)
+                .Include(u => u.UploadedFiles)
                 .Include(u => u.UserLeaderboards)
                     .ThenInclude(ul => ul.Leaderboard)
-                    .ThenInclude(ul => ul.Division);
+                        .ThenInclude(ub => new { ub.UOM, ub.WeightClass, ub.Division } )
+                            .ThenInclude(c => c.Division.DivisionCategories)
+                                .ThenInclude(dc => dc.Category)
+                .Include(u => u.UserCategories)
+                    .ThenInclude(uc => uc.Category);
 
         /// <summary>
         /// Get the user, and also load all of the relavent navigation properties

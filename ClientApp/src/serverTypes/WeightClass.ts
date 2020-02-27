@@ -1,5 +1,4 @@
-export default interface WeightClass {
-    id: string;
-    weightLowerBound: number | null;
-    weightUpperBound: number | null;
+export default interface WeightClassModel {
+    weightLowerBound?: number;
+    weightUpperBound?: number;
 }

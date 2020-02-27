@@ -12,7 +12,6 @@ namespace Leaderboard.Areas.Leaderboards.ViewModels
         public GenderValues? Gender { get; set; }
         public int? AgeLowerBound { get; set; }
         public int? AgeUpperBound { get; set; }
-        public List<LeaderboardViewModel> Boards { get; set; }
 
         public DivisionViewModel(Division division)
         {
@@ -20,17 +19,6 @@ namespace Leaderboard.Areas.Leaderboards.ViewModels
             Gender = division.Gender;
             AgeLowerBound = division.AgeLowerBound;
             AgeUpperBound = division.AgeUpperBound;
-        }
-
-        public DivisionViewModel(Division division, bool includeBoards) : this(division)
-        {
-            if (includeBoards) Boards = LeaderboardViewModel.Create(division.Boards).ToList();
-        }
-
-        public static IEnumerable<DivisionViewModel> Create(bool includeBoards, params Division[] divisions)
-        {
-            foreach (var division in divisions)
-                yield return new DivisionViewModel(division, includeBoards);
         }
 
         public static IEnumerable<DivisionViewModel> Create(params Division[] divisions)
