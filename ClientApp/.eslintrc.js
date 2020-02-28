@@ -37,6 +37,9 @@ module.exports = {
                 extensions: ['.tsx'],
             },
         ],
+
+        // the babel-plugin-typescript-to-proptypes package will auto-generate propTypes for us
+        'react/prop-types': 0,
         '@typescript-eslint/indent': 0,
         '@typescript-eslint/explicit-function-return-type': 0,
         '@typescript-eslint/no-parameter-properties': 0,

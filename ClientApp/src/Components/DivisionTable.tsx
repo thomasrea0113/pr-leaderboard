@@ -1,9 +1,7 @@
 /* eslint-disable max-classes-per-file */
-import React from 'react';
-import 'react-dom';
+import React, { useMemo } from 'react';
 
-import PropTypes from 'prop-types';
-import { useTable, Column } from 'react-table';
+import { useTable, Column, useExpanded } from 'react-table';
 
 import flow from 'lodash/fp/flow';
 import groupBy from 'lodash/fp/groupBy';
@@ -11,6 +9,7 @@ import map from 'lodash/fp/map';
 import UserView from '../serverTypes/UserView';
 import Division from '../serverTypes/Division';
 import NoBoundIcon from './NoBoundIcon';
+import BoardTable from './BoardTable';
 
 class DivisionBoards {
     // eslint-disable-next-line no-useless-constructor
@@ -19,26 +18,34 @@ class DivisionBoards {
 
 const columns: Column<DivisionBoards>[] = [
     {
-        Header: 'Division',
-        columns: [
-            {
-                Header: 'Name',
-                accessor: r => r.division.name,
-            },
-            {
-                Header: 'Gender',
-                accessor: r => r.division.gender ?? '(any)',
-            },
-            {
-                Header: 'Age Range',
-                accessor: r => (
-                    <span>
-                        {r.division.ageLowerBound ?? <NoBoundIcon />} -{' '}
-                        {r.division.ageUpperBound ?? <NoBoundIcon />}
-                    </span>
-                ),
-            },
-        ],
+        // Make an expander cell
+        Header: () => null, // No header
+        id: 'expander', // It needs an ID
+        Cell: ({ row }) => (
+            // Use Cell to render an expander for each row.
+            // We can use the getToggleRowExpandedProps prop-getter
+            // to build the expander.
+            <span key={row.id} {...row.getToggleRowExpandedProps()}>
+                {row.isExpanded ? '👇' : '👉'}
+            </span>
+        ),
+    },
+    {
+        Header: 'Name',
+        accessor: r => r.division.name,
+    },
+    {
+        Header: 'Gender',
+        accessor: r => r.division.gender ?? '(any)',
+    },
+    {
+        Header: 'Age Range',
+        accessor: r => (
+            <span>
+                {r.division.ageLowerBound ?? <NoBoundIcon />} -{' '}
+                {r.division.ageUpperBound ?? <NoBoundIcon />}
+            </span>
+        ),
     },
 ];
 
@@ -62,21 +69,32 @@ const DivisionTable: React.FunctionComponent<{
     boards: UserView[];
 }> = props => {
     const { boards: divisions } = props;
+
+    // must useMemo on the table data for useExpanded to work correctly
+    const data = useMemo(() => groupByDivision(divisions), [divisions]);
+
     const {
         getTableProps,
         getTableBodyProps,
         headerGroups,
         rows,
         prepareRow,
-    } = useTable({ columns, data: groupByDivision(divisions) });
+        visibleColumns,
+    } = useTable(
+        {
+            columns,
+            data,
+        },
+        useExpanded
+    );
 
     return (
-        <table {...getTableProps()}>
+        <table className="table" {...getTableProps()}>
             <thead>
                 {headerGroups.map(headerGroup => (
                     <tr {...headerGroup.getHeaderGroupProps()}>
                         {headerGroup.headers.map(column => (
-                            <th {...column.getHeaderProps()}>
+                            <th scope="col" {...column.getHeaderProps()}>
                                 {column.render('Header')}
                             </th>
                         ))}
@@ -87,25 +105,32 @@ const DivisionTable: React.FunctionComponent<{
                 {rows.map(row => {
                     prepareRow(row);
                     return (
-                        <tr {...row.getRowProps()}>
-                            {row.cells.map(cell => {
-                                return (
-                                    <td {...cell.getCellProps()}>
-                                        {cell.render('Cell')}
+                        <React.Fragment key={`${row.id}`}>
+                            <tr {...row.getRowProps()}>
+                                {row.cells.map(cell => {
+                                    return (
+                                        <td {...cell.getCellProps()}>
+                                            {cell.render('Cell')}
+                                        </td>
+                                    );
+                                })}
+                            </tr>
+                            {row.isExpanded ? (
+                                <tr>
+                                    <td colSpan={visibleColumns.length}>
+                                        <BoardTable
+                                            boards={row.original.boards}
+                                            renderDivision={false}
+                                        />
                                     </td>
-                                );
-                            })}
-                        </tr>
+                                </tr>
+                            ) : null}
+                        </React.Fragment>
                     );
                 })}
             </tbody>
         </table>
     );
-};
-
-DivisionTable.propTypes = {
-    boards: PropTypes.arrayOf(PropTypes.instanceOf(UserView).isRequired)
-        .isRequired,
 };
 
 export default DivisionTable;

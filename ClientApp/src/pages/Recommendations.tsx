@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import 'react-dom';
 
-import PropTypes from 'prop-types';
-
 import User from '../serverTypes/User';
 import UserView from '../serverTypes/UserView';
 import DivisionTable from '../Components/DivisionTable';
@@ -13,22 +11,17 @@ interface ReactProps {
 }
 
 class ReactState {
-    public user: User;
-
+    // eslint-disable-next-line no-useless-constructor
     public constructor(
-        user?: User,
-        public recommendations: UserView[] = [],
-        public isLoading: boolean = true
-    ) {
-        this.user = user ?? {
+        public user: User = {
             userName: '',
             email: '',
             interests: [],
             leaderboards: [],
-        };
-        this.isLoading = isLoading;
-        this.recommendations = recommendations;
-    }
+        },
+        public recommendations: UserView[] = [],
+        public isLoading: boolean = true
+    ) {}
 }
 
 const RecommendationsComponent = (props: ReactProps) => {
@@ -42,7 +35,19 @@ const RecommendationsComponent = (props: ReactProps) => {
     useEffect(() => {
         fetch(initialUrl)
             .then(response => response.json())
-            .then(json => setState({ isLoading: false, ...json }));
+            .then(json => {
+                const {
+                    user: serverUser,
+                    recommendations: serverRecommendations,
+                } = json;
+                setState(
+                    new ReactState(
+                        serverUser as User,
+                        serverRecommendations as UserView[],
+                        false
+                    )
+                );
+            });
     }, []);
 
     const data = isLoading ? [] : recommendations;
@@ -58,10 +63,6 @@ const RecommendationsComponent = (props: ReactProps) => {
             <DivisionTable boards={data} />
         </div>
     );
-};
-
-RecommendationsComponent.propTypes = {
-    initialUrl: PropTypes.string.isRequired,
 };
 
 export default RecommendationsComponent;
