@@ -39,6 +39,8 @@ module.exports = {
         ],
         '@typescript-eslint/indent': 0,
         '@typescript-eslint/explicit-function-return-type': 0,
+        '@typescript-eslint/no-parameter-properties': 0,
+        'no-empty-function': [2, { allow: ['constructors'] }],
         'import/no-unresolved': [2, { commonjs: true, amd: true }],
         'import/named': 2,
         'no-underscore-dangle': [2, { allowAfterThis: true }],
