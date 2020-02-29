@@ -77,7 +77,13 @@ const RecommendationsComponent = (props: ReactProps) => {
             {data.map(d => (
                 <div key={d.division.id} className="card mb-2">
                     <div className="card-header">{d.division.name}</div>
-                    <img className="card-img-top" alt="Card cap" />
+                    <div className="embed-responsive embed-responsive-9by16 vh-25">
+                        <img
+                            className="card-img-top embed-responsive-item embed-responsive-cover"
+                            src="https://yorkbarbell.com/wp-content/uploads/2017/03/4201_9201PowerLiftingBench.jpg"
+                            alt="Card cap"
+                        />
+                    </div>
                     <div className="card-footer p-1">
                         <button
                             type="button"
