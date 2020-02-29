@@ -13,13 +13,15 @@ namespace Leaderboard.Areas.Leaderboards.ViewModels
     /// </summary>
     public class LeaderboardViewModel
     {
-        public string Name { get; set; }
-        public UnitOfMeasureViewModel UOM { get; set; }
-        public DivisionViewModel Division { get; set; }
-        public WeightClassViewModel WeightClass { get; set; }
+        public string Id { get; private set; }
+        public string Name { get; private set; }
+        public UnitOfMeasureViewModel UOM { get; private set; }
+        public DivisionViewModel Division { get; private set; }
+        public WeightClassViewModel WeightClass { get; private set; }
 
         public LeaderboardViewModel(LeaderboardModel model)
         {
+            Id = model.Id;
             Name = model.Name;
             Division = new DivisionViewModel(model.Division);
             UOM = new UnitOfMeasureViewModel(model.UOM);
@@ -32,5 +34,20 @@ namespace Leaderboard.Areas.Leaderboards.ViewModels
             foreach (var model in models)
                 yield return new LeaderboardViewModel(model);
         }
+
+        #region equality
+        
+        // 2 instances are equal if they have the same Id
+        # nullable enable
+        public override int GetHashCode() => Id.GetHashCode();
+        public override bool Equals(object? obj)
+        {
+            if (obj is LeaderboardModel m)
+                return Id.Equals(m.Id);
+            return Id.Equals(obj);
+        }
+        #nullable disable
+
+        #endregion
     }
 }

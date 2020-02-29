@@ -1,7 +1,8 @@
 import React from 'react';
 import { Row } from 'react-table';
 import UserView from '../serverTypes/UserView';
-import { Expander } from './StyleComponents';
+import { ExpanderFactory } from './StyleComponents';
+import Board from './Board';
 
 const DivisionComponent: React.FC<{
     row: Row<UserView>;
@@ -11,9 +12,6 @@ const DivisionComponent: React.FC<{
             <img className="card-img-top" src="..." alt="Card ap" />
             <div className="card-body">
                 <div className="card-title">
-                    {Expander<UserView>()({ row })} View Boards
-                </div>
-                <p className="card-text">
                     {row.cells.map(cell => (
                         <span
                             key={row.id + cell.column.id}
@@ -22,6 +20,10 @@ const DivisionComponent: React.FC<{
                             {cell.column.Header} - {cell.render('Cell')}
                         </span>
                     ))}
+                </div>
+                <p className="card-text">
+                    {ExpanderFactory<UserView>()({ row })} View Boards
+                    {row.isExpanded ? <Board name="hello world" /> : null}
                 </p>
                 <a href="?" className="btn btn-primary">
                     Go somewhere

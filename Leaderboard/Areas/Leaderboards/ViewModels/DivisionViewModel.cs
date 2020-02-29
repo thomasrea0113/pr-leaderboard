@@ -8,13 +8,15 @@ namespace Leaderboard.Areas.Leaderboards.ViewModels
 {
     public class DivisionViewModel
     {
-        public string Name { get; set; }
-        public GenderValues? Gender { get; set; }
-        public int? AgeLowerBound { get; set; }
-        public int? AgeUpperBound { get; set; }
+        public string Id { get; private set; }
+        public string Name { get; private set; }
+        public GenderValues? Gender { get; private set; }
+        public int? AgeLowerBound { get; private set; }
+        public int? AgeUpperBound { get; private set; }
 
         public DivisionViewModel(Division division)
         {
+            Id = division.Id;
             Name = division.Name;
             Gender = division.Gender;
             AgeLowerBound = division.AgeLowerBound;

@@ -7,11 +7,12 @@ export default class UserViewModel extends Leaderboard {
     public constructor(
         public isMember: boolean,
         public isRecommended: boolean,
+        id: string,
         name: string,
         uom: UnitOfMeasure,
         division: Division,
         weightClass: WeightClass
     ) {
-        super(name, uom, division, weightClass);
+        super(id, name, uom, division, weightClass);
     }
 }

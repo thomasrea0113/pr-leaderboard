@@ -83,8 +83,13 @@ namespace Leaderboard.Areas.Leaderboards.Models
         // 2 instances are equal if they have the same Id
         # nullable enable
         public override int GetHashCode() => Id.GetHashCode();
-        public override bool Equals(object? obj) => Id.Equals(obj);
-        # nullable disable
+        public override bool Equals(object? obj)
+        {
+            if (obj is LeaderboardModel m)
+                return Id.Equals(m.Id);
+            return Id.Equals(obj);
+        }
+        #nullable disable
 
         #endregion
     }

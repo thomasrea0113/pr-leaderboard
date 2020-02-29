@@ -5,6 +5,7 @@ import WeightClass from './WeightClass';
 export default class LeaderboardModel {
     // eslint-disable-next-line no-useless-constructor
     public constructor(
+        public id: string,
         public name: string,
         public uom: UnitOfMeasure,
         public division: Division,

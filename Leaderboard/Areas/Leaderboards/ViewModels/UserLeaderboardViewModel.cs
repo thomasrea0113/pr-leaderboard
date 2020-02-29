@@ -23,5 +23,20 @@ namespace Leaderboard.Areas.Leaderboards.ViewModels
             foreach (var model in models)
                 yield return new UserLeaderboardViewModel(model, isMember, isRecommended);
         }
+
+        #region equality
+        
+        // 2 instances are equal if they have the same Id
+        # nullable enable
+        public override int GetHashCode() => Id.GetHashCode();
+        public override bool Equals(object? obj)
+        {
+            if (obj is LeaderboardModel m)
+                return Id.Equals(m.Id);
+            return Id.Equals(obj);
+        }
+        #nullable disable
+
+        #endregion
     }
 }
