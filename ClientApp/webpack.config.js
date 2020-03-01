@@ -145,6 +145,9 @@ module.exports = env => {
             port: 9000,
             hot: true,
             writeToDisk: true,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+            },
         };
 
         config.output.publicPath = 'http://localhost:9000';
