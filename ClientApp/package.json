@@ -71,13 +71,15 @@
         "typescript": "^3.5.3",
         "webpack": "^4.41.5",
         "webpack-cli": "^3.3.10",
+        "webpack-dev-server": "^3.10.3",
         "webpack-stats-plugin": "^0.3.1"
     },
     "scripts": {
-        "build": "rimraf ./dist/* && webpack",
+        "build": "rimraf ./dist/* && webpack --progress",
         "test": "jest",
         "lint": "eslint --ext .tsx,.ts ./src/",
-        "lint-fix": "eslint --fix --ext .tsx,.ts ./src/"
+        "lint-fix": "eslint --fix --ext .tsx,.ts ./src/",
+        "start": "webpack-dev-server --progress"
     },
     "browserslist": {
         "production": [

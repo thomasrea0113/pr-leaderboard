@@ -16,6 +16,19 @@
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",
             "disableOptimisticBPs": true
-        }
+        },
+        {
+            "type": "node",
+            "name": "Launch Webpack Server",
+            "request": "launch",
+            "program": "${workspaceFolder}/node_modules/webpack-dev-server/bin/webpack-dev-server",
+            "args": [
+                "--progress"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "disableOptimisticBPs": true
+        },
     ]
 }

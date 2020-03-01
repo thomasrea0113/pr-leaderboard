@@ -3,13 +3,9 @@
     "tasks": [
         {
             "label": "lint-fix",
-            "type": "shell",
-            "command": "npm",
-            "args": [
-                "run",
-                "lint-fix"
-            ],
-            "problemMatcher": []
-        }
+            "type": "npm",
+            "script": "lint-fix",
+            "problemMatcher": "$eslint-stylish"
+        },
     ]
 }

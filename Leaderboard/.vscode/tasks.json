@@ -19,7 +19,8 @@
                 "${workspaceFolder}/Leaderboard.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary",
-                "/p:BuildClient=${input:BuildClient}"
+                "/p:BuildClient=false"
+                // "/p:BuildClient=${input:BuildClient}"
             ],
             "problemMatcher": "$msCompile"
         },

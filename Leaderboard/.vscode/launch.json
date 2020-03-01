@@ -3,15 +3,6 @@
    // Use hover for the description of the existing attributes
    // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
    "version": "0.2.0",
-   "compounds": [
-       {
-           "name": "Debug",
-           "configurations": [
-               "Lauch Site",
-               "Launch Chrome"
-           ],
-       }
-   ],
    "configurations": [
        {
            "type": "chrome",
@@ -24,7 +15,7 @@
            }
        },
         {
-            "name": "Lauch Site",
+            "name": "Lauch dotnet Server",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",

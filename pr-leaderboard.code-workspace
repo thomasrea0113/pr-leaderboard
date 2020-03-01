@@ -19,6 +19,19 @@
 			"path": ".devcontainer"
 		}
 	],
+	"launch": {
+		"configurations": [],
+		"compounds": [
+			{
+				"name": "Debug",
+				"configurations": [
+					"Launch Webpack Server",
+					"Lauch dotnet Server",
+					"Launch Chrome"
+				],
+			}
+		]
+	},
 	"settings": {
 		"jest.disabledWorkspaceFolders": [
 			"Solution",
