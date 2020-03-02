@@ -9,14 +9,13 @@ import {
     TableState,
     Column,
 } from 'react-table';
-import User from '../serverTypes/User';
-import UserView from '../serverTypes/UserView';
 import {
     Expander,
     Range,
     Grouper,
     GenderIcon,
 } from '../Components/StyleComponents';
+import { User, UserView } from '../types/server';
 
 interface ReactProps {
     initialUrl: string;
