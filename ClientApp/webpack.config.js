@@ -144,7 +144,7 @@ module.exports = env => {
             host: '0.0.0.0',
             port: 9000,
             hot: true,
-            writeToDisk: true,
+            writeToDisk: file => path.basename(file) === 'stats.json',
             headers: {
                 'Access-Control-Allow-Origin': '*',
             },
