@@ -1,0 +1,18 @@
+﻿@{
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+
+<h1>Manage your account</h1>
+
+<div>
+    <h4>Change your account settings</h4>
+    <hr />
+    <div class="row justify-content-center">
+        <partial name="_ManageNav" />
+    </div>
+    @RenderBody()
+</div>
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}

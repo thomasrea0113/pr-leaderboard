@@ -1,7 +1,6 @@
 @import 'node_modules/bootstrap/scss/bootstrap';
 
-// resonable sizes. Could include every increment of 5, but that adds to our bundle size
-$sizes: (25, 50, 75);
+$sizes: (10, 25, 50, 75);
 @each $prop, $abbrev in (width: vw, height: vh) {
     @each $size in $sizes {
         .#{$abbrev}-#{$size} {

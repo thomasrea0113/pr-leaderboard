@@ -17,13 +17,13 @@ interface ReactState {
     user?: User;
     recommendations: UserView[];
     isLoading: boolean;
-    hideBoards: { [key: string]: boolean };
+    showBoards: { [key: string]: boolean };
 }
 
 const InitialState: ReactState = {
     recommendations: [],
     isLoading: true,
-    hideBoards: {},
+    showBoards: {},
 };
 
 interface DivisionBoards {
@@ -44,7 +44,7 @@ const groupByDivision = (boards: UserView[]): DivisionBoards[] =>
 
 const RecommendationsComponent = (props: ReactProps) => {
     const [state, setState] = useState(InitialState);
-    const { recommendations, isLoading, hideBoards } = state;
+    const { recommendations, isLoading, showBoards } = state;
 
     const { initialUrl, userName } = props;
 
@@ -72,61 +72,65 @@ const RecommendationsComponent = (props: ReactProps) => {
     };
 
     return (
-        <div>
+        <>
             <div>{message(isLoading)}</div>
-            {data.map(d => (
-                <div key={d.division.id} className="card mb-2">
-                    <div className="card-header">{d.division.name}</div>
-                    <div className="embed-responsive embed-responsive-9by16 vh-25">
-                        <img
-                            className="card-img-top embed-responsive-item embed-responsive-cover"
-                            src="https://yorkbarbell.com/wp-content/uploads/2017/03/4201_9201PowerLiftingBench.jpg"
-                            alt="Card cap"
-                        />
+            <div className="row">
+                {data.map(d => (
+                    <div key={d.division.id} className="col-12">
+                        <div className="card mb-2">
+                            <div className="card-header">{d.division.name}</div>
+                            <div className="embed-responsive embed-responsive-4by3 vh-10">
+                                <img
+                                    className="card-img-top embed-responsive-item embed-responsive-cover"
+                                    src="https://yorkbarbell.com/wp-content/uploads/2017/03/4201_9201PowerLiftingBench.jpg"
+                                    alt="Card cap"
+                                />
+                            </div>
+                            <div className="card-footer p-1">
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        setState({
+                                            ...state,
+                                            showBoards: {
+                                                ...showBoards,
+                                                [d.division.id]: !showBoards[
+                                                    d.division.id
+                                                ],
+                                            },
+                                        })
+                                    }
+                                    className="btn btn-dark m-1 mb-2"
+                                >
+                                    View Boards
+                                </button>
+                                <table
+                                    hidden={!showBoards[d.division.id]}
+                                    className="table table-sm mb-0"
+                                >
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Name</th>
+                                            <th scope="col">Unit of Measure</th>
+                                            <th scope="col">Weight Range</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {d.boards.map(b => (
+                                            <tr key={b.id}>
+                                                <th scope="row">{b.name}</th>
+                                                <td>{b.uom.unit}</td>
+                                                <td />
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
-                    <div className="card-footer p-1">
-                        <button
-                            type="button"
-                            onClick={() =>
-                                setState({
-                                    ...state,
-                                    hideBoards: {
-                                        ...hideBoards,
-                                        [d.division.id]: !hideBoards[
-                                            d.division.id
-                                        ],
-                                    },
-                                })
-                            }
-                            className="btn btn-dark m-1 mb-2"
-                        >
-                            View Boards
-                        </button>
-                        <table
-                            hidden={hideBoards[d.division.id]}
-                            className="table table-sm table-dark mb-0"
-                        >
-                            <thead>
-                                <tr>
-                                    <th scope="col">Name</th>
-                                    <th scope="col">Unit of Measure</th>
-                                    <th scope="col">Weight Range</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {d.boards.map(b => (
-                                    <tr key={b.id}>
-                                        <th scope="row">{b.name}</th>
-                                        <td>{b.uom.unit}</td>
-                                        <td />
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            ))}
-        </div>
+                ))}
+            </div>
+        </>
     );
 };
 
