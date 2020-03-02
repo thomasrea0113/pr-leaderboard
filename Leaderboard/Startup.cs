@@ -20,6 +20,7 @@ using System.Text.Json;
 using Leaderboard.Data.SeedExtensions;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
+using System.Text.Json.Serialization;
 
 namespace Leaderboard
 {
@@ -91,6 +92,7 @@ namespace Leaderboard
             services.AddRazorPages().AddJsonOptions(options => {
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(default, false));
             });
 
             services.AddSpaStaticFiles(cnf =>

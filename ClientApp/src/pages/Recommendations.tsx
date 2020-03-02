@@ -1,12 +1,22 @@
+/* eslint-disable no-nested-ternary */
 import React, { useState, useEffect, useMemo } from 'react';
 import 'react-dom';
 
-import flow from 'lodash/fp/flow';
-import groupBy from 'lodash/fp/groupBy';
-import map from 'lodash/fp/map';
+import {
+    useTable,
+    useGroupBy,
+    useExpanded,
+    TableState,
+    Column,
+} from 'react-table';
 import User from '../serverTypes/User';
 import UserView from '../serverTypes/UserView';
-import Division from '../serverTypes/Division';
+import {
+    Expander,
+    Range,
+    Grouper,
+    GenderIcon,
+} from '../Components/StyleComponents';
 
 interface ReactProps {
     initialUrl: string;
@@ -17,36 +27,82 @@ interface ReactState {
     user?: User;
     recommendations: UserView[];
     isLoading: boolean;
-    showBoards: { [key: string]: boolean };
 }
 
 const InitialState: ReactState = {
     recommendations: [],
     isLoading: true,
-    showBoards: {},
 };
 
-interface DivisionBoards {
-    division: Division;
-    boards: UserView[];
-}
+const message = (loading: boolean, userName?: string): string => {
+    if (loading)
+        return `Hang tight, ${userName}! We're gathering some information for you.`;
+    return "All done! Here's what we've got for you";
+};
 
-const groupByDivision = (boards: UserView[]): DivisionBoards[] =>
-    flow(
-        groupBy((b: UserView) => b.division.id),
-        map(b => {
-            return {
-                division: b[0].division,
-                boards: b,
-            };
-        })
-    )(boards);
+const columns: Column<UserView>[] = [
+    {
+        Header: 'Division Name',
+        id: 'division-name',
+        accessor: r => r.division.name,
+    },
+    {
+        Header: 'Gender',
+        accessor: r => r.division.gender ?? '(All Genders)',
+        Cell: ({ cell: { value } }) => (
+            <>
+                &nbsp;
+                <GenderIcon gender={value} />
+            </>
+        ),
+        // the age is the same across all instances of the division, so we can just return the first value
+        aggregate: lv => lv[0],
+        disableGroupBy: true,
+    },
+    {
+        Header: 'Age Range',
+        accessor: r => (
+            <Range
+                lowerBound={r.division.ageLowerBound}
+                upperBound={r.division.ageUpperBound}
+            />
+        ),
+        // the age is the same across all instances of the division, so we can just return the first value
+        aggregate: lv => lv[0],
+        disableGroupBy: true,
+    },
+    {
+        Header: 'Board Name',
+        accessor: r => r.name,
+        disableGroupBy: true,
+        show: t => !t.columns.find(c => c.id === 'division-name')?.isGrouped,
+    },
+];
 
 const RecommendationsComponent = (props: ReactProps) => {
     const [state, setState] = useState(InitialState);
-    const { recommendations, isLoading, showBoards } = state;
+    const { recommendations, isLoading } = state;
 
     const { initialUrl, userName } = props;
+
+    const initialState = useMemo(() => {
+        const tableState: Partial<TableState<UserView>> = {
+            groupBy: ['division-name'],
+        };
+        return tableState;
+    }, []);
+
+    const {
+        getTableProps,
+        getTableBodyProps,
+        headerGroups,
+        rows,
+        prepareRow,
+    } = useTable(
+        { data: recommendations, columns, initialState },
+        useGroupBy,
+        useExpanded
+    );
 
     // load initial data
     useEffect(() => {
@@ -61,75 +117,62 @@ const RecommendationsComponent = (props: ReactProps) => {
             );
     }, []);
 
-    const data = useMemo(() => groupByDivision(recommendations), [
-        recommendations,
-    ]);
-
-    const message = (loading: boolean): string => {
-        if (loading)
-            return `Hang tight, ${userName}! We're gathering some information for you.`;
-        return "All done! Here's what we've got for you";
-    };
-
     return (
         <>
-            <div>{message(isLoading)}</div>
-            <div className="row">
-                {data.map(d => (
-                    <div key={d.division.id} className="col-12">
-                        <div className="card mb-2">
-                            <div className="card-header">{d.division.name}</div>
-                            <div className="embed-responsive embed-responsive-4by3 vh-10">
-                                <img
-                                    className="card-img-top embed-responsive-item embed-responsive-cover"
-                                    src="https://yorkbarbell.com/wp-content/uploads/2017/03/4201_9201PowerLiftingBench.jpg"
-                                    alt="Card cap"
-                                />
-                            </div>
-                            <div className="card-footer p-1">
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        setState({
-                                            ...state,
-                                            showBoards: {
-                                                ...showBoards,
-                                                [d.division.id]: !showBoards[
-                                                    d.division.id
-                                                ],
-                                            },
-                                        })
-                                    }
-                                    className="btn btn-dark m-1 mb-2"
-                                >
-                                    View Boards
-                                </button>
-                                <table
-                                    hidden={!showBoards[d.division.id]}
-                                    className="table table-sm mb-0"
-                                >
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">Name</th>
-                                            <th scope="col">Unit of Measure</th>
-                                            <th scope="col">Weight Range</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {d.boards.map(b => (
-                                            <tr key={b.id}>
-                                                <th scope="row">{b.name}</th>
-                                                <td>{b.uom.unit}</td>
-                                                <td />
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
+            <div>{message(isLoading, userName)}</div>
+            <table className="table" {...getTableProps()}>
+                <thead>
+                    {headerGroups.map(headerGroup => (
+                        <tr {...headerGroup.getHeaderGroupProps()}>
+                            {headerGroup.headers.map(column => (
+                                <th {...column.getHeaderProps()}>
+                                    <Grouper
+                                        hidden={!column.canGroupBy}
+                                        props={column.getGroupByToggleProps()}
+                                        isGrouped={column.isGrouped}
+                                    />
+                                    &nbsp;{column.render('Header')}
+                                </th>
+                            ))}
+                        </tr>
+                    ))}
+                </thead>
+                <tbody {...getTableBodyProps()}>
+                    {rows.map(row => {
+                        prepareRow(row);
+                        return (
+                            <tr {...row.getRowProps()}>
+                                {row.cells.map(cell => {
+                                    return (
+                                        <td {...cell.getCellProps()}>
+                                            {cell.isGrouped ? (
+                                                // If it's a grouped cell, add an expander and row count
+                                                <>
+                                                    <Expander
+                                                        props={row.getToggleRowExpandedProps()}
+                                                        isExpanded={
+                                                            row.isExpanded
+                                                        }
+                                                    />
+                                                    {cell.render('Cell')} (
+                                                    {row.subRows.length})
+                                                </>
+                                            ) : cell.isAggregated ? (
+                                                // If the cell is aggregated, use the Aggregated
+                                                // renderer for cell
+                                                cell.render('Aggregated')
+                                            ) : cell.isRepeatedValue ? null : ( // For cells with repeated values, render null
+                                                // Otherwise, just render the regular cell
+                                                cell.render('Cell')
+                                            )}
+                                        </td>
+                                    );
+                                })}
+                            </tr>
+                        );
+                    })}
+                </tbody>
+            </table>
         </>
     );
 };

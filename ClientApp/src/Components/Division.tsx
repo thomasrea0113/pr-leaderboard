@@ -1,7 +1,7 @@
 import React from 'react';
 import { Row } from 'react-table';
 import UserView from '../serverTypes/UserView';
-import { ExpanderFactory } from './StyleComponents';
+import { Expander } from './StyleComponents';
 import Board from './Board';
 
 const DivisionComponent: React.FC<{
@@ -22,7 +22,11 @@ const DivisionComponent: React.FC<{
                     ))}
                 </div>
                 <p className="card-text">
-                    {ExpanderFactory<UserView>()({ row })} View Boards
+                    <Expander
+                        props={row.getToggleRowExpandedProps()}
+                        isExpanded={row.isExpanded}
+                    />{' '}
+                    View Boards
                     {row.isExpanded ? <Board name="hello world" /> : null}
                 </p>
                 <a href="?" className="btn btn-primary">

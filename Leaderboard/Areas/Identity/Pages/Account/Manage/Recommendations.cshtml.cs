@@ -59,8 +59,6 @@ namespace Leaderboard.Areas.Identity.Pages.Account.Manage
                 .Concat(UserLeaderboardViewModel
                     .Create(recommendations.Except(userBoards), false, true)).Distinct().ToArray();
 
-            var byId = allUserBoards.GroupBy(l => l.Id).Where(g => g.Count() > 1).ToArray();
-
             return new JsonResult(new ReactState
             {
                 User = new UserViewModel(user),
