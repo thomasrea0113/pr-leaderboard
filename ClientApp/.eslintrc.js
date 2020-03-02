@@ -7,14 +7,14 @@ module.exports = {
     extends: [
         'airbnb',
         'prettier',
-        'prettier/@typescript-eslint',
         'prettier/babel',
         'prettier/react',
         'prettier/standard',
+        'prettier/@typescript-eslint',
+        'plugin:@typescript-eslint/recommended',
         'plugin:import/errors',
         'plugin:import/warnings',
         'plugin:import/typescript',
-        'plugin:@typescript-eslint/recommended',
     ],
     globals: {
         Atomics: 'readonly',
@@ -67,6 +67,6 @@ module.exports = {
         'jest/valid-expect': 'error',
     },
     settings: {
-        'import/extensions': ['.tsx'],
+        'import/extensions': ['.ts', '.tsx'],
     },
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import { GenderValues } from '../types/server';
+import { GenderValues } from '../types/dotnet-types';
 
 export const BoundIcon: React.FC<{
     bound?: number;

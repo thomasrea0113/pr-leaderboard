@@ -1,9 +1,13 @@
-export interface WeightClassModel {
+/**
+ * Types that are meant to interface directly with the dotnet core server-side application
+ */
+
+export interface WeightClass {
     weightLowerBound?: number;
     weightUpperBound?: number;
 }
 
-export interface DivisionModel {
+export interface Division {
     id: string;
     name: string;
     gender?: GenderValues;
@@ -11,22 +15,22 @@ export interface DivisionModel {
     ageUpperBound?: number;
 }
 
-export interface CategoryModel {
+export interface Category {
     id: string;
     name: string;
 }
 
 export interface Leaderboard {
-    public id: string;
-    public name: string;
-    public uom: UnitOfMeasure;
-    public division: Division;
-    public weightClass: WeightClass;
+    id: string;
+    name: string;
+    uom: UnitOfMeasure;
+    division: Division;
+    weightClass: WeightClass;
 }
 
 export interface UserView extends Leaderboard {
-    public isMember: boolean;
-    public isRecommended: boolean;
+    isMember: boolean;
+    isRecommended: boolean;
 }
 
 export interface User {

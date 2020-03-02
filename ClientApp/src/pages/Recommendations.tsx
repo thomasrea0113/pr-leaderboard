@@ -15,7 +15,7 @@ import {
     Grouper,
     GenderIcon,
 } from '../Components/StyleComponents';
-import { User, UserView } from '../types/server';
+import { UserView, User } from '../types/dotnet-types';
 
 interface ReactProps {
     initialUrl: string;
