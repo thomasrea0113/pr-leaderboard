@@ -6,6 +6,7 @@ import React, {
     ReactNode,
     ReactFragment,
     Fragment,
+    PropsWithChildren,
 } from 'react';
 import 'react-dom';
 
@@ -17,6 +18,7 @@ import {
     Column,
     Cell,
     Row,
+    CellProps,
 } from 'react-table';
 import {
     Expander,
@@ -43,51 +45,74 @@ const InitialState: ReactState = {
     isLoading: true,
 };
 
+const withSubRowCount = <T extends {}>(
+    {
+        row: {
+            subRows: { length },
+            isGrouped,
+            groupByID,
+        },
+        cell: {
+            value,
+            column: { id },
+        },
+    }: PropsWithChildren<CellProps<T>>,
+    cellComponent?: ReactNode
+) => {
+    const cellVal = cellComponent ?? value;
+    return groupByID === id && isGrouped && length > 0 ? (
+        <>
+            {cellVal} ({length})
+        </>
+    ) : (
+        cellVal
+    );
+};
+
 const columns: Column<UserView>[] = [
     {
         Header: 'Division Name',
         id: 'division-name',
         accessor: ({ division: { name } }) => name,
-        Cell: ({
-            row: {
-                subRows: { length },
-            },
-            cell: { value },
-        }) =>
-            length > 0 ? (
-                <>
-                    {value} ({length})
-                </>
-            ) : (
-                value
-            ),
+        Cell: c => withSubRowCount(c),
     },
     {
         Header: 'Gender',
         id: 'division-gender',
-        accessor: ({ division: { gender } }) => gender ?? '(All Genders)',
-        Cell: ({ cell: { value } }) => (
-            <>
-                &nbsp;
-                <GenderIcon gender={value} />
-            </>
-        ),
+        accessor: ({ division: { gender } }) => gender,
+        Cell: c => {
+            const {
+                cell: { value },
+            } = c;
+            return withSubRowCount(
+                c,
+                <>
+                    &nbsp;
+                    <GenderIcon gender={value} />
+                </>
+            );
+        },
         // the age is the same across all instances of the division, so we can just return the first value
         aggregate: lv => lv[0],
-        disableGroupBy: true,
     },
     {
         Header: 'Age Range',
         id: 'division-age',
-        accessor: ({ division }) => division,
-        Cell: ({
-            cell: {
-                value: { ageLowerBound, ageUpperBound },
-            },
-        }) => <Range lowerBound={ageLowerBound} upperBound={ageUpperBound} />,
+        accessor: ({ division }) => [
+            division.ageLowerBound,
+            division.ageUpperBound,
+        ],
+        Cell: c => {
+            const {
+                cell: { value },
+            } = c;
+            return withSubRowCount(
+                c,
+                <Range lowerBound={value[0]} upperBound={value[1]} />
+            );
+        },
         // the age is the same across all instances of the division, so we can just return the first value
         aggregate: lv => lv[0],
-        disableGroupBy: true,
     },
     {
         Header: 'Board Name',
