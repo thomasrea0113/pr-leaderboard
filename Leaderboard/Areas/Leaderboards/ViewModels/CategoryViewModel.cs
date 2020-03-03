@@ -13,7 +13,7 @@ namespace Leaderboard.Areas.Leaderboards.ViewModels
             Name = category.Name;
         }
 
-        public static IEnumerable<CategoryViewModel> Create(params Category[] categories)
+        public static IEnumerable<CategoryViewModel> Create(IEnumerable<Category> categories)
         {
             foreach (var category in categories)
                 yield return new CategoryViewModel(category);

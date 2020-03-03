@@ -18,13 +18,6 @@ $sizes: (10, 20, 25, 50, 75);
     }
 }
 
-table .row.subrow {
-    min-height: 5rem;
-    max-height: 12rem;
-    height: 20vh;
-    min-width: 10%;
-}
-
 .text-blue {
     color: $blue;
 }

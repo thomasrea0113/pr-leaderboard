@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 import { Leaderboard, UserView } from '../types/dotnet-types';
-import { Range, ThumbnailImage } from './StyleComponents';
+import { Range, ThumbnailImage, GenderIcon } from './StyleComponents';
 
 const Field: React.FC<{
     label: string;
@@ -21,33 +21,34 @@ const Board: React.FC<Partial<UserView> & Leaderboard> = ({
     iconUrl,
     weightClass,
     isMember,
+    division: { gender, ageLowerBound, ageUpperBound, categories },
 }) => {
     const { weightLowerBound, weightUpperBound } = weightClass ?? {};
-    const colClass = 'col-6';
+    const colClass = 'col-12 col-sm-6';
 
     const buttons = [
         <button
-            key={isMember ? 'join-button' : 'view-button'}
+            key={isMember ? 'view-button' : 'join-button'}
             type="submit"
-            name={isMember ? 'join' : 'view'}
+            name={!isMember ? 'view' : 'join'}
             className={`btn ${isMember ? 'btn-success' : 'btn-warning'} col-sm`}
         >
-            {isMember ? (
+            {!isMember ? (
                 <i className="fas fa-dumbbell" />
             ) : (
                 <i className="fas fa-chevron-right" />
             )}
-            &nbsp; {isMember ? 'Join Board' : 'View Board'}
+            &nbsp; {isMember ? 'View Board' : 'Join Board'}
         </button>,
     ];
 
     return (
-        <div className="row subrow shadow p-1 bg-light rounded">
+        <div className="row shadow p-1 bg-light rounded">
             <div className="col-md-3 hide-sm">
                 <ThumbnailImage src={iconUrl} />
             </div>
-            <div className="col col-md-9 container">
-                <div className="row text-center pl-4 pr-4 pt-2 pb-2">
+            <div className="col-md-9 container">
+                <div className="row text-center p-2">
                     <div className={colClass}>
                         <Field label="Board Name">
                             <strong className="text-primary">{name}</strong>
@@ -60,6 +61,29 @@ const Board: React.FC<Partial<UserView> & Leaderboard> = ({
                                 upperBound={weightUpperBound}
                             />
                         </Field>
+                    </div>
+                    <div className={colClass}>
+                        <Field label="Gender">
+                            <GenderIcon gender={gender} />
+                        </Field>
+                    </div>
+                    <div className={colClass}>
+                        <Field label="Age Range">
+                            <Range
+                                lowerBound={ageLowerBound}
+                                upperBound={ageUpperBound}
+                            />
+                        </Field>
+                    </div>
+                    <div className="col-12">
+                        <Field
+                            label="Categories"
+                            // TODO move this to a single component so it can be reused
+                            value={
+                                categories?.map(c => c.name).join(', ') ??
+                                '(none)'
+                            }
+                        />
                     </div>
                 </div>
                 <form className="row" method="post" action="">

@@ -18,7 +18,7 @@ namespace Leaderboard.Areas.Identity.ViewModels
         {
             UserName = user.UserName;
             Email = user.Email;
-            Interests = CategoryViewModel.Create(user.UserCategories.Select(uc => uc.Category).ToArray()).ToList();
+            Interests = CategoryViewModel.Create(user.UserCategories.Select(uc => uc.Category)).ToList();
             Leaderboards = LeaderboardViewModel.Create(user.UserLeaderboards.Select(uc => uc.Leaderboard)).ToList();
         }
     }

@@ -10,6 +10,7 @@ export interface WeightClass {
 export interface Division {
     id: string;
     name: string;
+    categories: Category[];
     icon?: string;
     gender?: GenderValues;
     ageLowerBound?: number;

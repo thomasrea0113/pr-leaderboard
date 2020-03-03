@@ -10,6 +10,10 @@ import React, {
 } from 'react';
 import 'react-dom';
 
+import flow from 'lodash/fp/flow';
+import uniq from 'lodash/fp/uniq';
+import join from 'lodash/fp/join';
+
 import {
     useTable,
     useGroupBy,
@@ -45,21 +49,26 @@ const InitialState: ReactState = {
     isLoading: true,
 };
 
+const joinVals = <T extends {}>(vals: T[]): string =>
+    flow(uniq, join(', '))(vals);
+
 const withSubRowCount = <T extends {}>(
     {
         row: {
             subRows: { length },
-            isGrouped,
             groupByID,
         },
         cell: {
             value,
+            isGrouped,
+            isRepeatedValue,
             column: { id },
         },
     }: PropsWithChildren<CellProps<T>>,
     cellComponent?: ReactNode
 ) => {
-    const cellVal = cellComponent ?? value;
+    // TODO should no display repeated value when grouping multiple columns
+    const cellVal = isRepeatedValue ? undefined : cellComponent ?? value;
     return groupByID === id && isGrouped && length > 0 ? (
         <>
             {cellVal} ({length})
@@ -75,6 +84,15 @@ const columns: Column<UserView>[] = [
         id: 'division-name',
         accessor: ({ division: { name } }) => name,
         Cell: c => withSubRowCount(c),
+        aggregate: lv => joinVals(lv),
+    },
+    {
+        Header: 'Categories',
+        id: 'division-categories',
+        accessor: ({ division: { categories } }) =>
+            categories?.map(c => c.name),
+        Cell: ({ cell: { value } }) => value?.join(', ') ?? '(none)',
+        disableGroupBy: true,
     },
     {
         Header: 'Gender',
@@ -93,7 +111,8 @@ const columns: Column<UserView>[] = [
             );
         },
         // the age is the same across all instances of the division, so we can just return the first value
-        aggregate: lv => lv[0],
+        aggregate: lv => joinVals(lv),
+        disableGroupBy: true,
     },
     {
         Header: 'Age Range',
@@ -113,6 +132,7 @@ const columns: Column<UserView>[] = [
         },
         // the age is the same across all instances of the division, so we can just return the first value
         aggregate: lv => lv[0],
+        disableGroupBy: true,
     },
     {
         Header: 'Board Name',

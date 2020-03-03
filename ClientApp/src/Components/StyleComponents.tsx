@@ -30,7 +30,7 @@ export const Expander: React.FC<{
 );
 
 export const GenderIcon: React.FC<{
-    gender: GenderValues;
+    gender?: GenderValues;
 }> = ({ gender }) => {
     const male = <i className="fas fa-male text-blue" />;
     const female = <i className="fas fa-female text-pink" />;
