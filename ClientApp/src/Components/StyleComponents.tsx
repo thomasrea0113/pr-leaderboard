@@ -1,5 +1,6 @@
 import React from 'react';
 import { GenderValues } from '../types/dotnet-types';
+import { NumberRange } from '../types/types';
 
 export const BoundIcon: React.FC<{
     bound?: number;
@@ -76,9 +77,9 @@ export const ThumbnailImage: React.FC<{
     src?: string;
 }> = ({ src }) => {
     return (
-        <span className="vh-20 embed-responsive embed-responsive-4x3">
+        <div className="h-100 embed-responsive embed-responsive-4x3">
             <img
-                className="embed-responsive-item img-thumbnail embed-responsive-cover rounded"
+                className="embed-responsive-item embed-responsive-cover rounded"
                 alt="Board"
                 src={
                     src !== undefined
@@ -86,6 +87,6 @@ export const ThumbnailImage: React.FC<{
                         : 'https://dks.scene7.com/is/image/GolfGalaxy/16FGEU10LBCSTHXDMDMB?wid=685&fmt=jpg'
                 }
             />
-        </span>
+        </div>
     );
 };

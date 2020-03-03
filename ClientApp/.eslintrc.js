@@ -38,6 +38,9 @@ module.exports = {
             },
         ],
 
+        // the typescript tooling in vscode will handle this for us
+        'no-undef': 0,
+
         // the babel-plugin-typescript-to-proptypes package will auto-generate propTypes for us
         'react/prop-types': 0,
         '@typescript-eslint/indent': 0,

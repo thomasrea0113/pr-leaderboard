@@ -5,6 +5,7 @@ import React, {
     useMemo,
     ReactNode,
     ReactFragment,
+    Fragment,
 } from 'react';
 import 'react-dom';
 
@@ -50,8 +51,6 @@ const columns: Column<UserView>[] = [
         Cell: ({
             row: {
                 subRows: { length },
-                isGrouped,
-                original,
             },
             cell: { value },
         }) =>
@@ -65,6 +64,7 @@ const columns: Column<UserView>[] = [
     },
     {
         Header: 'Gender',
+        id: 'division-gender',
         accessor: ({ division: { gender } }) => gender ?? '(All Genders)',
         Cell: ({ cell: { value } }) => (
             <>
@@ -78,6 +78,7 @@ const columns: Column<UserView>[] = [
     },
     {
         Header: 'Age Range',
+        id: 'division-age',
         accessor: ({ division }) => division,
         Cell: ({
             cell: {
@@ -176,36 +177,50 @@ const RecommendationsComponent = (props: ReactProps) => {
             original,
         } = row;
 
-        const rowProps = getRowProps();
-
         let renderedCells: ReactFragment | undefined;
         if (isExpanded) {
-            if (groupByID === 'division-name')
-                renderedCells = subRows.map(({ original: subRowOriginal }) => (
-                    <tr>
-                        <td colSpan={visibleColumnCount}>
-                            <Board {...subRowOriginal} />
-                        </td>
-                    </tr>
-                ));
+            // if we're grouping by a division field, we want the expanded rows to be a board
+            if (groupByID.startsWith('division-'))
+                renderedCells = subRows.map(r => {
+                    prepareRow(r);
+                    const {
+                        original: subRowOriginal,
+                        getRowProps: getSubRowProps,
+                    } = r;
+                    return (
+                        <tr {...getSubRowProps()}>
+                            <td colSpan={visibleColumnCount}>
+                                <Board {...subRowOriginal} />
+                            </td>
+                        </tr>
+                    );
+                });
             // if we're not grouped by division, we want to simply render the sub rows
             else renderedCells = subRows.map(subRow => renderRow(subRow));
         }
 
+        // calls to getRowProps includes the key for the react mapped array. We want the fragment to have
+        // the key, but all other props should be shared amongst both rows.
+        const rowProps = getRowProps();
+        const { key } = rowProps;
+        const rowPropsNoKey = { ...rowProps, key: undefined };
+
         return (
-            <>
-                <tr {...rowProps}>{cells.map(cell => renderCell(cell))}</tr>
+            <Fragment key={key}>
+                <tr {...rowPropsNoKey}>
+                    {cells.map(cell => renderCell(cell))}
+                </tr>
                 {renderedCells}
 
                 {/* render the original UserView as a board */}
                 {!isGrouped ? (
-                    <tr {...getRowProps()}>
+                    <tr {...rowPropsNoKey}>
                         <td colSpan={visibleColumnCount}>
                             <Board {...original} />
                         </td>
                     </tr>
                 ) : null}
-            </>
+            </Fragment>
         );
     };
 

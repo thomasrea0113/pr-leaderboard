@@ -9,6 +9,22 @@ $sizes: (10, 20, 25, 50, 75);
     }
 }
 
+// hidden when the viewport is smaller than the provided grid breakpoint
+@each $label, $size in $grid-breakpoints {
+    @include media-breakpoint-down($label) {
+        .hide-#{$label} {
+            display: none;
+        }
+    }
+}
+
+table .row.subrow {
+    min-height: 5rem;
+    max-height: 12rem;
+    height: 20vh;
+    min-width: 10%;
+}
+
 .text-blue {
     color: $blue;
 }
