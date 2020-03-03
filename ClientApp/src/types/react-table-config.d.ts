@@ -47,6 +47,7 @@ import {
     UseSortByState,
     Partial,
     TableExpandedToggleProps,
+    IdType,
 } from 'react-table';
 
 declare module 'react-table' {
@@ -122,7 +123,9 @@ declare module 'react-table' {
 
     export interface Row<D extends object = {}>
         extends UseExpandedRowProps<D>,
-            UseGroupByRowProps<D>,
+            Omit<UseGroupByRowProps<D>, 'groupById'>,
             UseRowSelectRowProps<D>,
-            UseRowStateRowProps<D> {}
+            UseRowStateRowProps<D> {
+        groupByID: IdType<D>;
+    }
 }

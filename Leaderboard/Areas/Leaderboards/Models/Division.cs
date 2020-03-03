@@ -21,10 +21,10 @@ namespace Leaderboard.Areas.Leaderboards.Models
         public GenderValues? Gender { get; set; }
         public string Name { get; set; }
 
-        // public string DivisionImageId { get; set; }
+        // public string IconId { get; set; }
 
         // [JsonIgnore]
-        // public FileModel DivisionImage { get; set; }
+        // public FileModel Icon { get; set; }
 
         [Range(0, 500)]
         public int? AgeLowerBound { get; set; }

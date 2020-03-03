@@ -10,6 +10,7 @@ export interface WeightClass {
 export interface Division {
     id: string;
     name: string;
+    icon?: string;
     gender?: GenderValues;
     ageLowerBound?: number;
     ageUpperBound?: number;
@@ -22,6 +23,7 @@ export interface Category {
 
 export interface Leaderboard {
     id: string;
+    iconUrl?: string;
     name: string;
     uom: UnitOfMeasure;
     division: Division;

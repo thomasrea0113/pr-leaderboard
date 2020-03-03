@@ -1,5 +1,11 @@
 /* eslint-disable no-nested-ternary */
-import React, { useState, useEffect, useMemo } from 'react';
+import React, {
+    useState,
+    useEffect,
+    useMemo,
+    ReactNode,
+    ReactFragment,
+} from 'react';
 import 'react-dom';
 
 import {
@@ -8,6 +14,8 @@ import {
     useExpanded,
     TableState,
     Column,
+    Cell,
+    Row,
 } from 'react-table';
 import {
     Expander,
@@ -16,6 +24,7 @@ import {
     GenderIcon,
 } from '../Components/StyleComponents';
 import { UserView, User } from '../types/dotnet-types';
+import Board from '../Components/Board';
 
 interface ReactProps {
     initialUrl: string;
@@ -33,21 +42,30 @@ const InitialState: ReactState = {
     isLoading: true,
 };
 
-const message = (loading: boolean, userName?: string): string => {
-    if (loading)
-        return `Hang tight, ${userName}! We're gathering some information for you.`;
-    return "All done! Here's what we've got for you";
-};
-
 const columns: Column<UserView>[] = [
     {
         Header: 'Division Name',
         id: 'division-name',
-        accessor: r => r.division.name,
+        accessor: ({ division: { name } }) => name,
+        Cell: ({
+            row: {
+                subRows: { length },
+                isGrouped,
+                original,
+            },
+            cell: { value },
+        }) =>
+            length > 0 ? (
+                <>
+                    {value} ({length})
+                </>
+            ) : (
+                value
+            ),
     },
     {
         Header: 'Gender',
-        accessor: r => r.division.gender ?? '(All Genders)',
+        accessor: ({ division: { gender } }) => gender ?? '(All Genders)',
         Cell: ({ cell: { value } }) => (
             <>
                 &nbsp;
@@ -60,33 +78,61 @@ const columns: Column<UserView>[] = [
     },
     {
         Header: 'Age Range',
-        accessor: r => (
-            <Range
-                lowerBound={r.division.ageLowerBound}
-                upperBound={r.division.ageUpperBound}
-            />
-        ),
+        accessor: ({ division }) => division,
+        Cell: ({
+            cell: {
+                value: { ageLowerBound, ageUpperBound },
+            },
+        }) => <Range lowerBound={ageLowerBound} upperBound={ageUpperBound} />,
         // the age is the same across all instances of the division, so we can just return the first value
         aggregate: lv => lv[0],
         disableGroupBy: true,
     },
     {
         Header: 'Board Name',
+        id: 'board-name',
         accessor: r => r.name,
         disableGroupBy: true,
-        show: t => !t.columns.find(c => c.id === 'division-name')?.isGrouped,
     },
 ];
 
+const renderCell = (cell: Cell<UserView>): React.ReactNode | null => {
+    const {
+        isGrouped,
+        isAggregated,
+        isRepeatedValue,
+        row: { isExpanded, getToggleRowExpandedProps },
+    } = cell;
+
+    let innerCell: ReactNode;
+
+    if (isAggregated) innerCell = cell.render('Aggregated');
+    else if (isGrouped)
+        innerCell = (
+            <>
+                <Expander
+                    props={getToggleRowExpandedProps()}
+                    isExpanded={isExpanded}
+                />
+                {cell.render('Cell')}
+            </>
+        );
+    else if (isRepeatedValue) innerCell = null;
+    else innerCell = cell.render('Cell');
+
+    return <td {...cell.getCellProps()}>{innerCell}</td>;
+};
+
 const RecommendationsComponent = (props: ReactProps) => {
     const [state, setState] = useState(InitialState);
-    const { recommendations, isLoading } = state;
+    const { recommendations } = state;
 
-    const { initialUrl, userName } = props;
+    const { initialUrl } = props;
 
     const initialState = useMemo(() => {
         const tableState: Partial<TableState<UserView>> = {
             groupBy: ['division-name'],
+            hiddenColumns: ['board-name'],
         };
         return tableState;
     }, []);
@@ -97,8 +143,9 @@ const RecommendationsComponent = (props: ReactProps) => {
         headerGroups,
         rows,
         prepareRow,
+        visibleColumns: { length: visibleColumnCount },
     } = useTable(
-        { data: recommendations, columns, initialState },
+        { data: recommendations, columns, initialState, expandSubRows: false },
         useGroupBy,
         useExpanded
     );
@@ -116,63 +163,74 @@ const RecommendationsComponent = (props: ReactProps) => {
             );
     }, []);
 
+    const renderRow = (row: Row<UserView>): ReactFragment => {
+        prepareRow(row);
+
+        const {
+            isGrouped,
+            isExpanded,
+            groupByID,
+            subRows,
+            getRowProps,
+            cells,
+            original,
+        } = row;
+
+        const rowProps = getRowProps();
+
+        let renderedCells: ReactFragment | undefined;
+        if (isExpanded) {
+            if (groupByID === 'division-name')
+                renderedCells = subRows.map(({ original: subRowOriginal }) => (
+                    <tr>
+                        <td colSpan={visibleColumnCount}>
+                            <Board {...subRowOriginal} />
+                        </td>
+                    </tr>
+                ));
+            // if we're not grouped by division, we want to simply render the sub rows
+            else renderedCells = subRows.map(subRow => renderRow(subRow));
+        }
+
+        return (
+            <>
+                <tr {...rowProps}>{cells.map(cell => renderCell(cell))}</tr>
+                {renderedCells}
+
+                {/* render the original UserView as a board */}
+                {!isGrouped ? (
+                    <tr {...getRowProps()}>
+                        <td colSpan={visibleColumnCount}>
+                            <Board {...original} />
+                        </td>
+                    </tr>
+                ) : null}
+            </>
+        );
+    };
+
     return (
-        <>
-            <div>{message(isLoading, userName)}</div>
-            <table className="table" {...getTableProps()}>
-                <thead>
-                    {headerGroups.map(headerGroup => (
-                        <tr {...headerGroup.getHeaderGroupProps()}>
-                            {headerGroup.headers.map(column => (
-                                <th {...column.getHeaderProps()}>
-                                    <Grouper
-                                        hidden={!column.canGroupBy}
-                                        props={column.getGroupByToggleProps()}
-                                        isGrouped={column.isGrouped}
-                                    />
-                                    &nbsp;{column.render('Header')}
-                                </th>
-                            ))}
-                        </tr>
-                    ))}
-                </thead>
-                <tbody {...getTableBodyProps()}>
-                    {rows.map(row => {
-                        prepareRow(row);
-                        return (
-                            <tr {...row.getRowProps()}>
-                                {row.cells.map(cell => {
-                                    return (
-                                        <td {...cell.getCellProps()}>
-                                            {cell.isGrouped ? (
-                                                // If it's a grouped cell, add an expander and row count
-                                                <>
-                                                    <Expander
-                                                        props={row.getToggleRowExpandedProps()}
-                                                        isExpanded={
-                                                            row.isExpanded
-                                                        }
-                                                    />
-                                                    {cell.render('Cell')} (
-                                                    {row.subRows.length})
-                                                </>
-                                            ) : cell.isAggregated ? (
-                                                // If the cell is aggregated, use the Aggregated
-                                                // renderer for cell
-                                                cell.render('Aggregated')
-                                            ) : cell.isRepeatedValue ? null : ( // For cells with repeated values, render null
-                                                // Otherwise, just render the regular cell
-                                                cell.render('Cell')
-                                            )}
-                                        </td>
-                                    );
-                                })}
-                            </tr>
-                        );
-                    })}
-                </tbody>
-            </table>
-        </>
+        <table className="table" {...getTableProps()}>
+            <thead>
+                {headerGroups.map(headerGroup => (
+                    <tr {...headerGroup.getHeaderGroupProps()}>
+                        {headerGroup.headers.map(column => (
+                            <th {...column.getHeaderProps()}>
+                                <Grouper
+                                    hidden={!column.canGroupBy}
+                                    props={column.getGroupByToggleProps()}
+                                    isGrouped={column.isGrouped}
+                                />
+                                &nbsp;{column.render('Header')}
+                            </th>
+                        ))}
+                    </tr>
+                ))}
+            </thead>
+            <tbody {...getTableBodyProps()}>
+                {rows.map(row => renderRow(row))}
+            </tbody>
+        </table>
     );
 };
 

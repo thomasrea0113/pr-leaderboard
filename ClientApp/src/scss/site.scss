@@ -1,6 +1,6 @@
 @import 'node_modules/bootstrap/scss/bootstrap';
 
-$sizes: (10, 25, 50, 75);
+$sizes: (10, 20, 25, 50, 75);
 @each $prop, $abbrev in (width: vw, height: vh) {
     @each $size in $sizes {
         .#{$abbrev}-#{$size} {
@@ -30,7 +30,7 @@ $sizes: (10, 25, 50, 75);
     display: none;
 }
 
-.embed-responsive img.embed-responsive-cover {
+.embed-responsive .embed-responsive-cover {
     object-fit: cover;
 }
 
