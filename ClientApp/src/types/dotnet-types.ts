@@ -24,7 +24,7 @@ export interface Category {
 
 export interface Leaderboard {
     id: string;
-    iconUrl?: string;
+    iconUrl: string;
     name: string;
     uom: UnitOfMeasure;
     division: Division;

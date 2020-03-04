@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { GenderValues } from '../types/dotnet-types';
 import { NumberRange } from '../types/types';
 
@@ -50,13 +51,30 @@ export const GenderIcon: React.FC<{
     }
 };
 
+export const Checkbox: React.FC<{
+    id: string;
+    label: string;
+    checked: boolean;
+}> = ({ checked, id, label }) => (
+    <div>
+        <span id={id} className="fa-stack">
+            <i className="far fa-square fa-stack-1x text-muted" />
+            {checked ? (
+                <i className="fas fa-times fa-stack-1x fa-inverse text-primary" />
+            ) : null}
+        </span>
+        <label htmlFor={id}>{label}</label>
+        <input hidden type="checkbox" />
+    </div>
+);
+
 export const Grouper: React.FC<{
     hidden?: boolean;
     isGrouped: boolean;
-    props: unknown;
+    props?: unknown;
 }> = ({ hidden, isGrouped, props }) => (
     <i
-        {...props}
+        {...(props !== undefined ? props : {})}
         hidden={hidden}
         className={`fas fa-layer-group ${
             isGrouped ? 'text-primary' : 'text-muted'
@@ -74,18 +92,14 @@ export const Range: React.FC<NumberRange & {
 );
 
 export const ThumbnailImage: React.FC<{
-    src?: string;
+    src: string;
 }> = ({ src }) => {
     return (
         <div className="h-100 embed-responsive embed-responsive-4x3">
             <img
                 className="embed-responsive-item embed-responsive-cover rounded"
                 alt="Board"
-                src={
-                    src !== undefined
-                        ? src
-                        : 'https://dks.scene7.com/is/image/GolfGalaxy/16FGEU10LBCSTHXDMDMB?wid=685&fmt=jpg'
-                }
+                src={src}
             />
         </div>
     );

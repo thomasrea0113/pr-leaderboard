@@ -48,10 +48,17 @@ import {
     Partial,
     TableExpandedToggleProps,
     IdType,
+    PropGetter,
 } from 'react-table';
 
 declare module 'react-table' {
     // take this file as-is, or comment out the sections that don't apply to your plugin configuration
+
+    export interface UseToggleAllProps<D extends object> {
+        getToggleAllRowsExpandedProps: (
+            props?: PropGetter<D, TableToggleCommonProps>
+        ) => TableToggleCommonProps;
+    }
 
     export interface TableOptions<D extends object>
         extends UseExpandedOptions<D>,
@@ -73,6 +80,7 @@ declare module 'react-table' {
     export interface TableInstance<D extends object = {}>
         extends UseColumnOrderInstanceProps<D>,
             UseExpandedInstanceProps<D>,
+            UseToggleAllProps<D>,
             UseFiltersInstanceProps<D>,
             UseGlobalFiltersInstanceProps<D>,
             UseGroupByInstanceProps<D>,

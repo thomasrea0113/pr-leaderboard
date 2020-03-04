@@ -18,6 +18,7 @@ const Field: React.FC<{
  */
 const Board: React.FC<Partial<UserView> & Leaderboard> = ({
     name,
+    uom: { unit },
     iconUrl,
     weightClass,
     isMember,
@@ -55,16 +56,16 @@ const Board: React.FC<Partial<UserView> & Leaderboard> = ({
                         </Field>
                     </div>
                     <div className={colClass}>
+                        <Field label="Gender">
+                            <GenderIcon gender={gender} />
+                        </Field>
+                    </div>
+                    <div className={colClass}>
                         <Field label="Weight Range">
                             <Range
                                 lowerBound={weightLowerBound}
                                 upperBound={weightUpperBound}
                             />
-                        </Field>
-                    </div>
-                    <div className={colClass}>
-                        <Field label="Gender">
-                            <GenderIcon gender={gender} />
                         </Field>
                     </div>
                     <div className={colClass}>
@@ -75,7 +76,10 @@ const Board: React.FC<Partial<UserView> & Leaderboard> = ({
                             />
                         </Field>
                     </div>
-                    <div className="col-12">
+                    <div className={colClass}>
+                        <Field label="Unit">{unit}</Field>
+                    </div>
+                    <div className={colClass}>
                         <Field
                             label="Categories"
                             // TODO move this to a single component so it can be reused
