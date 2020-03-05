@@ -1,7 +1,7 @@
 {
     "recommendations": [
         "msjsdiag.debugger-for-chrome",
-        "ms-vscode.csharp",
+        "ms-dotnettools.csharp",
         "k--kato.docomment",
         "dotjoshjohnson.xml"
     ]

@@ -58,9 +58,9 @@ export const Checkbox: React.FC<{
 }> = ({ checked, id, label }) => (
     <div>
         <span id={id} className="fa-stack">
-            <i className="far fa-square fa-stack-1x text-muted" />
+            <i className="far fa-square fa-stack-2x text-muted" />
             {checked ? (
-                <i className="fas fa-times fa-stack-1x fa-inverse text-primary" />
+                <i className="fas fa-check fa-stack-1x fa-inverse text-primary" />
             ) : null}
         </span>
         <label htmlFor={id}>{label}</label>

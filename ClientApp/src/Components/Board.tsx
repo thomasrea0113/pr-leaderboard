@@ -44,7 +44,7 @@ const Board: React.FC<Partial<UserView> & Leaderboard> = ({
     ];
 
     return (
-        <div className="row shadow p-1 bg-light rounded">
+        <div className="row p-1 rounded">
             <div className="col-md-3 hide-sm">
                 <ThumbnailImage src={iconUrl} />
             </div>
@@ -52,7 +52,7 @@ const Board: React.FC<Partial<UserView> & Leaderboard> = ({
                 <div className="row text-center p-2">
                     <div className={colClass}>
                         <Field label="Board Name">
-                            <strong className="text-primary">{name}</strong>
+                            <strong>{name}</strong>
                         </Field>
                     </div>
                     <div className={colClass}>
