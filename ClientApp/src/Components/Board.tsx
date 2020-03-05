@@ -27,22 +27,6 @@ const Board: React.FC<Partial<UserView> & Leaderboard> = ({
     const { weightLowerBound, weightUpperBound } = weightClass ?? {};
     const colClass = 'col-12 col-sm-6';
 
-    const buttons = [
-        <button
-            key={isMember ? 'view-button' : 'join-button'}
-            type="submit"
-            name={!isMember ? 'view' : 'join'}
-            className={`btn ${isMember ? 'btn-success' : 'btn-warning'} col-sm`}
-        >
-            {!isMember ? (
-                <i className="fas fa-dumbbell" />
-            ) : (
-                <i className="fas fa-chevron-right" />
-            )}
-            &nbsp; {isMember ? 'View Board' : 'Join Board'}
-        </button>,
-    ];
-
     return (
         <div className="row p-1 rounded grow">
             <div className="col-md-3 hide-sm">
@@ -90,9 +74,38 @@ const Board: React.FC<Partial<UserView> & Leaderboard> = ({
                         />
                     </div>
                 </div>
-                <form className="row" method="post" action="">
-                    {buttons.map(b => b)}
-                </form>
+                <div className="row">
+                    {isMember ? (
+                        <a href="?" className="btn btn-outline-success col-sm">
+                            <strong>
+                                <i className="fas fa-chevron-right" />
+                                &nbsp; View Board
+                            </strong>
+                        </a>
+                    ) : (
+                        <form
+                            className="col-sm"
+                            method="post"
+                            action="?handler=join"
+                        >
+                            {/* {HiddenFor('name', board)}
+                            {HiddenFor('name', board.division, 'divisionName')}
+                            {HiddenFor('weightLowerBound', board.weightClass)}
+                            {HiddenFor('weightUpperBound', board.weightClass)} */}
+                            <button
+                                key="join-button"
+                                type="submit"
+                                name="join"
+                                className="btn btn-outline-warning row col-sm"
+                            >
+                                <strong>
+                                    <i className="fas fa-dumbbell" />
+                                    &nbsp; Join Board
+                                </strong>
+                            </button>
+                        </form>
+                    )}
+                </div>
             </div>
         </div>
     );

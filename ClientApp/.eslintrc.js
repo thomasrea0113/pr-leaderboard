@@ -56,6 +56,7 @@ module.exports = {
         'import/no-unresolved': [2, { commonjs: true, amd: true }],
         'import/named': 2,
         'no-underscore-dangle': [2, { allowAfterThis: true }],
+        'import/prefer-default-export': 0,
         'import/namespace': 2,
         'import/default': 2,
         'import/export': 2,
