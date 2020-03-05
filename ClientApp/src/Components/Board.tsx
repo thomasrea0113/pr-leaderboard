@@ -44,7 +44,7 @@ const Board: React.FC<Partial<UserView> & Leaderboard> = ({
     ];
 
     return (
-        <div className="row p-1 rounded">
+        <div className="row p-1 rounded grow">
             <div className="col-md-3 hide-sm">
                 <ThumbnailImage src={iconUrl} />
             </div>

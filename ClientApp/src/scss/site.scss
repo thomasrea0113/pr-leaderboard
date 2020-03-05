@@ -10,6 +10,11 @@ $font-family-base: 'Signika', sans-serif, monospace !default;
 
 html {
     letter-spacing: 0.05rem;
+    font-size: 12px;
+
+    @include media-breakpoint-up(md) {
+        font-size: $font-size-base;
+    }
 }
 
 .navbar-bold {
@@ -31,6 +36,13 @@ html {
             letter-spacing: 0.3rem;
         }
     }
+}
+
+.grow {
+    transition: all 0.2s ease-in-out;
+}
+.grow:hover {
+    transform: scale(1.03);
 }
 
 $sizes: (10, 20, 25, 50, 75);
@@ -80,17 +92,6 @@ a.navbar-brand {
     white-space: normal;
     text-align: center;
     word-break: break-all;
-}
-
-/* Sticky footer styles
--------------------------------------------------- */
-html {
-    font-size: 14px;
-}
-@media (min-width: 768px) {
-    html {
-        font-size: 16px;
-    }
 }
 
 button.accept-policy {
