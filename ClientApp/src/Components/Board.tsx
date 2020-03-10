@@ -33,38 +33,21 @@ const Board: React.FC<Partial<UserView> & Leaderboard> = ({
     const actionButton = () => {
         if (isMember && viewUrl)
             return (
-                <div className="col-sm">
-                    <a
-                        href={viewUrl}
-                        className="btn btn-outline-success col-sm"
-                    >
-                        <strong>
-                            <i className="fas fa-chevron-right" />
-                            &nbsp; View Board
-                        </strong>
-                    </a>
-                </div>
+                <a href={viewUrl} className="btn btn-outline-success col-sm">
+                    <strong>
+                        <i className="fas fa-chevron-right" />
+                        &nbsp; View Board
+                    </strong>
+                </a>
             );
         if (!isMember && joinUrl) {
             return (
-                <form
-                    className="col-sm"
-                    data-csrf="true"
-                    method="post"
-                    action={joinUrl}
-                >
-                    <button
-                        key="join-button"
-                        type="submit"
-                        name="join"
-                        className="btn btn-outline-warning col-sm"
-                    >
-                        <strong>
-                            <i className="fas fa-dumbbell" />
-                            &nbsp; Join Board
-                        </strong>
-                    </button>
-                </form>
+                <a href={joinUrl} className="btn btn-outline-warning col-sm">
+                    <strong>
+                        <i className="fas fa-dumbbell" />
+                        &nbsp; Join Board
+                    </strong>
+                </a>
             );
         }
         return null;

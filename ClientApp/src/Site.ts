@@ -4,8 +4,13 @@
 // jQuery
 import 'jquery';
 import 'jquery-validation';
+import 'bootstrap';
 import './jquery.unobtrusive-ajax.extended';
 
 // Styles
 import './scss/site.scss';
 import '@fortawesome/fontawesome-free/css/all.css';
+
+$(document).ready($ => {
+    $('[data-modal-show=True]').modal('show');
+});

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Areas.Leaderboards.Models;
 using Leaderboard.Data;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +15,15 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
         private readonly ApplicationDbContext _ctx;
 
         public LeaderboardModel Board { get; private set; }
+
+        [ViewData]
+        public string ModalTitle { get; private set; }
+
+        [ViewData]
+        public string ModalBody { get; private set; }
+
+        [ViewData]
+        public bool DataModalShow { get; private set; }
 
         public ViewModel(ApplicationDbContext ctx)
         {
@@ -49,9 +59,12 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
             await InitAsync();
         }
 
-        public async Task OnPostJoinAsync()
+        public async Task OnGetJoinAsync()
         {
             await InitAsync();
+            ModalTitle = "Join Board";
+            ModalBody = "Would you like to join this board?";
+            DataModalShow = true;
         }
     }
 }

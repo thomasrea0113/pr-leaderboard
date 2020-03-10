@@ -48,6 +48,27 @@
     </footer>
     <react-bundle src="js/site.[hash].js" />
     @RenderSection("scripts", required: false)
+
+    <!-- Root modal -->
+    <div class="modal fade" id="root-modal" data-modal-show="@(ViewData["DataModalShow"] ?? false)" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">@ViewData["ModalTitle"]</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="ModalBody">
+            @ViewData["modal-body"]
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">@(ViewData["ModalCancelText"] ?? "Cancel")</button>
+            <button type="button" class="btn btn-primary">@(ViewData["ModalConfirmText"] ?? "Confirm")</button>
+        </div>
+        </div>
+    </div>
+    </div>
 </body>
 
 </html>
