@@ -34,6 +34,8 @@ export interface Leaderboard {
 export interface UserView extends Leaderboard {
     isMember: boolean;
     isRecommended: boolean;
+    viewUrl?: string;
+    joinUrl?: string;
 }
 
 export interface User {

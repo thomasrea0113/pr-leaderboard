@@ -20,13 +20,14 @@ const Board: React.FC<Partial<UserView> & Leaderboard> = ({
     name,
     uom: { unit },
     iconUrl,
+    joinUrl,
+    viewUrl: boardUrl,
     weightClass,
     isMember,
     division: { gender, ageLowerBound, ageUpperBound, categories },
 }) => {
     const { weightLowerBound, weightUpperBound } = weightClass ?? {};
     const colClass = 'col-12 col-sm-6';
-
     return (
         <div className="row p-1 rounded grow">
             <div className="col-md-3 hide-sm">
@@ -76,27 +77,26 @@ const Board: React.FC<Partial<UserView> & Leaderboard> = ({
                 </div>
                 <div className="row">
                     {isMember ? (
-                        <a href="?" className="btn btn-outline-success col-sm">
-                            <strong>
-                                <i className="fas fa-chevron-right" />
-                                &nbsp; View Board
-                            </strong>
-                        </a>
-                    ) : (
-                        <form
-                            className="col-sm"
-                            method="post"
-                            action="?handler=join"
-                        >
-                            {/* {HiddenFor('name', board)}
-                            {HiddenFor('name', board.division, 'divisionName')}
-                            {HiddenFor('weightLowerBound', board.weightClass)}
-                            {HiddenFor('weightUpperBound', board.weightClass)} */}
+                        boardUrl ? (
+                            <div className="col-sm">
+                                <a
+                                    href={boardUrl}
+                                    className="btn btn-outline-success col-sm"
+                                >
+                                    <strong>
+                                        <i className="fas fa-chevron-right" />
+                                        &nbsp; View Board
+                                    </strong>
+                                </a>
+                            </div>
+                        ) : null
+                    ) : boardUrl != null ? (
+                        <form className="col-sm" method="post" action={joinUrl}>
                             <button
                                 key="join-button"
                                 type="submit"
                                 name="join"
-                                className="btn btn-outline-warning row col-sm"
+                                className="btn btn-outline-warning col-sm"
                             >
                                 <strong>
                                     <i className="fas fa-dumbbell" />
@@ -104,7 +104,7 @@ const Board: React.FC<Partial<UserView> & Leaderboard> = ({
                                 </strong>
                             </button>
                         </form>
-                    )}
+                    ) : null}
                 </div>
             </div>
         </div>
