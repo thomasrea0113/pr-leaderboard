@@ -71,7 +71,8 @@ namespace Leaderboard.Migrations
                     Gender = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: false),
                     AgeLowerBound = table.Column<int>(nullable: true),
-                    AgeUpperBound = table.Column<int>(nullable: true)
+                    AgeUpperBound = table.Column<int>(nullable: true),
+                    Slug = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -97,7 +98,8 @@ namespace Leaderboard.Migrations
                 {
                     Id = table.Column<string>(nullable: false),
                     WeightLowerBound = table.Column<int>(nullable: true),
-                    WeightUpperBound = table.Column<int>(nullable: true)
+                    WeightUpperBound = table.Column<int>(nullable: true),
+                    Range = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -314,7 +316,8 @@ namespace Leaderboard.Migrations
                     DivisionId = table.Column<string>(nullable: false),
                     WeightClassId = table.Column<string>(nullable: true),
                     IsActive = table.Column<bool>(nullable: true, defaultValue: true),
-                    UOMId = table.Column<string>(nullable: false)
+                    UOMId = table.Column<string>(nullable: false),
+                    Slug = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -473,9 +476,9 @@ namespace Leaderboard.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Divisions_Gender_Name",
+                name: "IX_Divisions_Gender_Slug",
                 table: "Divisions",
-                columns: new[] { "Gender", "Name" },
+                columns: new[] { "Gender", "Slug" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -500,9 +503,9 @@ namespace Leaderboard.Migrations
                 column: "WeightClassId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Leaderboards_DivisionId_WeightClassId_Name",
+                name: "IX_Leaderboards_DivisionId_WeightClassId_Slug",
                 table: "Leaderboards",
-                columns: new[] { "DivisionId", "WeightClassId", "Name" },
+                columns: new[] { "DivisionId", "WeightClassId", "Slug" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -557,6 +560,12 @@ namespace Leaderboard.Migrations
                 name: "IX_UserLeaderboards_UserId_LeaderboardId",
                 table: "UserLeaderboards",
                 columns: new[] { "UserId", "LeaderboardId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WeightClasses_Range",
+                table: "WeightClasses",
+                column: "Range",
                 unique: true);
 
             migrationBuilder.CreateIndex(

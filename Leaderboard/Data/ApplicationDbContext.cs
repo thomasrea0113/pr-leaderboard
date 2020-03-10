@@ -52,23 +52,11 @@ namespace Leaderboard.Data
         public override async Task<int> SaveChangesAsync(CancellationToken ct = default)
         {
             this.ChangeTracker.DetectChanges();
-
             var allEntries = this.ChangeTracker.Entries();
-
-            // All added users. need to evaluate the enumerable immediately
-            var users = allEntries.Select(ee => ee.Entity)
-                .Where(e => e is ApplicationUser)
-                .Cast<ApplicationUser>()
-                .ToArray();
-
             await allEntries.ProcessPreSaveFeaturesAsync();
-
-            var added = allEntries.Where(s => s.State == EntityState.Added);
-            
+            this.ChangeTracker.DetectChanges();
             var count = await base.SaveChangesAsync();
-
             await allEntries.ProcessPostSaveFeaturesAsync();
-
             return count;
         }
     }

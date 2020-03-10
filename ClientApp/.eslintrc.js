@@ -38,6 +38,9 @@ module.exports = {
             },
         ],
 
+        // might want to reenable this, but sometimes nested ternary is convenient
+        'no-nested-ternary': 0,
+
         // the typescript tooling in vscode will handle this for us
         'no-undef': 0,
         'jsx-a11y/label-has-associated-control': [

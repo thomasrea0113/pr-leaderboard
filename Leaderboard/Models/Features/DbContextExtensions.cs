@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using static Leaderboard.Utilities.SlugUtilities;
 
 namespace Leaderboard.Models.Features
 {
@@ -54,23 +55,39 @@ namespace Leaderboard.Models.Features
 
         public static async Task ProcessPreSaveFeaturesAsync(this IEnumerable<EntityEntry> entries)
         {
-            
-            var added = entries.Where(t => t.State == EntityState.Added);
-            foreach (var entry in added)
+
+            foreach (var entry in entries)
             {
-                var entity = entry.Entity;
+                if (entry.State == EntityState.Added || entry.State == EntityState.Modified)
+                {
+                    if (entry.Entity is IOnDbPreSaveAsync onSave)
+                        await onSave.OnPreSaveAsync(entry.Context, entry.CurrentValues);
+                    if (entry.Entity is ISlugged slugged)
+                        slugged.Slug = Slugify(slugged.Name);
+                }
 
-                if (entry.Entity is IOnDbPreCreateAsync onCreate)
-                    await onCreate.OnPreCreateAsync(entry.Context, entry.CurrentValues);
-            }
+                if (entry.State == EntityState.Added)
+                {
+                    if (entry.Entity is IOnDbPreCreateAsync onCreate)
+                        await onCreate.OnPreCreateAsync(entry.Context, entry.CurrentValues);
+                }
+                else if (entry.State == EntityState.Deleted)
+                {
 
-            var modified = entries.Where(t => t.State == EntityState.Modified);
-            foreach (var entry in modified)
-            {
-                var entity = entry.Entity;
-
-                if (entity is IOnDbPreSaveAsync onSave)
-                    await onSave.OnPreSaveAsync(entry.Context, entry.CurrentValues);
+                    // if this model has an active feature, then we prevent the delete
+                    // and set active to false
+                    if (entry.Entity is IDbActive active)
+                    {
+                        active.IsActive = false;
+                        entry.State = EntityState.Modified;
+                    }
+                    else
+                    {
+                        // if not active, continue processing actions
+                        if (entry.Entity is IOnDbPreDeleteAsync onDelete)
+                            await onDelete.OnDeleteAsync(entry.Context);
+                    }
+                }
             }
 
             var deleted = entries.Where(t => t.State == EntityState.Deleted);

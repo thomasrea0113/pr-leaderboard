@@ -2,17 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using System.Text.Json.Serialization;
 using Leaderboard.Models.Features;
 using Leaderboard.Models.Relationships;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using static Leaderboard.Utilities.SlugUtilities;
 
 namespace Leaderboard.Areas.Leaderboards.Models
 {
     // TODO implement sluggy on save
-    public class LeaderboardModel : IDbEntity<LeaderboardModel>, IDbActive
+    public class LeaderboardModel : IDbEntity<LeaderboardModel>, IDbActive, ISlugged
     {
+
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public string Id { get; set; }
@@ -25,7 +28,7 @@ namespace Leaderboard.Areas.Leaderboards.Models
         public virtual Division Division { get; set; }
 
         public string WeightClassId { get; set; }
-        
+
         [JsonIgnore]
         public virtual WeightClass WeightClass { get; set; }
 
@@ -39,21 +42,24 @@ namespace Leaderboard.Areas.Leaderboards.Models
         public virtual ICollection<ScoreModel> Scores { get; set; }
 
         public virtual string UOMId { get; set; }
-        
+
         [JsonIgnore]
         public virtual UnitOfMeasureModel UOM { get; set; }
+
+        public string Slug { get; set; }
 
         public void OnModelCreating(EntityTypeBuilder<LeaderboardModel> builder)
         {
             // ensuring Name is unique
             builder.Property(p => p.Name).IsRequired();
+            builder.Property(b => b.Slug).IsRequired();
 
             // A division can only contain one board with a given name
-            builder.HasIndex(p => new 
+            builder.HasIndex(p => new
             {
                 p.DivisionId,
                 p.WeightClassId,
-                p.Name
+                p.Slug
             }).IsUnique();
 
             builder.Property(p => p.IsActive).HasDefaultValue(true);
@@ -79,9 +85,9 @@ namespace Leaderboard.Areas.Leaderboards.Models
         }
 
         #region equality
-        
+
         // 2 instances are equal if they have the same Id
-        # nullable enable
+#nullable enable
         public override int GetHashCode() => Id.GetHashCode();
         public override bool Equals(object? obj)
         {
@@ -89,7 +95,7 @@ namespace Leaderboard.Areas.Leaderboards.Models
                 return Id.Equals(m.Id);
             return Id.Equals(obj);
         }
-        #nullable disable
+#nullable disable
 
         #endregion
     }

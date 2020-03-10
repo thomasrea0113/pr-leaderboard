@@ -3,15 +3,11 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Leaderboard.Areas.Identity.Managers;
-using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Areas.Identity.ViewModels;
-using Leaderboard.Areas.Leaderboards.Models;
 using Leaderboard.Areas.Leaderboards.ViewModels;
-using Leaderboard.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Leaderboard.Areas.Identity.Pages.Account.Manage
 {
@@ -19,12 +15,14 @@ namespace Leaderboard.Areas.Identity.Pages.Account.Manage
     {
         private readonly AppUserManager _manager;
 
-        public class ReactProps {
+        public class ReactProps
+        {
             public string InitialUrl { get; set; }
             public string UserName { get; set; }
         }
 
-        public class ReactState {
+        public class ReactState
+        {
             public UserViewModel User { get; set; }
             public IEnumerable<UserLeaderboardViewModel> Recommendations { get; set; }
         }
@@ -49,15 +47,14 @@ namespace Leaderboard.Areas.Identity.Pages.Account.Manage
             var user = await _manager.GetCompleteUserAsync(User);
             var userBoards = user.UserLeaderboards.Select(ub => ub.Leaderboard).ToArray();
 
-            // want to exclude the boards that the user is already in
             var recommendations = await _manager.GetRecommendedBoardsQuery(user)
                 .Include(b => b.Division)
                 .ToArrayAsync();
 
             var allUserBoards = UserLeaderboardViewModel
-                .Create(userBoards, true, false)
+                .Create(userBoards, true, false, Url)
                 .Concat(UserLeaderboardViewModel
-                    .Create(recommendations.Except(userBoards), false, true)).Distinct().ToArray();
+                    .Create(recommendations.Except(userBoards), false, true, Url)).Distinct().ToArray();
 
             return new JsonResult(new ReactState
             {

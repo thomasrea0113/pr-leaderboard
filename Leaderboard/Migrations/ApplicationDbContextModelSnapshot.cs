@@ -281,9 +281,13 @@ namespace Leaderboard.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("Gender", "Name")
+                    b.HasIndex("Gender", "Slug")
                         .IsUnique();
 
                     b.ToTable("Divisions");
@@ -356,6 +360,10 @@ namespace Leaderboard.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("UOMId")
                         .IsRequired()
                         .HasColumnType("text");
@@ -369,7 +377,7 @@ namespace Leaderboard.Migrations
 
                     b.HasIndex("WeightClassId");
 
-                    b.HasIndex("DivisionId", "WeightClassId", "Name")
+                    b.HasIndex("DivisionId", "WeightClassId", "Slug")
                         .IsUnique();
 
                     b.ToTable("Leaderboards");
@@ -459,6 +467,10 @@ namespace Leaderboard.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("text");
 
+                    b.Property<string>("Range")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<int?>("WeightLowerBound")
                         .HasColumnType("integer");
 
@@ -466,6 +478,9 @@ namespace Leaderboard.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Range")
+                        .IsUnique();
 
                     b.HasIndex("WeightLowerBound", "WeightUpperBound")
                         .IsUnique();

@@ -10,10 +10,9 @@ using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Areas.Leaderboards.Models;
 using Leaderboard.Data.BulkExtensions;
 using Leaderboard.Models.Relationships;
-using Leaderboard.Utilities;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Leaderboard.Utilities;
 
 namespace Leaderboard.Data.SeedExtensions
 {
@@ -32,7 +31,7 @@ namespace Leaderboard.Data.SeedExtensions
             var configuringType = typeof(TEntity);
 
             // seed data for this configuration, as well as all data for all configurations
-            var seedFilePath = new string []
+            var seedFilePath = new string[]
             {
                 Path.Combine(SeedDirectory, $"{configuringType.FullName}.data.json"),
                 Path.Combine(SeedDirectory, $"{configuringType.FullName}.{environmentName}.data.json")
@@ -65,8 +64,8 @@ namespace Leaderboard.Data.SeedExtensions
             weightClasses ??= new List<WeightClass> { null };
 
             var allCombinations = from d in divisions
-                from wc in weightClasses
-                select (d, wc);
+                                  from wc in weightClasses
+                                  select (d, wc);
 
             var count = allCombinations.Count();
 
@@ -76,7 +75,7 @@ namespace Leaderboard.Data.SeedExtensions
                 string weightClassId
             ) => new LeaderboardModel
             {
-                Id = GuidUtility.Create(GuidUtility.UrlNamespace, $"lb_{weightClassId}{divisionId}{name}").ToString(),
+                Id = GuidUtilities.Create($"lb_{weightClassId}{divisionId}{name}").ToString(),
                 Name = name,
                 IsActive = true,
                 WeightClassId = weightClassId,
@@ -85,7 +84,7 @@ namespace Leaderboard.Data.SeedExtensions
             };
 
             foreach ((var division, var weightClass) in allCombinations.Distinct())
-                foreach(var boardName in boardNames)
+                foreach (var boardName in boardNames)
                     yield return generateBoard(boardName, division?.Id, weightClass?.Id);
         }
 
@@ -95,7 +94,7 @@ namespace Leaderboard.Data.SeedExtensions
             {
                 var role = new ApplicationRole(roleName)
                 {
-                    Id = GuidUtility.Create(GuidUtility.UrlNamespace, $"role_{roleName}").ToString()
+                    Id = GuidUtilities.Create($"role_{roleName}").ToString()
                 };
                 await manager.TryCreateByNameAsync(role);
                 yield return role;
@@ -108,7 +107,7 @@ namespace Leaderboard.Data.SeedExtensions
             {
                 var user = new ApplicationUser(userName)
                 {
-                    Id = GuidUtility.Create(GuidUtility.UrlNamespace, $"u_{userName}").ToString(),
+                    Id = GuidUtilities.Create($"u_{userName}").ToString(),
                     Gender = gender,
                     IsActive = true
                 };
@@ -124,7 +123,7 @@ namespace Leaderboard.Data.SeedExtensions
                 foreach (var board in boards)
                     yield return new UserLeaderboard
                     {
-                        Id = GuidUtility.Create(GuidUtility.UrlNamespace, $"ub_{board.Id}{user.Id}").ToString(),
+                        Id = GuidUtilities.Create($"ub_{board.Id}{user.Id}").ToString(),
                         UserId = user.Id,
                         LeaderboardId = board.Id
                     };
@@ -139,8 +138,9 @@ namespace Leaderboard.Data.SeedExtensions
             {
                 for (var i = 0; i < 10; i++)
                 {
-                    yield return new ScoreModel {
-                        Id = GuidUtility.Create(GuidUtility.UrlNamespace, $"score_{board.UserId}{board.LeaderboardId}{i}").ToString(),
+                    yield return new ScoreModel
+                    {
+                        Id = GuidUtilities.Create($"score_{board.UserId}{board.LeaderboardId}{i}").ToString(),
                         IsApproved = i % 2 == 0, // if i is even, then true. All odd indexes will be false,
                         UserId = board.UserId,
                         BoardId = board.LeaderboardId,
@@ -153,7 +153,7 @@ namespace Leaderboard.Data.SeedExtensions
         private static IEnumerable<UserCategory> GenerateUserCategories(string categoryId, params ApplicationUser[] users)
             => users.Select(u => new UserCategory
             {
-                Id = GuidUtility.Create(GuidUtility.UrlNamespace, $"uc{u.Id}{categoryId}").ToString(),
+                Id = GuidUtilities.Create($"uc{u.Id}{categoryId}").ToString(),
                 UserId = u.Id,
                 CategoryId = categoryId
             });
@@ -161,7 +161,7 @@ namespace Leaderboard.Data.SeedExtensions
         private static List<DivisionCategory> GenerateDivisionCategories(List<Division> divisions, string categoryId)
             => divisions.Select(d => new DivisionCategory
             {
-                Id = GuidUtility.Create(GuidUtility.UrlNamespace, $"dc_{d.Id}{categoryId}").ToString(),
+                Id = GuidUtilities.Create($"dc_{d.Id}{categoryId}").ToString(),
                 CategoryId = categoryId,
                 DivisionId = d.Id
             }).ToList();
@@ -188,7 +188,7 @@ namespace Leaderboard.Data.SeedExtensions
 
             var divisions = await GetSeedDataFromFile<Division>(environmentName);
             await context.BulkInsertOrUpdateAsync((elist, e) => elist.Any(e2 => e2.Id == e.Id), divisions.ToArray());
-            
+
             await context.SaveChangesAsync();
 
             // categoryId from Category.cs call to HasData()
@@ -215,7 +215,7 @@ namespace Leaderboard.Data.SeedExtensions
             var roles = await roleManager.GetOrCreateRoles("admin").ToListAsync();
             var users = await userManager.GetOrCreateUsers(null, "Admin").ToListAsync();
             await userManager.TryAddToRoleAsync(users.First(), "Admin");
-            
+
             await context.SaveChangesAsync();
 
             // if not in productions, we want some dummy users and scores
@@ -240,7 +240,7 @@ namespace Leaderboard.Data.SeedExtensions
                 llUser.Email = email;
                 llUser.NormalizedEmail = email.ToUpper();
                 await userManager.UpdateAsync(llUser);
-                
+
                 // setting some birthdates
                 users[0].BirthDate = DateTime.Parse("05/11/1993");
                 users[1].BirthDate = DateTime.Parse("01/12/2011");
@@ -265,7 +265,7 @@ namespace Leaderboard.Data.SeedExtensions
                         return default;
                     })
                     .Where(ub => ub != default);
-                    
+
                 var userBoards = await GenerateUserLeaderboards(recommendations).ToArrayAsync();
                 await context.BulkInsertOrUpdateAsync(e => new { e.UserId, e.LeaderboardId }, userBoards);
 

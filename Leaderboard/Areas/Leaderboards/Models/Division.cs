@@ -9,10 +9,11 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Leaderboard.Areas.Identity.Models;
 using System.Text.Json.Serialization;
+using static Leaderboard.Utilities.SlugUtilities;
 
 namespace Leaderboard.Areas.Leaderboards.Models
 {
-    public class Division : IDbEntity<Division>
+    public class Division : IDbEntity<Division>, ISlugged
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -33,12 +34,14 @@ namespace Leaderboard.Areas.Leaderboards.Models
 
         [JsonIgnore]
         public virtual ICollection<DivisionWeightClass> WeightClasses { get; set; }
-        
+
         [JsonIgnore]
         public virtual ICollection<LeaderboardModel> Boards { get; set; }
-        
+
         [JsonIgnore]
         public virtual ICollection<DivisionCategory> DivisionCategories { get; set; }
+
+        public string Slug { get; set; }
 
         public void OnModelCreating(EntityTypeBuilder<Division> builder)
         {
@@ -46,12 +49,13 @@ namespace Leaderboard.Areas.Leaderboards.Models
             builder.Property(b => b.Gender).HasConversion<string>();
 
             builder.Property(b => b.Name).IsRequired();
+            builder.Property(b => b.Slug).IsRequired();
 
             // can't have multiple divisions with the same name for a given gender
             builder.HasIndex(b => new
             {
                 b.Gender,
-                b.Name
+                b.Slug
             }).IsUnique();
         }
 

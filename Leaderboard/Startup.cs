@@ -9,18 +9,14 @@ using Microsoft.Extensions.Hosting;
 using Leaderboard.Areas.Identity.Validators;
 using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Areas.Identity.Managers;
-using System;
-using System.Linq;
-using Microsoft.AspNetCore.Http;
 using Leaderboard.Areas.Identity;
 using Leaderboard.Services;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using System.Text.Json;
-using Leaderboard.Data.SeedExtensions;
-using System.Reflection;
 using Microsoft.Extensions.Logging;
 using System.Text.Json.Serialization;
+using Leaderboard.Routing.Constraints;
 
 namespace Leaderboard
 {
@@ -89,7 +85,14 @@ namespace Leaderboard
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddTransient<IPartialRenderer, PartialRenderer>();
 
-            services.AddRazorPages().AddJsonOptions(options => {
+            services.AddRouting(o =>
+            {
+                o.ConstraintMap["slug"] = typeof(SlugConstraint);
+                o.ConstraintMap["range"] = typeof(RangeConstraint);
+            });
+
+            services.AddRazorPages().AddJsonOptions(options =>
+            {
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(default, false));
@@ -126,9 +129,6 @@ namespace Leaderboard
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });
         }

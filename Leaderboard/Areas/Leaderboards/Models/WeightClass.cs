@@ -1,13 +1,17 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 using Leaderboard.Models.Features;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Leaderboard.Areas.Leaderboards.Models
 {
-    public class WeightClass : IDbEntity<WeightClass>
+    public class WeightClass : IDbEntity<WeightClass>, IOnDbPreSaveAsync
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -26,10 +30,12 @@ namespace Leaderboard.Areas.Leaderboards.Models
         /// <value></value>
         /// [Range(0, 500)]
         public int? WeightUpperBound { get; set; }
+        public string Range { get; private set; }
+
 
         [JsonIgnore]
         public virtual ICollection<DivisionWeightClass> Divisions { get; set; }
-        
+
         [JsonIgnore]
         public virtual ICollection<LeaderboardModel> Boards { get; set; }
 
@@ -40,8 +46,18 @@ namespace Leaderboard.Areas.Leaderboards.Models
                 b.WeightLowerBound,
                 b.WeightUpperBound
             }).IsUnique();
+            builder.Property(b => b.Range).IsRequired();
+            builder.HasIndex(b => b.Range).IsUnique();
         }
 
-        public override string ToString() => $"{WeightLowerBound}-{WeightUpperBound}";
+        public Task OnPreSaveAsync(DbContext ctx, PropertyValues values)
+        {
+            Range = ToString();
+            return Task.CompletedTask;
+        }
+
+        private string ToBound(int? bound) => bound != null ? Convert.ToString(bound) : "any";
+
+        public override string ToString() => $"{ToBound(WeightLowerBound)}-{ToBound(WeightUpperBound)}";
     }
 }
