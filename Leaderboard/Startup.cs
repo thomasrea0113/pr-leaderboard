@@ -87,8 +87,10 @@ namespace Leaderboard
 
             services.AddRouting(o =>
             {
+                // route constraints - used to make assertions about route parameters
                 o.ConstraintMap["slug"] = typeof(SlugConstraint);
                 o.ConstraintMap["range"] = typeof(RangeConstraint);
+                o.ConstraintMap["gender"] = typeof(GenderConstraint);
             });
 
             services.AddRazorPages().AddJsonOptions(options =>
