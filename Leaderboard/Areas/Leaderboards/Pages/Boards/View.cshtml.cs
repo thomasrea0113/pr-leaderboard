@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Areas.Leaderboards.Models;
 using Leaderboard.Data;
+using Leaderboard.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,7 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
     public class ViewModel : PageModel
     {
         private readonly ApplicationDbContext _ctx;
+        private readonly IMessageQueue _messages;
 
         public LeaderboardModel Board { get; private set; }
 
@@ -25,9 +27,10 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
         [ViewData]
         public bool DataModalShow { get; private set; }
 
-        public ViewModel(ApplicationDbContext ctx)
+        public ViewModel(ApplicationDbContext ctx, IMessageQueue messages)
         {
             _ctx = ctx;
+            _messages = messages;
         }
 
         private async Task InitAsync()
@@ -62,9 +65,19 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
         public async Task OnGetJoinAsync()
         {
             await InitAsync();
+            // TODO confirm user is not already in this board
             ModalTitle = "Join Board";
             ModalBody = "Would you like to join this board?";
             DataModalShow = true;
+        }
+
+        public async Task<RedirectToPageResult> OnPostModalAsync()
+        {
+            // TODO implement join
+            await Task.CompletedTask;
+
+            _messages.PushMessage("You've joined this board!");
+            return RedirectToPage();
         }
     }
 }

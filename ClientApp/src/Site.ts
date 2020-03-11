@@ -12,5 +12,5 @@ import './scss/site.scss';
 import '@fortawesome/fontawesome-free/css/all.css';
 
 $(document).ready($ => {
-    $('[data-modal-show=True]').modal('show');
+    $('[data-show=true]').modal('show');
 });
