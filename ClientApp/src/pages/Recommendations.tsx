@@ -112,13 +112,12 @@ const RecommendationsComponent: React.FC<{
         useExpanded
     );
 
+    const reload = () => reloadAsync().then(d => setData(d));
+
     useEffect(() => {
-        reloadAsync()
-            .then(d => setData(d))
-            .then(() => {
-                if (!isAllRowsExpanded && !isLoading)
-                    toggleAllRowsExpanded(true);
-            });
+        reload().then(() => {
+            if (!isAllRowsExpanded && !isLoading) toggleAllRowsExpanded(true);
+        });
     }, []);
 
     const renderRow = (row: Row<UserView>): ReactFragment => {
@@ -231,7 +230,7 @@ const RecommendationsComponent: React.FC<{
                 <div className="form-row">
                     <RefreshButton
                         isLoading={isLoading}
-                        onClick={reloadAsync}
+                        onClick={reload}
                         className="col-sm"
                     />
                 </div>

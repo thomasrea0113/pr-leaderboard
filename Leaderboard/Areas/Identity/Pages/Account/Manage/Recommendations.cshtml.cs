@@ -45,11 +45,8 @@ namespace Leaderboard.Areas.Identity.Pages.Account.Manage
 
         public async Task<JsonResult> OnGetInitialAsync()
         {
-            // TODO remove? It's nice to slow things down a bit for the visual
-            Thread.Sleep(1000);
-
             var user = await _manager.GetCompleteUserAsync(User);
-            var userBoards = user.UserLeaderboards.Select(ub => ub.Leaderboard).ToArray();
+            var userBoards = user.UserLeaderboards.Select(ub => ub.Leaderboard);
 
             var recommendations = await _manager.GetRecommendedBoardsQuery(user)
                 .Include(b => b.Division)
@@ -58,7 +55,7 @@ namespace Leaderboard.Areas.Identity.Pages.Account.Manage
             var allUserBoards = UserLeaderboardViewModel
                 .Create(userBoards, true, false, Url)
                 .Concat(UserLeaderboardViewModel
-                    .Create(recommendations.Except(userBoards), false, true, Url)).Distinct().Take(5).ToArray();
+                    .Create(recommendations.Except(userBoards), false, true, Url)).Distinct();
 
             return new JsonResult(new ReactState
             {
