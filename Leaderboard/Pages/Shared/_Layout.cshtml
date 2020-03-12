@@ -6,6 +6,8 @@
     var showModal = (ViewData["DataModalShow"] ?? false).ToString().ToLower();
     var allowModalClose = Convert.ToBoolean(ViewData["AllowModalClose"]);
     var modalBackdrop = allowModalClose ? "true" : "static";
+    var modalCancelText = ViewData["ModalCancelText"] ?? "Cancel";
+    var modalConfirmText = ViewData["ModalConfirmText"] ?? "Confirm";
 }
 
 <!DOCTYPE html>
@@ -21,7 +23,7 @@
 
 <body>
     <header>
-        <nav class="navbar navbar-bold navbar-expand-sm navbar-toggleable-sm bg-secondary border-bottom box-shadow mb-3">
+        <nav class="navbar sticky-top navbar-bold bg-secondary border-bottom box-shadow mb-3">
             <div class="container">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Leaderboard</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse"
@@ -68,8 +70,8 @@
         data-keyboard="false"
         tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-        <div class="modal-header">
+    <div class="modal-content">
+    <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">@ViewData["ModalTitle"]</h5>
             @if (allowModalClose)
             {
@@ -82,8 +84,8 @@
             @ViewData["modal-body"]
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">@(ViewData["ModalCancelText"] ?? "Cancel")</button>
-            <button type="submit" class="btn btn-primary">@(ViewData["ModalConfirmText"] ?? "Confirm")</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">@modalCancelText</button>
+            <button type="submit" class="btn btn-primary">@modalConfirmText</button>
         </div>
         </div>
     </div>

@@ -1,3 +1,12 @@
 @page "~/{division:slug}/{gender:gender}/{weightClass:range}/{slug:slug}"
 @using Leaderboard.Areas.Leaderboards.Pages.Boards
 @model ViewModel
+
+<span class="container" id="root">
+  <div id="scores"></div>
+  <partial name="_LoadingPartial" />
+</span>
+
+@section scripts {
+    <react-component src="js/scores.[hash].js" element-id="root" props="Model.Props" />
+}

@@ -1,7 +1,6 @@
-import React, { ReactNode, useRef } from 'react';
-import $ from 'jquery';
+import React, { ReactNode } from 'react';
 import { Leaderboard, UserView } from '../types/dotnet-types';
-import { Range, ThumbnailImage, GenderIcon } from './StyleComponents';
+import { RangeDisplay, ThumbnailImage, GenderIcon } from './StyleComponents';
 
 const Field: React.FC<{
     label: string;
@@ -72,7 +71,7 @@ const Board: React.FC<Partial<UserView> & Leaderboard> = ({
                     </div>
                     <div className={colClass}>
                         <Field label="Weight Range">
-                            <Range
+                            <RangeDisplay
                                 lowerBound={weightLowerBound}
                                 upperBound={weightUpperBound}
                             />
@@ -80,7 +79,7 @@ const Board: React.FC<Partial<UserView> & Leaderboard> = ({
                     </div>
                     <div className={colClass}>
                         <Field label="Age Range">
-                            <Range
+                            <RangeDisplay
                                 lowerBound={ageLowerBound}
                                 upperBound={ageUpperBound}
                             />

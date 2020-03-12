@@ -17,6 +17,12 @@ html {
     }
 }
 
+.sticky-top {
+    :not([data-scroll='0']) {
+        background-color: inherit !important;
+    }
+}
+
 .navbar-bold {
     padding: 0.5rem;
 

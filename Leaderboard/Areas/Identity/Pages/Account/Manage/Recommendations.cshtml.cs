@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using Leaderboard.Areas.Identity.Managers;
 using Leaderboard.Areas.Identity.ViewModels;
@@ -44,6 +45,9 @@ namespace Leaderboard.Areas.Identity.Pages.Account.Manage
 
         public async Task<JsonResult> OnGetInitialAsync()
         {
+            // TODO remove? It's nice to slow things down a bit for the visual
+            Thread.Sleep(1000);
+
             var user = await _manager.GetCompleteUserAsync(User);
             var userBoards = user.UserLeaderboards.Select(ub => ub.Leaderboard).ToArray();
 
@@ -54,7 +58,7 @@ namespace Leaderboard.Areas.Identity.Pages.Account.Manage
             var allUserBoards = UserLeaderboardViewModel
                 .Create(userBoards, true, false, Url)
                 .Concat(UserLeaderboardViewModel
-                    .Create(recommendations.Except(userBoards), false, true, Url)).Distinct().ToArray();
+                    .Create(recommendations.Except(userBoards), false, true, Url)).Distinct().Take(5).ToArray();
 
             return new JsonResult(new ReactState
             {
