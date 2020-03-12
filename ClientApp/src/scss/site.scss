@@ -52,6 +52,10 @@ html {
         letter-spacing: 0.3rem;
     }
 
+    button.navbar-toggler:focus {
+        outline: unset;
+    }
+
     .navbar-toggler {
         background-color: $dark;
 
@@ -64,11 +68,24 @@ html {
             height: 100%; //needed for align-middle
             text-shadow: 2px 2px $dark;
 
+            $trans: transform 0.35s ease-in-out !default;
+            -moz-transition: $trans;
+            -webkit-transition: $trans;
+            transition: $trans;
+
             &:before {
                 @extend .align-middle;
                 content: fa-content($fa-var-chevron-down);
             }
         }
+    }
+
+    .navbar-toggler[aria-expanded='true'] .navbar-toggler-icon {
+        $rotate: rotate(180deg) !important;
+        -ms-transform: $rotate;
+        -moz-transform: $rotate;
+        -webkit-transform: $rotate;
+        transform: $rotate;
     }
 }
 
