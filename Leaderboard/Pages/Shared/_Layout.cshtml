@@ -1,6 +1,9 @@
 ﻿@inject Leaderboard.Services.IMessageQueue Messages
 
 @{
+    // will fade the nav when at the top scroll position
+    var navFadeTop = Convert.ToBoolean(ViewData["NavFadeTop"]);
+
     var modalAction = ViewData["DataModalAction"] ?? "?handler=modal";
     var modalMethod = ViewData["DataModalMethod"] ?? "POST";
     var showModal = (ViewData["DataModalShow"] ?? false).ToString().ToLower();
@@ -23,7 +26,7 @@
 
 <body>
     <header>
-        <nav class="navbar navbar-bold navbar-expand-sm navbar-toggleable-sm box-shadow mb-1">
+        <nav class="navbar @if(navFadeTop) { <text>fade-top </text> }fixed-top navbar-bold navbar-expand-sm navbar-toggleable-sm box-shadow">
             <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Leaderboard</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,7 +45,7 @@
             </div>
         </nav>
     </header>
-    <div class="container">
+    <div class="container @if(!navFadeTop) { <text>navbar-fixed-offset</text> }">
         <main role="main" class="pb-3">
             <partial name="_StatusMessages" model="Messages.GetAllMessages()" />
             @RenderBody()

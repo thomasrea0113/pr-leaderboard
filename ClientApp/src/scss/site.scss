@@ -21,14 +21,34 @@ html {
     }
 }
 
-.sticky-top {
-    :not([data-scroll='0']) {
-        background-color: inherit !important;
+@mixin transition-color($color) {
+    background-color: $color !important;
+
+    $bgTransition: background-color 250ms linear;
+    -webkit-transition: $bgTransition;
+    -ms-transition: $bgTransition;
+    transition: $bgTransition;
+}
+
+// will only match if the scroll is at the top. see site.ts for how the scroll position is calculated
+html[data-scroll='0'] {
+    .navbar.fade-top {
+        @include transition-color(rgba($secondary, 0.25));
     }
 }
 
+$navbar-height: 6vh;
+
+.navbar-fixed-offset {
+    padding-top: $navbar-height;
+}
+
+.navbar.fixed-top {
+    min-height: $navbar-height;
+}
+
 .navbar-bold {
-    @extend .bg-secondary;
+    @include transition-color(rgba($secondary, 1));
     @extend .text-success;
 
     padding-top: 0rem;
