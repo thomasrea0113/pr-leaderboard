@@ -9,7 +9,6 @@ import './jquery.unobtrusive-ajax.extended';
 
 // Styles
 import './scss/site.scss';
-import '@fortawesome/fontawesome-free/css/all.css';
 
 $(document).ready($ => {
     $('[data-show=true]').modal('show');

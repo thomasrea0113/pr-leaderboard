@@ -8,6 +8,10 @@ $font-family-base: 'Signika', sans-serif, monospace !default;
 @import '../../node_modules/bootstrap/scss/bootstrap';
 @import './bootswatch';
 
+@import '../../node_modules/@fortawesome/fontawesome-free/scss/fontawesome';
+@import '../../node_modules/@fortawesome/fontawesome-free/scss/solid';
+@import '../../node_modules/@fortawesome/fontawesome-free/scss/regular';
+
 html {
     letter-spacing: 0.05rem;
     font-size: 12px;
@@ -24,25 +28,47 @@ html {
 }
 
 .navbar-bold {
-    padding: 0.5rem;
+    @extend .bg-secondary;
+    @extend .text-success;
 
-    * {
-        .nav-link,
-        .navbar-brand {
-            text-transform: uppercase !important;
+    padding-top: 0rem;
+    padding-right: $navbar-brand-padding-y;
+    padding-bottom: 0rem;
+
+    text-shadow: 2px 2px $dark;
+
+    .nav-link,
+    .navbar-brand {
+        text-transform: uppercase !important;
+    }
+
+    .nav-link {
+        font-size: $font-size-sm;
+        letter-spacing: 0.2rem;
+    }
+
+    .navbar-brand {
+        font-size: $font-size-lg;
+        letter-spacing: 0.3rem;
+    }
+
+    .navbar-toggler {
+        background-color: $dark;
+
+        .navbar-toggler-icon {
+            @extend %fa-icon;
+            @extend .fas;
+            @extend .fa-lg;
+            @extend .text-success;
+
+            height: 100%; //needed for align-middle
+            text-shadow: 2px 2px $dark;
+
+            &:before {
+                @extend .align-middle;
+                content: fa-content($fa-var-chevron-down);
+            }
         }
-
-        .nav-link {
-            font-size: $font-size-sm;
-            letter-spacing: 0.2rem;
-        }
-
-        .navbar-brand {
-            font-size: $font-size-lg;
-            letter-spacing: 0.3rem;
-        }
-
-        text-shadow: 2px 2px $dark;
     }
 }
 
