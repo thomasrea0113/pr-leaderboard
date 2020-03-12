@@ -45,7 +45,8 @@
             </div>
         </nav>
     </header>
-    <div class="container @if(!navFadeTop) { <text>navbar-fixed-offset</text> }">
+    @RenderSection("beforeContainer", required: false)
+    <div class="container @if(!navFadeTop && !IsSectionDefined("beforeContainer")) { <text>navbar-fixed-offset</text> }">
         <main role="main" class="pb-3">
             <partial name="_StatusMessages" model="Messages.GetAllMessages()" />
             @RenderBody()

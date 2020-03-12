@@ -140,7 +140,7 @@ export const ThumbnailImage: React.FC<{
     src: string;
 }> = ({ src }) => {
     return (
-        <div className="h-100 embed-responsive embed-responsive-4x3">
+        <div className="h-100 embed-responsive embed-responsive-4by3">
             <img
                 className="embed-responsive-item embed-responsive-cover rounded"
                 alt="Board"

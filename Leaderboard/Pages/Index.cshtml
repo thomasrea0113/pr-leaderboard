@@ -2,16 +2,17 @@
 
 @{
   ViewData["Title"] = "Home Page";
+  ViewData["navFadeTop"] = true;
 }
 
-@section styles {
-
+@section beforeContainer {
+  <div class="embed-responsive embed-responsive-4by3" style="max-height: 90vh;">
+      <img
+          class="embed-responsive-item embed-responsive-cover"
+          alt="Board"
+          src="https://www.toyoda.com/uploads/images/_mediumFitImage/Integrated-logo.png"
+      />
+  </div>
 }
 
-<div id="root">
-  <partial name="_LoadingPartial" />
-</div>
-
-@section scripts {
-    <react-component src="js/home.[hash].js" element-id="root" />
-}
+<h1>Leaderboard Home</h1>
