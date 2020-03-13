@@ -46,12 +46,10 @@
         </nav>
     </header>
     @RenderSection("beforeContainer", required: false)
-    <div class="container @if(!navFadeTop && !IsSectionDefined("beforeContainer")) { <text>navbar-fixed-offset</text> }">
-        <main role="main" class="pb-3">
-            <partial name="_StatusMessages" model="Messages.GetAllMessages()" />
-            @RenderBody()
-        </main>
-    </div>
+    <partial name="_StatusMessages" model="Messages.GetAllMessages()" />
+    <react-root class="container pb-3 @if(!navFadeTop && !IsSectionDefined("beforeContainer")) { <text>navbar-fixed-offset</text> }">
+        @RenderBody()
+    </react-root>
 
     <footer class="border-top footer text-muted">
         <div class="container">

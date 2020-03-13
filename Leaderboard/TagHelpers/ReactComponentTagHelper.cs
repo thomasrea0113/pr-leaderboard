@@ -15,7 +15,12 @@ namespace Leaderboard.TagHelpers
     public class ReactComponentTagHelper : ReactBundleTagHelper
     {
         public object Props { get; set; }
-        public string ElementId { get; set; }
+
+        /// <summary>
+        /// Defaults to the ReactRootTagHelper DOM Id
+        /// </summary>
+        /// <value></value>
+        public string ElementId { get; set; } = ReactRootTagHelper.ReactRootDOMId;
 
         public ReactComponentTagHelper(ISpaStaticFileProvider spaFiles) : base(spaFiles)
         {
@@ -32,7 +37,7 @@ namespace Leaderboard.TagHelpers
                 throw new ArgumentException($"source {assetPath} does not exist in the pack directory");
 
             var publicPath = _webpackStats.GetAssetPublicPath(Src);
-            
+
             var props = "{}";
             if (Props != null)
                 props = JsonSerializer.Serialize(Props, Props.GetType(), new JsonSerializerOptions()

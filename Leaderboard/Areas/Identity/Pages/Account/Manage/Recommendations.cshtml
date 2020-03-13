@@ -2,10 +2,6 @@
 @using Leaderboard.Areas.Identity.Pages.Account.Manage
 @model RecommendationsModel
 
-<span class="container" id="root">
-  <partial name="_LoadingPartial" />
-</span>
-
 @section scripts {
-    <react-component src="js/recommendations.[hash].js" element-id="root" props="Model.Props" />
+    <react-component src="js/recommendations.[hash].js" props="Model.Props" />
 }
