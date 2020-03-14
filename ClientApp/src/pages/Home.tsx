@@ -1,64 +1,42 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import 'react-dom';
+import uniqueId from 'lodash/fp/uniqueId';
+import { useLoading } from '../hooks/useLoading';
+import { Featured } from '../types/dotnet-types';
+import { FeaturedCard } from '../Components/FeaturedCard';
+
+interface ReactProps {
+    initialUrl: string;
+}
+
+interface ServerData {
+    featured: Featured[];
+}
 
 // eslint-disable-next-line react/prefer-stateless-function
-export default class HomeComponent extends Component {
-    public static get displayName(): string {
-        return 'Home';
-    }
+const HomeComponent: React.FC<ReactProps> = ({ initialUrl }) => {
+    const { isLoading, reloadAsync } = useLoading<ServerData>(initialUrl);
 
-    public render(): JSX.Element {
-        return (
-            <div>
-                <h1>Hello, world!</h1>
-                <p>Welcome to your new single-page application, built with:</p>
-                <ul>
-                    <li>
-                        <a href="https://get.asp.net/">ASP.NET Core</a> and{' '}
-                        <a href="https://msdn.microsoft.com/en-us/library/67ef8sbd.aspx">
-                            C#
-                        </a>{' '}
-                        for cross-platform server-side code
-                    </li>
-                    <li>
-                        <a href="https://facebook.github.io/react/">React</a>{' '}
-                        for client-side code
-                    </li>
-                    <li>
-                        <a href="http://getbootstrap.com/">Bootstrap</a> for
-                        layout and styling
-                    </li>
-                </ul>
-                <p>To help you get started, we have also set up:</p>
-                <ul>
-                    <li>
-                        <strong>Client-side navigation</strong>. For example,
-                        click <em>Counter</em> then <em>Back</em> to return
-                        here.
-                    </li>
-                    <li>
-                        <strong>Development server integration</strong>. In
-                        development mode, the development server from{' '}
-                        <code>create-react-app</code> runs in the background
-                        automatically, so your client-side resources are
-                        dynamically built on demand and the page refreshes when
-                        you modify any file.
-                    </li>
-                    <li>
-                        <strong>Efficient production builds</strong>. In
-                        production mode, development-time features are disabled,
-                        and your <code>dotnet publish</code> configuration
-                        produces minified, efficiently bundled JavaScript files.
-                    </li>
-                </ul>
-                <p>
-                    The <code>ClientApp</code> subdirectory is a standard React
-                    application based on the <code>create-react-app</code>{' '}
-                    template. If you open a command prompt in that directory,
-                    you can run <code>npm</code> commands such as{' '}
-                    <code>npm test</code> or <code>npm install</code>.
-                </p>
-            </div>
-        );
-    }
-}
+    const [state, setState] = useState<ServerData>();
+
+    const featured = state?.featured ?? [];
+
+    const reload = () => {
+        reloadAsync().then(d => setState(d));
+    };
+
+    useEffect(reload, []);
+
+    return (
+        <div>
+            <h1>Welcome... I&apos;m bad with words.</h1>
+            {isLoading
+                ? null
+                : featured.map(f => (
+                      <FeaturedCard key={uniqueId('featured')} {...f} />
+                  ))}
+        </div>
+    );
+};
+
+export default HomeComponent;

@@ -25,14 +25,7 @@ namespace Leaderboard.Areas.Leaderboards.ViewModels
 
             if (url != default)
             {
-                var args = new
-                {
-                    area = "Leaderboards",
-                    division = model.Division.Slug,
-                    gender = model.Division.Gender?.ToString().ToLower() ?? "any",
-                    weightClass = model.WeightClass?.Range ?? "any",
-                    slug = model.Slug
-                };
+                var args = model.GetViewArgs();
                 // NOTE - page will return null if it does not resolve to a valid url (including any route constraints)
                 ViewUrl = url.Page("/Boards/View", args);
                 JoinUrl = url.Page("/Boards/View", "join", args);

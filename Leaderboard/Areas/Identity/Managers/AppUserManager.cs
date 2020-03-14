@@ -3,16 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Claims;
-using System.Threading;
 using System.Threading.Tasks;
 using Leaderboard.Areas.Identity.Models;
-using Leaderboard.Areas.Identity.ViewModels;
 using Leaderboard.Areas.Leaderboards.Models;
-using Leaderboard.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -106,5 +102,7 @@ namespace Leaderboard.Areas.Identity.Managers
             await ResetPasswordAsync(user, await GeneratePasswordResetTokenAsync(user), password);
             return created;
         }
+
+        public IQueryable<ScoreModel> GetFeatured() => _store.GetFeaturedQuery();
     }
 }

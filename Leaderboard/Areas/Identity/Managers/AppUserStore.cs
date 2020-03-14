@@ -40,34 +40,34 @@ namespace Leaderboard.Areas.Identity.Managers
             // LINQ to Queries is quite powerful! The key to remember is to NEVER use a navigation
             // property in your query. Always use the DbSet on the context, and then use joins
             var recommendations = from b in Context.Leaderboards.AsQueryable()
-                join d in Context.Divisions on b.DivisionId equals d.Id
+                                  join d in Context.Divisions on b.DivisionId equals d.Id
 
-                // left join, because a board may not have a weight class
-                join wc in Context.WeightClasses on b.WeightClassId equals wc.Id into gr
-                from wc in gr.DefaultIfEmpty()
+                                  // left join, because a board may not have a weight class
+                                  join wc in Context.WeightClasses on b.WeightClassId equals wc.Id into gr
+                                  from wc in gr.DefaultIfEmpty()
 
-                // board is active
-                where b.IsActive == true
+                                      // board is active
+                                  where b.IsActive == true
 
-                // there are overlapping categories
-                where Context.UserCategories.AsQueryable().Where(uc => uc.UserId == user.Id)
-                    .Join(Context.DivisionCategories.AsQueryable().Where(dc => dc.DivisionId == d.Id),
-                        uc => uc.CategoryId,
-                        dc => dc.CategoryId,
-                        (_, _2) => 1)
-                    .Any()
+                                  // there are overlapping categories
+                                  where Context.UserCategories.AsQueryable().Where(uc => uc.UserId == user.Id)
+                                      .Join(Context.DivisionCategories.AsQueryable().Where(dc => dc.DivisionId == d.Id),
+                                          uc => uc.CategoryId,
+                                          dc => dc.CategoryId,
+                                          (_, _2) => 1)
+                                      .Any()
 
-                // user fits division
-                where d.Gender == null || d.Gender == user.Gender
-                where d.AgeLowerBound == null || d.AgeLowerBound < user.Age
-                where d.AgeUpperBound == null || d.AgeUpperBound >= user.Age
+                                  // user fits division
+                                  where d.Gender == null || d.Gender == user.Gender
+                                  where d.AgeLowerBound == null || d.AgeLowerBound < user.Age
+                                  where d.AgeUpperBound == null || d.AgeUpperBound >= user.Age
 
-                // user fits weight class
-                where wc.WeightLowerBound == null || wc.WeightLowerBound <= user.Weight
-                where wc.WeightUpperBound == null || wc.WeightUpperBound > user.Weight
+                                  // user fits weight class
+                                  where wc.WeightLowerBound == null || wc.WeightLowerBound <= user.Weight
+                                  where wc.WeightUpperBound == null || wc.WeightUpperBound > user.Weight
 
-                // selecting the board
-                select b;
+                                  // selecting the board
+                                  select b;
 
             return recommendations;
         }
@@ -80,7 +80,7 @@ namespace Leaderboard.Areas.Identity.Managers
                 throw new InvalidOperationException($"This method should only be called on an entity that is in state '{EntityState.Detached}'");
 
             var existing = await FindByIdAsync(user.Id);
-            if(existing != null)
+            if (existing != null)
             {
                 // if the user exists, return it and overwrite passed values. 
                 var dbEntry = Context.Entry(existing);
@@ -98,6 +98,12 @@ namespace Leaderboard.Areas.Identity.Managers
             }
             else
                 return await CreateAsync(user);
+        }
+
+        public IQueryable<ScoreModel> GetFeaturedQuery()
+        {
+            // TODO implement
+            return Context.Scores.AsQueryable().Take(3).AsQueryable();
         }
     }
 }

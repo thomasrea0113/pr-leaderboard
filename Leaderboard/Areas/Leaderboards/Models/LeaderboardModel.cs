@@ -84,6 +84,23 @@ namespace Leaderboard.Areas.Leaderboards.Models
                 .HasForeignKey(b => b.WeightClassId);
         }
 
+        #region Helper Methods
+
+        /// <summary>
+        /// The 'View Board' page uses a friendly url, which means this information is needed to route currectly with Url.Page()
+        /// </summary>
+        /// <returns></returns>
+        public object GetViewArgs() => new
+        {
+            area = "Leaderboards",
+            division = Division.Slug,
+            gender = Division.Gender?.ToString().ToLower() ?? "any",
+            weightClass = WeightClass?.Range ?? "any",
+            slug = Slug
+        };
+
+        #endregion
+
         #region equality
 
         // 2 instances are equal if they have the same Id

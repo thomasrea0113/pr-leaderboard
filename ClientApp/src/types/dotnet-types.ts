@@ -55,3 +55,43 @@ export enum GenderValues {
     Female = 'Female',
     Other = 'Other',
 }
+
+export interface Score {
+    isApproved: boolean;
+    leaderboardId: string;
+    userId: string;
+    value: number;
+}
+
+export enum BootstrapColorClass {
+    Primary,
+    Secondary,
+    Success,
+    Danger,
+    Warning,
+    Info,
+    Light,
+    Dark,
+    Link,
+}
+
+export enum FontawesomeIcon {
+    Go = 'fas fa-chevron-right',
+    User = 'fas fa-user',
+}
+
+export interface Link {
+    // The server returns the string key of the enum (server and client enums have the same keys)
+    // so this is the key of the enum, not the value
+    addon?: keyof typeof FontawesomeIcon;
+    label: string;
+    className?: keyof typeof BootstrapColorClass;
+    url: string;
+}
+
+export interface Featured {
+    title: string;
+    description: string;
+    image: string;
+    links: Link[];
+}

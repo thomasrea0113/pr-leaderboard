@@ -6,7 +6,11 @@ import React, {
 } from 'react';
 
 import omit from 'lodash/fp/omit';
-import { GenderValues } from '../types/dotnet-types';
+import {
+    GenderValues,
+    BootstrapColorClass,
+    FontawesomeIcon,
+} from '../types/dotnet-types';
 import { NumberRange } from '../types/types';
 
 export const BoundIcon: React.FC<{
@@ -37,24 +41,23 @@ export const Expander: React.FC<{
 );
 
 export const GenderIcon: React.FC<{
-    gender?: GenderValues;
+    gender?: keyof typeof GenderValues;
 }> = ({ gender }) => {
     const male = <i className="fas fa-male text-blue" />;
     const female = <i className="fas fa-female text-pink" />;
+    const both = (
+        <>
+            {male}
+            {female}
+        </>
+    );
 
-    switch (gender) {
-        case GenderValues.Male:
-            return male;
-        case GenderValues.Female:
-            return female;
-        default:
-            return (
-                <>
-                    {male}
-                    {female}
-                </>
-            );
-    }
+    if (gender == null) return both;
+
+    const genderValue = GenderValues[gender];
+    if (genderValue === GenderValues.Male) return male;
+    if (genderValue === GenderValues.Female) return female;
+    return both;
 };
 
 type DivProps = DetailedHTMLProps<
@@ -178,3 +181,11 @@ export const RefreshButton: React.FC<DetailedHTMLProps<
         </button>
     );
 };
+
+export const bootstrapColorClassToString = (
+    color: keyof typeof BootstrapColorClass
+) => `btn btn-${color.toLowerCase()}`;
+
+export const FontawesomeIconToIcon = (icon: keyof typeof FontawesomeIcon) => (
+    <i className={FontawesomeIcon[icon].toLowerCase()} />
+);
