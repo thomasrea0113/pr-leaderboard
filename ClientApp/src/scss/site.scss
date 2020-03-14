@@ -68,6 +68,7 @@ html {
 .image-card-4by3 {
     @extend .embed-responsive;
     @extend .embed-responsive-4by3;
+    @extend .text-center;
 
     img.image-card-background {
         @extend .embed-responsive-item;
