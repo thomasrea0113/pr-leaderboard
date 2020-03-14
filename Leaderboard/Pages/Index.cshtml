@@ -1,4 +1,5 @@
 ﻿@page
+@model Leaderboard.Pages.Index
 
 @{
   ViewData["Title"] = "Home Page";
@@ -6,13 +7,24 @@
 }
 
 @section beforeContainer {
-  <div class="embed-responsive embed-responsive-4by3" style="max-height: 90vh;">
+  <div class="shadow-bottom navbar-fixed-offset image-card-4by3 bg-dark" style="max-height: 90vh;">
       <img
-          class="embed-responsive-item embed-responsive-cover"
+          class="image-card-background"
+          style="opacity: 0.75;"
           alt="Board"
-          src="https://www.toyoda.com/uploads/images/_mediumFitImage/Integrated-logo.png"
+          src="https://bloximages.chicago2.vip.townnews.com/thetandd.com/content/tncms/assets/v3/editorial/5/bc/5bc01127-ae03-52f4-b26b-923cde93f914/5afdb85c7e6c3.image.jpg"
       />
+      <div id="image-overlay" class="image-card-overlay text-center">
+      </div>
   </div>
 }
 
 <h1>Leaderboard Home</h1>
+
+<react-root>
+
+</react-root>
+
+@section scripts {
+    <react-component src="js/home.[hash].js" element-id="image-overlay" props="Model.Props" />
+}

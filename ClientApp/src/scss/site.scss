@@ -1,7 +1,5 @@
 @import './bootstrap-variables';
 
-$border-color: $table-border-color;
-
 @import url('https://fonts.googleapis.com/css?family=Signika&display=swap');
 $font-family-base: 'Signika', sans-serif, monospace !default;
 
@@ -30,17 +28,71 @@ html {
     transition: $bgTransition;
 }
 
+@mixin overlay() {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+}
+
+.shadow-bottom::after {
+    content: '';
+
+    @include overlay();
+
+    $shadow-bottom: inset 0px -50px 20px -20px $body-bg;
+    -moz-box-shadow: $shadow-bottom;
+    -webkit-box-shadow: $shadow-bottom;
+    box-shadow: $shadow-bottom;
+}
+
 // will only match if the scroll is at the top. see site.ts for how the scroll position is calculated
-html[data-scroll='0'] {
-    .navbar.fade-top {
-        @include transition-color(rgba($secondary, 0.25));
+// html[data-scroll='0'] {
+//     .navbar.fade-top {
+//         @include transition-color(rgba($white, 0.25));
+//     }
+// }
+
+@mixin header {
+    @extend .text-success;
+    @extend .font-weight-bolder;
+    text-shadow: 2px 2px rgba($light, 0.75);
+}
+
+// #region image-card
+
+.image-card-4by3 {
+    @extend .embed-responsive;
+    @extend .embed-responsive-4by3;
+
+    img.image-card-background {
+        @extend .embed-responsive-item;
+        @extend .embed-responsive-cover;
+    }
+
+    .image-card-overlay {
+        @include overlay();
+        height: unset;
+
+        // vertical alignment
+        top: 50%;
+        transform: translate(0, -50%);
+        -webkit-transform: translate(0, -50%);
     }
 }
+
+// #endregion
+
+// #region navbar
 
 $navbar-height: 3rem;
 
 .navbar-fixed-offset {
-    padding-top: $navbar-height;
+    margin-top: $navbar-height;
 }
 
 .navbar.fixed-top {
@@ -48,26 +100,33 @@ $navbar-height: 3rem;
 }
 
 .navbar-bold {
-    @include transition-color(rgba($secondary, 1));
-    @extend .text-success;
+    background-color: $white;
 
     padding-top: 0rem;
     padding-right: $navbar-brand-padding-y;
     padding-bottom: 0rem;
 
-    text-shadow: 2px 2px $dark;
+    * {
+        @extend .text-dark;
+    }
 
     .nav-link,
     .navbar-brand {
         text-transform: uppercase !important;
     }
 
-    .nav-link {
+    .nav-link,
+    .btn-link {
+        &:hover {
+            @extend .text-warning;
+            @extend .font-weight-bold;
+        }
         font-size: $font-size-sm;
         letter-spacing: 0.2rem;
     }
 
     .navbar-brand {
+        @include header();
         font-size: $font-size-lg;
         letter-spacing: 0.3rem;
     }
@@ -77,8 +136,6 @@ $navbar-height: 3rem;
     }
 
     .navbar-toggler {
-        background-color: $dark;
-
         .navbar-toggler-icon {
             @extend %fa-icon;
             @extend .fas;
@@ -108,6 +165,8 @@ $navbar-height: 3rem;
         transform: $rotate;
     }
 }
+
+// #endregion
 
 .grow {
     transition: all 0.2s ease-in-out;
