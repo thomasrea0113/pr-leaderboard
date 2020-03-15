@@ -30,11 +30,13 @@ const HomeComponent: React.FC<ReactProps> = ({ initialUrl }) => {
     return (
         <div>
             <h1>Welcome... I&apos;m bad with words.</h1>
-            {isLoading
-                ? null
-                : featured.map(f => (
-                      <FeaturedCard key={uniqueId('featured')} {...f} />
-                  ))}
+            {isLoading ? null : (
+                <div className="card-deck ml-1 mr-1 mr-lg-5 ml-lg-5">
+                    {featured.map(f => (
+                        <FeaturedCard {...f} />
+                    ))}
+                </div>
+            )}
         </div>
     );
 };
