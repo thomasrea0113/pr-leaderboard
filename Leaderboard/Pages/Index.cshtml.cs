@@ -74,10 +74,6 @@ namespace Leaderboard.Pages
 
         public async Task<JsonResult> OnGetInitial()
         {
-            // TODO remove
-            Thread.Sleep(1000);
-
-            // included all the important bits up front
             var featured = await _manager.GetFeatured()
                 .Include(f => f.Board)
                     .ThenInclude(f => f.Division)

@@ -1,4 +1,5 @@
 @import './bootstrap-variables';
+@import './animations';
 
 @import url('https://fonts.googleapis.com/css?family=Signika&display=swap');
 $font-family-base: 'Signika', sans-serif, monospace !default;
@@ -37,6 +38,8 @@ html {
     height: 100%;
 
     overflow: hidden;
+
+    pointer-events: none;
 }
 
 .shadow-bottom::after {
@@ -65,32 +68,20 @@ html {
 
 @mixin center-vertical {
     // vertical alignment
+    position: absolute;
     top: 50%;
     transform: translate(0, -50%);
     -webkit-transform: translate(0, -50%);
 }
 
-// #region image-card
-
-.image-card-4by3 {
-    @extend .embed-responsive;
-    @extend .embed-responsive-4by3;
-    @extend .text-center;
-
-    img.image-card-background {
-        @extend .embed-responsive-item;
-        @extend .embed-responsive-cover;
-    }
-
-    .image-card-overlay {
-        @include overlay();
-        height: unset;
-
-        @include center-vertical();
-    }
+.center-vertical {
+    @include center-vertical();
 }
 
-// #endregion
+div.center-vertical {
+    width: 100%;
+    left: 0;
+}
 
 // #region navbar
 
@@ -217,10 +208,6 @@ $sizes: (10, 20, 25, 50, 75);
 
 .loading-indicator {
     display: none;
-}
-
-.embed-responsive .embed-responsive-cover {
-    object-fit: cover;
 }
 
 a.navbar-brand {

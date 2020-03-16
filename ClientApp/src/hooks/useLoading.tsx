@@ -1,19 +1,25 @@
-import { useEffect, useState, useRef } from 'react';
+import { useState } from 'react';
 
 export interface LoadingState {
     isLoading: boolean;
+    isLoaded: false;
 }
 
-export interface UseLoadingProps<D> {
-    isLoading: boolean;
+export interface UseLoadingProps<D> extends LoadingState {
     reloadAsync: () => Promise<D>;
 }
 
 export const useLoading = <D extends {}>(
     initialUrl: string
 ): UseLoadingProps<D> => {
-    const [isLoading, setLoading] = useState(false);
-    const mount = useRef(false);
+    const [loadingState, setState] = useState<LoadingState>({
+        isLoaded: false,
+        isLoading: false,
+    });
+    const { isLoading } = loadingState;
+
+    const setLoading = (loading: boolean) =>
+        setState(os => ({ ...os, isLoading: loading }));
 
     // if the component is not currently loading, begin loading. The wrapped
     // promise will reject immediately if we are already loading. Otherwise,
@@ -37,12 +43,13 @@ export const useLoading = <D extends {}>(
         });
 
     // mount the component and perform the initial load
-    useEffect(() => {
-        mount.current = true;
-        return function unMount() {
-            mount.current = false;
-        };
-    }, []);
+    // const mount = useRef(false);
+    // useEffect(() => {
+    //     mount.current = true;
+    //     return function unMount() {
+    //         mount.current = false;
+    //     };
+    // }, []);
 
-    return { isLoading, reloadAsync };
+    return { ...loadingState, reloadAsync };
 };
