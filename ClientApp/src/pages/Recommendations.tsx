@@ -5,7 +5,6 @@ import React, {
     ReactFragment,
     Fragment,
     useEffect,
-    useState,
 } from 'react';
 import 'react-dom';
 
@@ -66,11 +65,9 @@ const renderCell = (cell: Cell<UserView>): React.ReactNode | null => {
 const RecommendationsComponent: React.FC<{
     initialUrl: string;
 }> = ({ initialUrl }) => {
-    const { isLoading, reloadAsync } = useLoading<ServerData>(initialUrl);
+    const { isLoading, reloadAsync, data } = useLoading<ServerData>(initialUrl);
 
-    const [serverData, setData] = useState<ServerData>();
-
-    const data = useMemo(() => serverData?.recommendations ?? [], [serverData]);
+    const recommendations = useMemo(() => data?.recommendations ?? [], [data]);
 
     const initialState = useMemo(() => {
         const tableState: Partial<TableState<UserView>> = {
@@ -101,7 +98,7 @@ const RecommendationsComponent: React.FC<{
         visibleColumns: { length: visibleColumnCount },
     } = useTable(
         {
-            data,
+            data: recommendations,
             columns,
             initialState,
             expandSubRows: false,
@@ -112,10 +109,8 @@ const RecommendationsComponent: React.FC<{
         useExpanded
     );
 
-    const reload = () => reloadAsync().then(d => setData(d));
-
     useEffect(() => {
-        reload().then(() => {
+        reloadAsync().then(() => {
             if (!isAllRowsExpanded && !isLoading) toggleAllRowsExpanded(true);
         });
     }, []);
@@ -230,7 +225,7 @@ const RecommendationsComponent: React.FC<{
                 <div className="form-row">
                     <RefreshButton
                         isLoading={isLoading}
-                        onClick={reload}
+                        onClick={reloadAsync}
                         className="col-sm"
                     />
                 </div>

@@ -1,55 +1,57 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
-export interface LoadingState {
+export interface LoadingState<D> {
     isLoading: boolean;
-    isLoaded: false;
+    isLoaded: boolean;
+    data?: D;
 }
 
-export interface UseLoadingProps<D> extends LoadingState {
-    reloadAsync: () => Promise<D>;
+export interface UseLoadingProps<D> extends LoadingState<D> {
+    reloadAsync: () => Promise<void>;
 }
 
 export const useLoading = <D extends {}>(
-    initialUrl: string
+    initialUrl: string,
+    loadOnMount: boolean = false
 ): UseLoadingProps<D> => {
-    const [loadingState, setState] = useState<LoadingState>({
+    const [loadingState, setState] = useState<LoadingState<D>>({
         isLoaded: false,
         isLoading: false,
     });
     const { isLoading } = loadingState;
 
-    const setLoading = (loading: boolean) =>
-        setState(os => ({ ...os, isLoading: loading }));
+    const mergeState = (newState: Partial<LoadingState<D>>) =>
+        setState(os => ({ ...os, ...newState }));
+
+    const isLoaded = useRef(false);
 
     // if the component is not currently loading, begin loading. The wrapped
     // promise will reject immediately if we are already loading. Otherwise,
     // it completes when the inner promise completes
-    const reloadAsync = (): Promise<D> =>
-        new Promise<D>((resolve, reject) => {
+    const reloadAsync = (): Promise<void> =>
+        new Promise<void>((resolve, reject) => {
             if (!isLoading) {
-                setLoading(true);
+                mergeState({ isLoading: true });
                 fetch(initialUrl)
                     .then(resp => resp.json())
-                    .then(j => j as D)
-                    .then(data => {
-                        setLoading(false);
-                        return data;
-                    })
+                    .then(j => j as D) // assume the returned json matches the typescript interface
+                    .then(data => mergeState({ isLoading: false, data }))
                     .then(
-                        fullfilled => resolve(fullfilled),
+                        fullfilled => {
+                            isLoaded.current = true;
+                            resolve(fullfilled);
+                        },
                         error => reject(error)
                     );
             } else reject(new Error('This component is already loading'));
         });
 
-    // mount the component and perform the initial load
-    // const mount = useRef(false);
-    // useEffect(() => {
-    //     mount.current = true;
-    //     return function unMount() {
-    //         mount.current = false;
-    //     };
-    // }, []);
+    useEffect(() => {
+        if (loadOnMount) reloadAsync();
+        return function dismount() {
+            isLoaded.current = false;
+        };
+    }, []);
 
-    return { ...loadingState, reloadAsync };
+    return { ...loadingState, isLoaded: isLoaded.current, reloadAsync };
 };

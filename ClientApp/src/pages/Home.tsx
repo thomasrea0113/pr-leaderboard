@@ -13,15 +13,19 @@ interface ServerData {
     featured: Featured[];
 }
 
-const HomeComponent: React.FC<ReactProps> = ({ initialUrl }) => {
-    const { isLoading, reloadAsync } = useLoading<ServerData>(initialUrl);
+interface LocalState {
+    delayed: boolean;
+}
 
-    const [{ featured, delayed }, setState] = useState<
-        ServerData & { delayed: boolean }
-    >({
-        featured: [],
+const HomeComponent: React.FC<ReactProps> = ({ initialUrl }) => {
+    const { isLoading, data, reloadAsync } = useLoading<ServerData>(initialUrl);
+
+    const [{ delayed }, setState] = useState<LocalState>({
         delayed: false,
     });
+
+    const mergeState = (newState: Partial<LocalState>) =>
+        setState(os => ({ ...os, ...newState }));
 
     // We want to slow down the load for visual affect. If the load takes less than 3
     // seconds, we pause
@@ -29,9 +33,11 @@ const HomeComponent: React.FC<ReactProps> = ({ initialUrl }) => {
         Promise.all([
             new Promise<void>(resolve => setTimeout(resolve, 3000)),
             reloadAsync(),
-        ]).then(([, d]) => setState({ ...d, delayed: true }));
+        ]).then(() => mergeState({ delayed: true }));
     };
 
+    // we want to load some initial data, and don't want to render anything until after
+    // loading has begun
     const isLoaded = React.useRef(false);
     useEffect(() => {
         reload();
@@ -40,8 +46,9 @@ const HomeComponent: React.FC<ReactProps> = ({ initialUrl }) => {
             isLoaded.current = false;
         };
     }, []);
-
     if (!isLoaded.current) return null;
+
+    const featured = data?.featured ?? [];
 
     return (
         <>
