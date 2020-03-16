@@ -6,6 +6,7 @@ import React, {
 } from 'react';
 
 import omit from 'lodash/fp/omit';
+import merge from 'lodash/fp/merge';
 import {
     GenderValues,
     BootstrapColorClass,
@@ -28,17 +29,31 @@ export const BoundIcon: React.FC<{
 
 export const Expander: React.FC<{
     isExpanded: boolean;
-    props: unknown;
-}> = ({ isExpanded, props }) => (
-    <span className="no-highlight" {...props}>
-        {isExpanded ? (
-            <i className="fas fa-chevron-down" />
-        ) : (
-            <i className="fas fa-chevron-right" />
-        )}
-        &nbsp;
-    </span>
-);
+    props: DetailedHTMLProps<HTMLAttributes<HTMLSpanElement>, HTMLSpanElement>;
+}> = ({ isExpanded, props }) => {
+    const mergedProps = merge(props, {
+        style: { minWidth: '1.5rem' },
+        className: 'no-highlight',
+    });
+    return (
+        <>
+            {isExpanded ? (
+                <i
+                    {...merge(mergedProps, {
+                        className: 'fas fa-chevron-down',
+                    })}
+                />
+            ) : (
+                <i
+                    {...merge(mergedProps, {
+                        className: 'fas fa-chevron-right',
+                    })}
+                />
+            )}
+            &nbsp;
+        </>
+    );
+};
 
 export const GenderIcon: React.FC<{
     gender?: keyof typeof GenderValues;

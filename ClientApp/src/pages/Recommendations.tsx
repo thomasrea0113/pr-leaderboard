@@ -1,11 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, {
-    useMemo,
-    ReactNode,
-    ReactFragment,
-    Fragment,
-    useEffect,
-} from 'react';
+import React, { useMemo, ReactFragment, Fragment, useEffect } from 'react';
 import 'react-dom';
 
 import {
@@ -14,13 +8,11 @@ import {
     useExpanded,
     useGlobalFilter,
     TableState,
-    Cell,
     Row,
 } from 'react-table';
 import uniqueId from 'lodash/fp/uniqueId';
 import { BoardColumns as columns } from '../Components/tables/columns/boards-columns';
 import {
-    Expander,
     Grouper,
     Checkbox,
     RefreshButton,
@@ -28,39 +20,12 @@ import {
 import { UserView, User } from '../types/dotnet-types';
 import Board from '../Components/Board';
 import { useLoading } from '../hooks/useLoading';
+import { renderCell } from '../Components/tables/render-utilities';
 
 interface ServerData {
     user?: User;
     recommendations: UserView[];
 }
-
-const renderCell = (cell: Cell<UserView>): React.ReactNode | null => {
-    const {
-        isGrouped,
-        isAggregated,
-        isPlaceholder,
-        getCellProps,
-        render,
-        row: { isExpanded, getToggleRowExpandedProps },
-    } = cell;
-
-    let innerCell: ReactNode;
-    if (isAggregated) innerCell = render('Aggregated');
-    else if (isGrouped)
-        innerCell = (
-            <>
-                <Expander
-                    props={getToggleRowExpandedProps()}
-                    isExpanded={isExpanded}
-                />
-                {render('Cell')}
-            </>
-        );
-    else if (isPlaceholder) innerCell = null;
-    else innerCell = render('Cell');
-
-    return <td {...getCellProps()}>{innerCell}</td>;
-};
 
 const RecommendationsComponent: React.FC<{
     initialUrl: string;

@@ -13,6 +13,7 @@ module.exports = env => {
             recommendations: ['./src/pages/Recommendations.tsx'],
             home: ['./src/pages/Home.tsx'],
             site: ['./src/Site.ts'],
+            'board/view': ['./src/pages/Board/View.tsx'],
         },
         output: {
             path: outDir,

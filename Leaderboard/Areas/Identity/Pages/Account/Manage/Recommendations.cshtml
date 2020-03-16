@@ -3,5 +3,6 @@
 @model RecommendationsModel
 
 @section scripts {
-    <react-component src="js/recommendations.[hash].js" props="Model.Props" />
+    <react-bundle src="js/recommendations.[hash].js" />
+    <react-component component-name="recommendations" props="Model.Props" />
 }

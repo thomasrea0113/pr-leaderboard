@@ -12,8 +12,9 @@ using Microsoft.Extensions.FileProviders;
 
 namespace Leaderboard.TagHelpers
 {
-    public class ReactComponentTagHelper : ReactBundleTagHelper
+    public class ReactComponentTagHelper : TagHelper
     {
+        public string ComponentName { get; set; }
         public object Props { get; set; }
 
         /// <summary>
@@ -22,21 +23,9 @@ namespace Leaderboard.TagHelpers
         /// <value></value>
         public string ElementId { get; set; } = ReactRootTagHelper.ReactRootDOMId;
 
-        public ReactComponentTagHelper(ISpaStaticFileProvider spaFiles) : base(spaFiles)
-        {
-        }
-
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            if (Path.GetExtension(Src) != ".js")
-                throw new ArgumentException($"source {Src} must be a javascript spa bundle");
-
-            var assetPath = _webpackStats.GetAssetPath(Src);
-            var asset = _allAssets.SingleOrDefault(a => a.Path == assetPath);
-            if (asset == default)
-                throw new ArgumentException($"source {assetPath} does not exist in the pack directory");
-
-            var publicPath = _webpackStats.GetAssetPublicPath(Src);
+            if (ComponentName == null) throw new ArgumentNullException(nameof(ComponentName));
 
             var props = "{}";
             if (Props != null)
@@ -45,11 +34,9 @@ namespace Leaderboard.TagHelpers
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                 });
 
-            output.PreElement.AppendHtml($"<script src=\"{publicPath}\"></script>");
-
             output.TagMode = TagMode.StartTagAndEndTag;
             output.TagName = "script";
-            output.Content.AppendHtml($@"ReactDOM.render(React.createElement(Components.{asset.Name}, {props}), document.getElementById('{ElementId}'));");
+            output.Content.AppendHtml($@"ReactDOM.render(React.createElement(Components['{ComponentName}'], {props}), document.getElementById('{ElementId}'));");
         }
     }
 }

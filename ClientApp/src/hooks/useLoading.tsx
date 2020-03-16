@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 
 export interface LoadingState<D> {
     isLoading: boolean;
-    isLoaded: boolean;
+    isMounted: boolean;
     data?: D;
 }
 
@@ -15,7 +15,7 @@ export const useLoading = <D extends {}>(
     loadOnMount: boolean = false
 ): UseLoadingProps<D> => {
     const [loadingState, setState] = useState<LoadingState<D>>({
-        isLoaded: false,
+        isMounted: false,
         isLoading: false,
     });
     const { isLoading } = loadingState;
@@ -23,7 +23,7 @@ export const useLoading = <D extends {}>(
     const mergeState = (newState: Partial<LoadingState<D>>) =>
         setState(os => ({ ...os, ...newState }));
 
-    const isLoaded = useRef(false);
+    const isMounted = useRef(false);
 
     // if the component is not currently loading, begin loading. The wrapped
     // promise will reject immediately if we are already loading. Otherwise,
@@ -38,7 +38,7 @@ export const useLoading = <D extends {}>(
                     .then(data => mergeState({ isLoading: false, data }))
                     .then(
                         fullfilled => {
-                            isLoaded.current = true;
+                            isMounted.current = true;
                             resolve(fullfilled);
                         },
                         error => reject(error)
@@ -48,10 +48,11 @@ export const useLoading = <D extends {}>(
 
     useEffect(() => {
         if (loadOnMount) reloadAsync();
+        isMounted.current = true;
         return function dismount() {
-            isLoaded.current = false;
+            isMounted.current = false;
         };
     }, []);
 
-    return { ...loadingState, isLoaded: isLoaded.current, reloadAsync };
+    return { ...loadingState, isMounted: isMounted.current, reloadAsync };
 };

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Leaderboard.Areas.Leaderboards.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Leaderboard.Areas.Leaderboards.ViewModels
 {
@@ -35,10 +36,21 @@ namespace Leaderboard.Areas.Leaderboards.ViewModels
                 yield return new LeaderboardViewModel(model);
         }
 
+        public static async IAsyncEnumerable<LeaderboardViewModel> FromQueryAsync(IQueryable<LeaderboardModel> query)
+        {
+            await foreach (var lb in query
+                .Include(b => b.Division)
+                .Include(b => b.WeightClass)
+                .Include(b => b.UOM).ToAsyncEnumerable())
+            {
+                yield return new LeaderboardViewModel(lb);
+            }
+        }
+
         #region equality
-        
+
         // 2 instances are equal if they have the same Id
-        # nullable enable
+#nullable enable
         public override int GetHashCode() => Id.GetHashCode();
         public override bool Equals(object? obj)
         {
@@ -46,7 +58,7 @@ namespace Leaderboard.Areas.Leaderboards.ViewModels
                 return Id.Equals(m.Id);
             return Id.Equals(obj);
         }
-        #nullable disable
+#nullable disable
 
         #endregion
     }

@@ -1,19 +1,19 @@
 {
-   // Use IntelliSense to find out which attributes exist for C# debugging
-   // Use hover for the description of the existing attributes
-   // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
-   "version": "0.2.0",
-   "configurations": [
-       {
-           "type": "chrome",
-           "request": "launch",
-           "name": "Launch Chrome",
-           "url": "http://localhost:5000/Identity/Account/Manage/Recommendations",
-           "webRoot": "${workspaceFolder}/wwwroot",
-           "sourceMapPathOverrides": {
-               "webpack:///*": "${workspaceFolder}/../ClientApp/*",
-           }
-       },
+    // Use IntelliSense to find out which attributes exist for C# debugging
+    // Use hover for the description of the existing attributes
+    // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch Chrome",
+            "url": "http://localhost:5000/other/male/74-83/deadlift",
+            "webRoot": "${workspaceFolder}/wwwroot",
+            "sourceMapPathOverrides": {
+                "webpack:///*": "${workspaceFolder}/../ClientApp/*",
+            }
+        },
         {
             "name": "Lauch dotnet Server",
             "type": "coreclr",
@@ -34,7 +34,5 @@
                 "/Views": "${workspaceFolder}/Views"
             }
         },
-
-        
     ]
 }
