@@ -85,7 +85,7 @@ namespace Leaderboard.Areas.Identity.Managers
         public async Task<ApplicationUser> GetCompleteUserAsync(string id)
             => await GetUserAsync(id, _allNavProps);
 
-        public async Task<ApplicationUser> GetCompleteUser(Expression<Func<ApplicationUser, bool>> equality)
+        public async Task<ApplicationUser> GetCompleteUserAsync(Expression<Func<ApplicationUser, bool>> equality)
             => await GetUserAsync(equality, _allNavProps);
         /// <summary>
         /// Joins all the divisions on the users categories. This will not filter out

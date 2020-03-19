@@ -3,8 +3,8 @@ import React, { PropsWithChildren, ReactNode } from 'react';
 import flow from 'lodash/fp/flow';
 import uniq from 'lodash/fp/uniq';
 import join from 'lodash/fp/join';
-import { CellProps, Cell } from 'react-table';
-import { Expander } from '../StyleComponents';
+import { CellProps, Cell, HeaderGroup } from 'react-table';
+import { Expander, Grouper, Sorter } from '../StyleComponents';
 
 export const joinVals = <T extends {}>(vals: T[]): string =>
     flow(uniq, join(', '))(vals);
@@ -32,6 +32,54 @@ export const withSubRowCount = <T extends {}>(
         </>
     ) : (
         cellVal
+    );
+};
+
+export const renderHeader = <T extends {}>(
+    header: HeaderGroup<T>,
+    disableGroupBy = false
+) => {
+    return (
+        <tr {...header.getHeaderGroupProps()}>
+            {header.headers.map(
+                ({
+                    canGroupBy,
+                    canSort,
+                    isSortedDesc,
+                    getSortByToggleProps,
+                    getHeaderProps,
+                    getGroupByToggleProps,
+                    isGrouped,
+                    render,
+                }) => (
+                    <th {...getHeaderProps()}>
+                        {canGroupBy ? (
+                            <>
+                                <Grouper
+                                    isGrouped={isGrouped}
+                                    groupByProps={
+                                        !disableGroupBy
+                                            ? getGroupByToggleProps()
+                                            : undefined
+                                    }
+                                />
+                                &nbsp;
+                            </>
+                        ) : null}
+                        {canSort ? (
+                            <>
+                                <Sorter
+                                    toggleSortProps={getSortByToggleProps()}
+                                    sort={isSortedDesc}
+                                />
+                                &nbsp;
+                            </>
+                        ) : null}
+                        {render('Header')}
+                    </th>
+                )
+            )}
+        </tr>
     );
 };
 

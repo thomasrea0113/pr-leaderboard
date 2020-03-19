@@ -12,15 +12,14 @@ import {
 } from 'react-table';
 import uniqueId from 'lodash/fp/uniqueId';
 import { BoardColumns as columns } from '../Components/tables/columns/boards-columns';
-import {
-    Grouper,
-    Checkbox,
-    RefreshButton,
-} from '../Components/StyleComponents';
+import { Checkbox, RefreshButton } from '../Components/StyleComponents';
 import { UserView, User } from '../types/dotnet-types';
 import Board from '../Components/Board';
 import { useLoading } from '../hooks/useLoading';
-import { renderCell } from '../Components/tables/render-utilities';
+import {
+    renderCell,
+    renderHeader,
+} from '../Components/tables/render-utilities';
 
 interface ServerData {
     user?: User;
@@ -197,19 +196,9 @@ const RecommendationsComponent: React.FC<{
             </div>
             <table className="table" {...getTableProps()}>
                 <thead>
-                    {headerGroups.map(headerGroup => (
-                        <tr {...headerGroup.getHeaderGroupProps()}>
-                            {headerGroup.headers.map(column => (
-                                <th {...column.getHeaderProps()}>
-                                    <Grouper
-                                        hidden={!column.canGroupBy}
-                                        isGrouped={column.isGrouped}
-                                    />
-                                    &nbsp;{column.render('Header')}
-                                </th>
-                            ))}
-                        </tr>
-                    ))}
+                    {headerGroups.map(headerGroup =>
+                        renderHeader(headerGroup, true)
+                    )}
                 </thead>
                 <tbody {...getTableBodyProps()}>
                     {rows.map(row => renderRow(row))}

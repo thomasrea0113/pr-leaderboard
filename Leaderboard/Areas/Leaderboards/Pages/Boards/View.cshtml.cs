@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Leaderboard.Areas.Identity.Managers;
 using Leaderboard.Areas.Identity.Models;
+using Leaderboard.Areas.Identity.ViewModels;
 using Leaderboard.Areas.Leaderboards.Models;
 using Leaderboard.Areas.Leaderboards.ViewModels;
 using Leaderboard.Data;
@@ -26,6 +29,7 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
     {
         private readonly ApplicationDbContext _ctx;
         private readonly IMessageQueue _messages;
+        private readonly AppUserManager _userManager;
 
         public LeaderboardModel Board { get; private set; }
 
@@ -45,17 +49,24 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
         public class ReactProps
         {
             public string ScoresUrl { get; set; }
-            public LeaderboardViewModel Board { get; set; }
         }
         public ReactProps Props { get; private set; }
 
-        public ViewModel(ApplicationDbContext ctx, IMessageQueue messages)
+        public class ReactState
+        {
+            public UserViewModel User { get; set; }
+            public LeaderboardViewModel Board { get; set; }
+            public IEnumerable<ScoreViewModel> Scores { get; set; }
+        }
+
+        public ViewModel(ApplicationDbContext ctx, IMessageQueue messages, AppUserManager userManager)
         {
             _ctx = ctx;
             _messages = messages;
+            _userManager = userManager;
         }
 
-        private async Task InitAsync()
+        private void Init()
         {
             RouteArgs = RouteData.ToObject<BoardRouteArgs>();
 
@@ -76,26 +87,43 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
 
             Props ??= new ReactProps
             {
-                ScoresUrl = Url.Page(null, "scores"),
-                Board = await LeaderboardViewModel.FromQueryAsync(BoardQuery).SingleAsync()
+                ScoresUrl = Url.Page(null, "initial"),
             };
         }
 
-        public async Task OnGetAsync()
+        public void OnGet()
         {
-            await InitAsync();
+            Init();
         }
 
-        public async Task<JsonResult> OnGetScoresAsync()
+        public async Task<JsonResult> OnGetInitialAsync()
         {
-            await InitAsync();
-            var boardId = await BoardQuery.Select(b => b.Id).SingleAsync();
-            return new JsonResult(await _ctx.Scores.AsQueryable().Where(s => s.BoardId == boardId).ToArrayAsync());
+            Init();
+
+            var board = await BoardQuery.SingleAsync();
+            var scores = await _ctx.Scores.AsQueryable().Where(s => s.BoardId == board.Id).ToArrayAsync();
+            var user = await _userManager.GetCompleteUserAsync(User);
+
+            var isMember = await _ctx.Entry(user).Collection(b => b.UserLeaderboards).Query()
+                .AnyAsync(ub => ub.LeaderboardId == board.Id);
+            var isRecommended = await _userManager.GetRecommendedBoardsQuery(user)
+                .AnyAsync(b => b.Id == board.Id);
+
+            return new JsonResult(new ReactState
+            {
+                User = new UserViewModel(user),
+                Board = new UserLeaderboardViewModel(board, isMember, isRecommended),
+                Scores = scores.Select(s => new ScoreViewModel(s))
+            });
         }
 
-        public void OnGetJoin()
+        public async Task OnGetJoinAsync()
         {
+            Init();
+
             // TODO confirm user is not already in this board
+            await Task.CompletedTask;
+
             ModalTitle = "Join Board";
             ModalBody = "Would you like to join this board?";
             DataModalShow = true;

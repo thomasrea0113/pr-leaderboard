@@ -7,12 +7,19 @@ import React, {
 
 import omit from 'lodash/fp/omit';
 import merge from 'lodash/fp/merge';
+import { TableSortByToggleProps, TableGroupByToggleProps } from 'react-table';
 import {
     GenderValues,
     BootstrapColorClass,
     FontawesomeIcon,
 } from '../types/dotnet-types';
 import { NumberRange } from '../types/types';
+
+/**
+ * the color to use when a give icon is active
+ */
+const activeClass = 'text-warning';
+const inactiveClass = 'text-muted';
 
 export const BoundIcon: React.FC<{
     bound?: number;
@@ -111,7 +118,9 @@ export const Checkbox: React.FC<CheckboxProps> = ({
             <span id={id} className="form-check-input fa-stack">
                 <i className="far fa-square fa-stack-2x text-muted" />
                 {checked ? (
-                    <i className="fas fa-check fa-stack-1x fa-inverse text-primary" />
+                    <i
+                        className={`fas fa-check fa-stack-1x fa-inverse ${activeClass}`}
+                    />
                 ) : null}
             </span>
             <label
@@ -134,15 +143,35 @@ export const Checkbox: React.FC<CheckboxProps> = ({
 export const Grouper: React.FC<{
     hidden?: boolean;
     isGrouped: boolean;
-    props?: unknown;
-}> = ({ hidden, isGrouped, props }) => (
+    groupByProps?: TableGroupByToggleProps;
+}> = ({ hidden, isGrouped, groupByProps }) => (
     <i
-        {...(props !== undefined ? props : {})}
+        {...groupByProps}
         hidden={hidden}
         className={`fas fa-layer-group ${
-            isGrouped ? 'text-primary' : 'text-muted'
+            isGrouped ? activeClass : inactiveClass
         }`}
     />
+);
+
+export interface TableSortProps {
+    toggleSortProps: TableSortByToggleProps;
+    sort: boolean | undefined;
+}
+
+export const Sorter: React.FC<TableSortProps> = ({ toggleSortProps, sort }) => (
+    <span {...toggleSortProps}>
+        <i
+            className={`fa fa-caret-up fa-lg${
+                sort === true ? ` ${activeClass}` : ` ${inactiveClass}`
+            }`}
+        />
+        <i
+            className={`fa fa-caret-down fa-lg${
+                sort === false ? ` ${activeClass}` : ` ${inactiveClass}`
+            }`}
+        />
+    </span>
 );
 
 export const RangeDisplay: React.FC<NumberRange & {
@@ -190,7 +219,7 @@ export const RefreshButton: React.FC<DetailedHTMLProps<
             <i
                 className={`fas fa-sync-alt${
                     isLoading ? ' fa-spin' : ''
-                } text-primary`}
+                } ${activeClass}`}
             />
             &nbsp;&nbsp;refresh
         </button>

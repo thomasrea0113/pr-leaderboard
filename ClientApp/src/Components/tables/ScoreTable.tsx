@@ -11,8 +11,7 @@ import {
 import omit from 'lodash/fp/omit';
 import { ScoreColumns } from './columns/score-columns';
 import { Score } from '../../types/dotnet-types';
-import { Grouper } from '../StyleComponents';
-import { renderCell } from './render-utilities';
+import { renderCell, renderHeader } from './render-utilities';
 
 interface LocalProps {
     reloadAsync?: () => Promise<void>;
@@ -20,7 +19,7 @@ interface LocalProps {
     unit: string;
 }
 
-export const ScoreTable: React.FC<LocalProps> = ({ scores, unit }) => {
+export const ScoreTable: React.FC<LocalProps> = ({ scores }) => {
     const initialState: Partial<TableState<Score>> = useMemo(
         () => ({
             sortBy: [{ id: 'score', desc: true }],
@@ -62,34 +61,10 @@ export const ScoreTable: React.FC<LocalProps> = ({ scores, unit }) => {
         );
     };
 
-    // because we wanted to load on mount, be must also check that we are mounted
     return (
         <table className="table" {...getTableProps()}>
             <thead>
-                {headerGroups.map(headerGroup => (
-                    <tr {...headerGroup.getHeaderGroupProps()}>
-                        {headerGroup.headers.map(
-                            ({
-                                canGroupBy,
-                                getHeaderProps,
-                                getGroupByToggleProps,
-                                isGrouped,
-                                render,
-                            }) => (
-                                <th
-                                    {...getHeaderProps()}
-                                    {...getGroupByToggleProps()}
-                                >
-                                    <Grouper
-                                        hidden={!canGroupBy}
-                                        isGrouped={isGrouped}
-                                    />
-                                    &nbsp;{render('Header')}
-                                </th>
-                            )
-                        )}
-                    </tr>
-                ))}
+                {headerGroups.map(headerGroup => renderHeader(headerGroup))}
             </thead>
             <tbody {...getTableBodyProps()}>
                 {rows.map(r => renderRow(r))}

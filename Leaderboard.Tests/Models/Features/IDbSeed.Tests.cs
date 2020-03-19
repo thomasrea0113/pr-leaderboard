@@ -40,7 +40,7 @@ namespace Leaderboard.Tests.Models.Features
             Assert.Empty(admin.UserLeaderboards);
 
             var userName = "LifterDuder".Normalize().ToUpper();
-            var user = await um.GetCompleteUser(u => u.NormalizedUserName == userName);
+            var user = await um.GetCompleteUserAsync(u => u.NormalizedUserName == userName);
 
             Assert.NotNull(user);
             Assert.NotEmpty(user.UserLeaderboards);
@@ -57,7 +57,8 @@ namespace Leaderboard.Tests.Models.Features
 
             Assert.Contains("Powerlifting", ucs);
 
-            var ages = await ctx.Users.AsQueryable().Select(u => new {
+            var ages = await ctx.Users.AsQueryable().Select(u => new
+            {
                 u.UserName,
                 u.Age
             }).ToListAsync();

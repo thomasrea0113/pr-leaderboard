@@ -37,21 +37,18 @@
     @include animate(fadeInUp 1s ease);
 }
 
-@include keyframes(fadeInLeft) {
+@keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translate3d(-100%, 0, 0);
     }
 
     to {
         opacity: 1;
-        transform: translate3d(0, 0, 0);
     }
 }
 
-.animate-fadeinleft-500ms {
-    opacity: 0;
-    @include animate(fadeInLeft 750ms ease forwards);
+.animate-fadein {
+    @include animate(fadeIn 500ms linear forwards);
 }
 
 @include keyframes(fadeOut) {
