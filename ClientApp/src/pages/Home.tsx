@@ -56,7 +56,7 @@ const HomeComponent: React.FC<ReactProps> = ({ initialUrl }) => {
             {isLoading || !delayed ? (
                 <h1 className="animate-fadeinup">Welcome...</h1>
             ) : (
-                <div>
+                <>
                     <h1 className="animate-fadeinup">
                         check out what we&apos;ve got.
                     </h1>
@@ -77,7 +77,7 @@ const HomeComponent: React.FC<ReactProps> = ({ initialUrl }) => {
                             />
                         ))}
                     </div>
-                </div>
+                </>
             )}
         </>
     );

@@ -14,7 +14,7 @@ type DivProps = DetailedHTMLProps<
 export const FeaturedCard: React.FC<Featured & {
     divProps?: DivProps;
 }> = ({ title, description, links, image, divProps }) => {
-    const defaultClassName = 'card';
+    const defaultClassName = 'card card-transparent';
     const defaultStyle: DivProps = { style: { width: '27.5vw' } };
 
     const props = merge(defaultStyle, divProps);
@@ -46,7 +46,8 @@ export const FeaturedCard: React.FC<Featured & {
                                     className={
                                         className != null
                                             ? bootstrapColorClassToString(
-                                                  className
+                                                  className,
+                                                  true
                                               )
                                             : ''
                                     }

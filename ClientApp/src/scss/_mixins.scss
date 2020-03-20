@@ -1,0 +1,60 @@
+@mixin transform($trans) {
+    transform: $trans;
+    -moz-transform: $trans;
+    -webkit-transform: $trans;
+    -o-transform: $trans;
+}
+
+@mixin transition($trans) {
+    -webkit-transition: $trans;
+    -ms-transition: $trans;
+    transition: $trans;
+}
+
+@mixin center-vertical {
+    // vertical alignment
+    position: absolute;
+    top: 50%;
+    transform: translate(0, -50%);
+    -webkit-transform: translate(0, -50%);
+}
+
+@mixin overlay() {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+}
+
+@mixin header {
+    @extend .text-success;
+    @extend .font-weight-bolder;
+    text-shadow: 2px 2px rgba($light, 0.75);
+}
+
+@mixin animate($animation) {
+    animation: $animation;
+    -webkit-animation: $animation;
+    -moz-animation: $animation;
+    -o-animation: $animation;
+    -ms-animation: $animation;
+}
+
+@mixin keyframes($name) {
+    @-webkit-keyframes #{$name} {
+        @content;
+    }
+    @-moz-keyframes #{$name} {
+        @content;
+    }
+    @-ms-keyframes #{$name} {
+        @content;
+    }
+    @keyframes #{$name} {
+        @content;
+    }
+}

@@ -1,0 +1,95 @@
+// will only match if the scroll is at the top. see site.ts for how the scroll position is calculated
+// html[data-scroll='0'] {
+//     .navbar.fade-top {
+//         @include transition-color(rgba($white, 0.25));
+//     }
+// }
+
+// #region navbar
+
+.navbar-bold {
+    background-color: $white;
+
+    padding-top: 0rem;
+    padding-right: $navbar-brand-padding-y;
+    padding-bottom: 0rem;
+
+    * {
+        @extend .text-dark;
+    }
+
+    .nav-link,
+    .navbar-brand {
+        text-transform: uppercase !important;
+    }
+
+    .nav-link,
+    .btn-link {
+        &:hover {
+            @extend .text-warning;
+            @extend .font-weight-bold;
+        }
+        font-size: $font-size-sm;
+        letter-spacing: 0.2rem;
+    }
+
+    .navbar-brand {
+        @include header();
+        font-size: $font-size-lg;
+        letter-spacing: 0.3rem;
+    }
+}
+
+.navbar-toggler {
+    .navbar-toggler-icon {
+        @extend %fa-icon;
+        @extend .fas;
+        @extend .fa-lg;
+        @extend .text-success;
+
+        height: 100%; //needed for align-middle
+        text-shadow: 2px 2px $dark;
+
+        $trans: transform 0.35s ease-in-out !default;
+        -moz-transition: $trans;
+        -webkit-transition: $trans;
+        transition: $trans;
+
+        &:before {
+            @extend .align-middle;
+            content: fa-content($fa-var-chevron-down);
+        }
+    }
+}
+
+button.navbar-toggler:focus {
+    outline: unset;
+}
+
+.navbar-toggler[aria-expanded='true'] .navbar-toggler-icon {
+    $rotate: rotate(180deg) !important;
+    -ms-transform: $rotate;
+    -moz-transform: $rotate;
+    -webkit-transform: $rotate;
+    transform: $rotate;
+}
+
+#admin-nav {
+    @extend .bg-warning;
+    border-radius: 0 0 0.75rem 0.75rem;
+    position: absolute;
+    right: 0;
+    padding: 0 0.5rem;
+    width: 15vw;
+
+    &,
+    * {
+        text-transform: uppercase;
+        letter-spacing: 0.1rem;
+        color: $dark;
+    }
+
+    // .nav-link {
+    //     width: 100%;
+    // }
+}

@@ -1,26 +1,3 @@
-@mixin animate($animation) {
-    animation: $animation;
-    -webkit-animation: $animation;
-    -moz-animation: $animation;
-    -o-animation: $animation;
-    -ms-animation: $animation;
-}
-
-@mixin keyframes($name) {
-    @-webkit-keyframes #{$name} {
-        @content;
-    }
-    @-moz-keyframes #{$name} {
-        @content;
-    }
-    @-ms-keyframes #{$name} {
-        @content;
-    }
-    @keyframes #{$name} {
-        @content;
-    }
-}
-
 @include keyframes(fadeInUp) {
     from {
         opacity: 0;

@@ -227,8 +227,9 @@ export const RefreshButton: React.FC<DetailedHTMLProps<
 };
 
 export const bootstrapColorClassToString = (
-    color: keyof typeof BootstrapColorClass
-) => `btn btn-${color.toLowerCase()}`;
+    color: keyof typeof BootstrapColorClass,
+    outline: boolean = false
+) => `btn btn${outline ? '-outline-' : '-'}${color.toLowerCase()}`;
 
 export const FontawesomeIconToIcon = (icon: keyof typeof FontawesomeIcon) => (
     <i className={FontawesomeIcon[icon].toLowerCase()} />

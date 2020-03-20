@@ -1,0 +1,59 @@
+@import './mixins';
+
+.center-vertical {
+    @include center-vertical();
+}
+
+div.center-vertical {
+    width: 100%;
+    left: 0;
+}
+
+.bg-fixed {
+    background-attachment: fixed;
+    background-position: center;
+}
+
+.navbar-fixed-offset {
+    margin-top: $navbar-height;
+}
+
+.navbar-left-offset {
+    margin-left: 0;
+    padding-left: $navbar-left-width;
+}
+
+.navbar {
+    &.fixed-top {
+        min-height: $navbar-height;
+    }
+}
+
+.nav {
+    &.fixed-left {
+        background-color: $dark;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+        position: fixed;
+        overflow: hidden;
+        z-index: 1000;
+
+        .nav-item {
+            .nav-link {
+                @include center-vertical();
+                position: relative;
+                padding: 0;
+            }
+        }
+
+        .navbar-toggler {
+            width: $navbar-left-width;
+            @include transform(rotate(-90deg));
+        }
+
+        .navbar-collapsed.collapsing {
+            @include transform($transition-collapse-width);
+        }
+    }
+}

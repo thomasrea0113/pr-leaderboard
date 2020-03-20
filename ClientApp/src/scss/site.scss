@@ -1,3 +1,4 @@
+@import './mixins';
 @import './bootstrap-variables';
 @import './animations';
 
@@ -11,6 +12,14 @@ $font-family-base: 'Signika', sans-serif, monospace !default;
 @import '../../node_modules/@fortawesome/fontawesome-free/scss/solid';
 @import '../../node_modules/@fortawesome/fontawesome-free/scss/regular';
 
+@import './nav';
+
+$navbar-height: 3rem;
+$navbar-left-width: 3rem;
+$transition-collapse-width: width 0.35s ease !default;
+
+@import './position';
+
 html {
     letter-spacing: 0.05rem;
     font-size: 12px;
@@ -20,27 +29,19 @@ html {
     }
 }
 
-@mixin transition-color($color) {
-    background-color: $color !important;
-
-    $bgTransition: background-color 250ms linear;
-    -webkit-transition: $bgTransition;
-    -ms-transition: $bgTransition;
-    transition: $bgTransition;
+.has-overlay {
+    position: relative;
+    background-size: cover;
+    .overlay {
+        @include overlay();
+    }
 }
 
-@mixin overlay() {
-    position: absolute;
-    top: 0;
-    left: 0;
-
-    width: 100%;
-    height: 100%;
-
-    overflow: hidden;
+.bg-body {
+    background-color: $body-bg !important;
 }
 
-.shadow-bottom::after {
+.shadow-bottom::before {
     content: '';
 
     @include overlay();
@@ -51,116 +52,20 @@ html {
     box-shadow: $shadow-bottom;
 }
 
-// will only match if the scroll is at the top. see site.ts for how the scroll position is calculated
-// html[data-scroll='0'] {
-//     .navbar.fade-top {
-//         @include transition-color(rgba($white, 0.25));
-//     }
-// }
+.card.card-transparent {
+    background-color: rgba($color: $body-bg, $alpha: 0.5);
 
-@mixin header {
-    @extend .text-success;
+    .card-header,
+    .card-footer {
+        background-color: rgba($color: $black, $alpha: 0.5);
+    }
+}
+
+.bold {
     @extend .font-weight-bolder;
-    text-shadow: 2px 2px rgba($light, 0.75);
+    text-transform: uppercase !important;
+    letter-spacing: 0.5rem;
 }
-
-@mixin center-vertical {
-    // vertical alignment
-    position: absolute;
-    top: 50%;
-    transform: translate(0, -50%);
-    -webkit-transform: translate(0, -50%);
-}
-
-.center-vertical {
-    @include center-vertical();
-}
-
-div.center-vertical {
-    width: 100%;
-    left: 0;
-}
-
-// #region navbar
-
-$navbar-height: 3rem;
-
-.navbar-fixed-offset {
-    margin-top: $navbar-height;
-}
-
-.navbar.fixed-top {
-    min-height: $navbar-height;
-}
-
-.navbar-bold {
-    background-color: $white;
-
-    padding-top: 0rem;
-    padding-right: $navbar-brand-padding-y;
-    padding-bottom: 0rem;
-
-    * {
-        @extend .text-dark;
-    }
-
-    .nav-link,
-    .navbar-brand {
-        text-transform: uppercase !important;
-    }
-
-    .nav-link,
-    .btn-link {
-        &:hover {
-            @extend .text-warning;
-            @extend .font-weight-bold;
-        }
-        font-size: $font-size-sm;
-        letter-spacing: 0.2rem;
-    }
-
-    .navbar-brand {
-        @include header();
-        font-size: $font-size-lg;
-        letter-spacing: 0.3rem;
-    }
-
-    button.navbar-toggler:focus {
-        outline: unset;
-    }
-
-    .navbar-toggler {
-        .navbar-toggler-icon {
-            @extend %fa-icon;
-            @extend .fas;
-            @extend .fa-lg;
-            @extend .text-success;
-
-            height: 100%; //needed for align-middle
-            text-shadow: 2px 2px $dark;
-
-            $trans: transform 0.35s ease-in-out !default;
-            -moz-transition: $trans;
-            -webkit-transition: $trans;
-            transition: $trans;
-
-            &:before {
-                @extend .align-middle;
-                content: fa-content($fa-var-chevron-down);
-            }
-        }
-    }
-
-    .navbar-toggler[aria-expanded='true'] .navbar-toggler-icon {
-        $rotate: rotate(180deg) !important;
-        -ms-transform: $rotate;
-        -moz-transform: $rotate;
-        -webkit-transform: $rotate;
-        transform: $rotate;
-    }
-}
-
-// #endregion
 
 .grow {
     transition: all 0.2s ease-in-out;
