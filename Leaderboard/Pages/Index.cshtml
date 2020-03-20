@@ -7,27 +7,15 @@
 }
 
 @section beforeContainer {
-  <div class="navbar-fixed-offset card bg-dark" style="max-height: 90vh; overflow: hidden; border: unset;">
-    <div class="shadow-bottom">
-      <img
-          class="card-img"
-          style="opacity: 0.4;"
-          alt="Board"
-          src="https://bloximages.chicago2.vip.townnews.com/thetandd.com/content/tncms/assets/v3/editorial/5/bc/5bc01127-ae03-52f4-b26b-923cde93f914/5afdb85c7e6c3.image.jpg"
-      />
-    </div>
-    <div class="card-img-overlay">
-      <div id="image-overlay" class="center-vertical text-center"></div>
-    </div>
+  <div class="navbar-fixed-offset bg-fixed has-overlay bg-body shadow-bottom" style="height: 85vh; background-image: url(https://bloximages.chicago2.vip.townnews.com/thetandd.com/content/tncms/assets/v3/editorial/5/bc/5bc01127-ae03-52f4-b26b-923cde93f914/5afdb85c7e6c3.image.jpg);">
+    <div class="overlay" style="background-color: inherit; opacity: 0.4;" ></div>
+    <div id="image-overlay" class="center-vertical text-center"></div>
   </div>
 }
 
 <h1>Leaderboard Home</h1>
-
-<react-root>
-
-</react-root>
-
+<p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 @section scripts {
     <react-bundle src="js/home.[hash].js" />
     <react-component component-name="home" element-id="image-overlay" props="Model.Props" />

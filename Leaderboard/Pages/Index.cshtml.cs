@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Leaderboard.ViewModels;
 using Leaderboard.Areas.Leaderboards.Models;
 using System.Threading;
+using Leaderboard.Pages.Shared;
 
 namespace Leaderboard.Pages
 {

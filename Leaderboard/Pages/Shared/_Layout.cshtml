@@ -1,9 +1,7 @@
-﻿@inject Leaderboard.Services.IMessageQueue Messages
+﻿@model Leaderboard.Pages.Shared.LayoutModel
+@inject Leaderboard.Services.IMessageQueue Messages
 
 @{
-    // will fade the nav when at the top scroll position
-    var navFadeTop = Convert.ToBoolean(ViewData["NavFadeTop"]);
-
     var modalAction = ViewData["DataModalAction"] ?? "?handler=modal";
     var modalMethod = ViewData["DataModalMethod"] ?? "POST";
     var showModal = (ViewData["DataModalShow"] ?? false).ToString().ToLower();
@@ -26,13 +24,13 @@
 
 <body>
     <header>
-        <nav class="navbar @if(navFadeTop) { <text>fade-top </text> }fixed-top navbar-bold navbar-expand-sm navbar-toggleable-sm box-shadow">
+        <nav class="navbar fixed-top navbar-bold navbar-expand-sm navbar-toggleable-sm box-shadow">
             <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Leaderboard</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse"
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+            <div id="nav" class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
                 <partial name="_LoginPartial" />
                 <ul class="navbar-nav flex-grow-1">
                     <li class="nav-item">
@@ -44,10 +42,36 @@
                 </ul>
             </div>
         </nav>
+        @* Usually, I avoid styling by ID, but admin-nav is unique *@
+        <div id="admin-nav">
+            <nav id="admin-nav-links" class="nav flex-column navbar-collapse collapse">
+                <a href="" class="nav-item nav-link">words</a>
+                <a href="" class="nav-item nav-link">words</a>
+                <a href="" class="nav-item nav-link">words</a>
+                <a href="" class="nav-item nav-link">words</a>
+            </nav>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#admin-nav-links"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <strong>admin</strong>&nbsp;
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
     </header>
     @RenderSection("beforeContainer", required: false)
     <partial name="_StatusMessages" model="Messages.GetAllMessages()" />
-    <react-root class="container pb-3 @if(!navFadeTop && !IsSectionDefined("beforeContainer")) { <text>navbar-fixed-offset</text> }">
+    @* <nav class="nav fixed-left">
+        <div id="action-drawer" class="navbar-collapsed collapse flex-column">
+            <li class="nav-item"><a href="" class="nav-link">hello</a></li>
+            <li class="nav-item"><a href="" class="nav-link">world</a></li>
+            <li class="nav-item"><a href="" class="nav-link">nav</a></li>
+            <li class="nav-item"><a href="" class="nav-link">bar</a></li>
+        </div>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#action-drawer"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </nav> *@
+    <react-root class="container pb-3 navbar-fixed-offset navbar-left-offset">
         @RenderBody()
     </react-root>
 
