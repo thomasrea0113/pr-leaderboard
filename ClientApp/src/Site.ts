@@ -10,9 +10,7 @@ import './jquery.unobtrusive-ajax.extended';
 // Styles
 import './scss/site.scss';
 
-$(document).ready($ => {
-    $('[data-show=true]').modal('show');
-});
+import './utilities/modal-hash';
 
 // store the page's scroll-y position as a data attribute on the root html element
 (function trackScroll() {
@@ -47,3 +45,9 @@ $(document).ready($ => {
     // Update scroll position for first time
     storeScroll();
 })();
+
+$(() => {
+    $('.upload-control::after').on('click', ({ target }) => {
+        const ctrl = $(target).closest('input["type=file"]');
+    });
+});

@@ -1,5 +1,4 @@
-﻿@model Leaderboard.Pages.Shared.LayoutModel
-@inject Leaderboard.Services.IMessageQueue Messages
+﻿@inject Leaderboard.Services.IMessageQueue Messages
 
 @{
     var modalAction = ViewData["DataModalAction"] ?? "?handler=modal";
@@ -43,7 +42,7 @@
             </div>
         </nav>
         @* Usually, I avoid styling by ID, but admin-nav is unique *@
-        <div id="admin-nav">
+        @* <div id="admin-nav">
             <nav id="admin-nav-links" class="nav flex-column navbar-collapse collapse">
                 <a href="" class="nav-item nav-link">words</a>
                 <a href="" class="nav-item nav-link">words</a>
@@ -55,22 +54,10 @@
                 <strong>admin</strong>&nbsp;
                 <span class="navbar-toggler-icon"></span>
             </button>
-        </div>
+        </div> *@
     </header>
     @RenderSection("beforeContainer", required: false)
     <partial name="_StatusMessages" model="Messages.GetAllMessages()" />
-    @* <nav class="nav fixed-left">
-        <div id="action-drawer" class="navbar-collapsed collapse flex-column">
-            <li class="nav-item"><a href="" class="nav-link">hello</a></li>
-            <li class="nav-item"><a href="" class="nav-link">world</a></li>
-            <li class="nav-item"><a href="" class="nav-link">nav</a></li>
-            <li class="nav-item"><a href="" class="nav-link">bar</a></li>
-        </div>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#action-drawer"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </nav> *@
     <react-root class="container pb-3 navbar-fixed-offset navbar-left-offset">
         @RenderBody()
     </react-root>
@@ -103,7 +90,7 @@
             </button>
             }
         </div>
-        <div class="ModalBody">
+        <div class="modal-body">
             @ViewData["modal-body"]
         </div>
         <div class="modal-footer">

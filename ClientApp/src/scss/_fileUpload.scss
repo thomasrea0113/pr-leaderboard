@@ -1,0 +1,32 @@
+@import './mixins';
+
+.circle {
+    position: relative;
+    border-style: dashed;
+    border-radius: 50%;
+    width: 7rem;
+    padding: 0;
+    margin: 0;
+
+    &::after {
+        content: '';
+        display: block;
+        padding-bottom: 100%;
+    }
+
+    .content {
+        @extend .text-center;
+        @include center-vertical();
+        width: 100%;
+    }
+}
+
+.file-upload {
+    width: 100%;
+    border: 1px solid $input-border-color;
+
+    * td {
+        text-align: left;
+        padding: 0.5rem;
+    }
+}

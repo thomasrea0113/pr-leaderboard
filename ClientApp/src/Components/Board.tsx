@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { Leaderboard, UserView } from '../types/dotnet-types';
+import { Leaderboard, UserView, GenderValues } from '../types/dotnet-types';
 import { RangeDisplay, ThumbnailImage, GenderIcon } from './StyleComponents';
 
 const Field: React.FC<{
@@ -66,7 +66,13 @@ const Board: React.FC<Partial<UserView> & Leaderboard> = ({
                     </div>
                     <div className={colClass}>
                         <Field label="Gender">
-                            <GenderIcon gender={gender} />
+                            <GenderIcon
+                                gender={
+                                    gender != null
+                                        ? GenderValues[gender]
+                                        : undefined
+                                }
+                            />
                         </Field>
                     </div>
                     <div className={colClass}>

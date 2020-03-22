@@ -49,6 +49,7 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
         public class ReactProps
         {
             public string ScoresUrl { get; set; }
+            public string SubmitScoreUrl { get; set; }
         }
         public ReactProps Props { get; private set; }
 
@@ -88,6 +89,7 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
             Props ??= new ReactProps
             {
                 ScoresUrl = Url.Page(null, "initial"),
+                SubmitScoreUrl = Url.Page(null, "submitScore")
             };
         }
 
@@ -136,6 +138,12 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
 
             _messages.PushMessage("You've joined this board!");
             return RedirectToPage();
+        }
+
+        public async Task<RedirectResult> OnPostSubmitScoreAsync()
+        {
+            var url = Request.ToString();
+            return Redirect(url);
         }
     }
 }

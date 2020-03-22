@@ -2,6 +2,39 @@
  * Types that are meant to interface directly with the dotnet core server-side application
  */
 
+export enum GenderValues {
+    Male,
+    Female,
+    Other,
+}
+
+export enum BootstrapColorClass {
+    Primary,
+    Secondary,
+    Success,
+    Danger,
+    Warning,
+    Info,
+    Light,
+    Dark,
+    Link,
+}
+
+export enum FontawesomeIcon {
+    Go = 'fas fa-chevron-right',
+    User = 'fas fa-user',
+}
+
+export enum Unit {
+    Kilograms,
+    Seconds,
+    Meters,
+}
+export interface KeyValuePair {
+    key: string;
+    value: string;
+}
+
 export interface WeightClass {
     weightLowerBound?: number;
     weightUpperBound?: number;
@@ -12,7 +45,7 @@ export interface Division {
     name: string;
     categories: Category[];
     icon?: string;
-    gender?: GenderValues;
+    gender?: keyof typeof GenderValues;
     ageLowerBound?: number;
     ageUpperBound?: number;
 }
@@ -46,14 +79,7 @@ export interface User {
 }
 
 export interface UnitOfMeasure {
-    unit: string;
-}
-
-// eslint-disable-next-line import/prefer-default-export
-export enum GenderValues {
-    Male = 'Male',
-    Female = 'Female',
-    Other = 'Other',
+    unit: keyof typeof Unit;
 }
 
 export interface Score {
@@ -61,23 +87,6 @@ export interface Score {
     leaderboardId: string;
     userId: string;
     value: number;
-}
-
-export enum BootstrapColorClass {
-    Primary,
-    Secondary,
-    Success,
-    Danger,
-    Warning,
-    Info,
-    Light,
-    Dark,
-    Link,
-}
-
-export enum FontawesomeIcon {
-    Go = 'fas fa-chevron-right',
-    User = 'fas fa-user',
 }
 
 export interface Link {

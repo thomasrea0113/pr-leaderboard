@@ -3,6 +3,8 @@ import React, {
     ButtonHTMLAttributes,
     HTMLAttributes,
     InputHTMLAttributes,
+    useRef,
+    useState,
 } from 'react';
 
 import omit from 'lodash/fp/omit';
@@ -12,6 +14,7 @@ import {
     GenderValues,
     BootstrapColorClass,
     FontawesomeIcon,
+    Unit,
 } from '../types/dotnet-types';
 import { NumberRange } from '../types/types';
 
@@ -63,7 +66,7 @@ export const Expander: React.FC<{
 };
 
 export const GenderIcon: React.FC<{
-    gender?: keyof typeof GenderValues;
+    gender?: GenderValues;
 }> = ({ gender }) => {
     const male = <i className="fas fa-male text-blue" />;
     const female = <i className="fas fa-female text-pink" />;
@@ -76,9 +79,9 @@ export const GenderIcon: React.FC<{
 
     if (gender == null) return both;
 
-    const genderValue = GenderValues[gender];
-    if (genderValue === GenderValues.Male) return male;
-    if (genderValue === GenderValues.Female) return female;
+    if (gender === GenderValues.Male) return male;
+    if (gender === GenderValues.Female) return female;
+
     return both;
 };
 
@@ -226,6 +229,43 @@ export const RefreshButton: React.FC<DetailedHTMLProps<
     );
 };
 
+export interface UnitIconProps {
+    forUnit: Unit;
+    additionalProps?: React.DetailedHTMLProps<
+        React.HTMLAttributes<HTMLElement>,
+        HTMLElement
+    >;
+}
+export const UnitIcon: React.FC<UnitIconProps> = ({
+    forUnit,
+    additionalProps,
+}) => {
+    const { className } = { ...additionalProps };
+    const mergeProps = (cls: string) => {
+        if (className != null)
+            return {
+                ...additionalProps,
+                className: `${className} ${cls}`,
+            };
+        return {
+            ...additionalProps,
+            className: cls,
+        };
+    };
+
+    switch (forUnit) {
+        case Unit.Kilograms:
+            return <i {...mergeProps('fas fa-weight-hanging')} />;
+        case Unit.Meters:
+            return <i {...mergeProps('fas fa-ruler')} />;
+        case Unit.Seconds:
+            return <i {...mergeProps('fas fa-stopwatch')} />;
+        default:
+            break;
+    }
+    return null;
+};
+
 export const bootstrapColorClassToString = (
     color: keyof typeof BootstrapColorClass,
     outline: boolean = false
@@ -234,3 +274,88 @@ export const bootstrapColorClassToString = (
 export const FontawesomeIconToIcon = (icon: keyof typeof FontawesomeIcon) => (
     <i className={FontawesomeIcon[icon].toLowerCase()} />
 );
+
+export const FileUploader: React.FC<React.DetailedHTMLProps<
+    React.InputHTMLAttributes<HTMLInputElement>,
+    HTMLInputElement
+>> = props => {
+    const { id } = props;
+    const [, setState] = useState(1);
+
+    const fileRef = useRef<HTMLInputElement>(null);
+
+    // const setFileName = (files: FileList | null) => {
+    //     if (files != null && files.length > 0) setState(files[0].name);
+    // };
+
+    const rerender = () => setState(os => os + 1);
+
+    const fileName = (function getFileName() {
+        // eslint-disable-next-line prefer-destructuring
+        const files = fileRef.current?.files;
+        if (files != null && files.length > 0) {
+            return files[0].name;
+        }
+        return '';
+    })();
+
+    return (
+        <>
+            <table className="file-upload">
+                <tbody>
+                    <tr>
+                        <td style={{ width: '1%' }}>
+                            <label
+                                htmlFor={id}
+                                className="btn btn-outline-primary circle"
+                            >
+                                <div className="content">
+                                    <div>
+                                        <i className="fas fa-cloud-upload-alt fa-2x" />
+                                    </div>
+                                    <div>Click to Upload</div>
+                                </div>
+                            </label>
+                        </td>
+                        <td style={{ position: 'relative' }}>
+                            <div>
+                                <strong>Filename: </strong>
+                            </div>
+                            {fileName !== '' ? (
+                                <>
+                                    <i className="fas fa-check fa-lg text-success" />
+                                    &nbsp;&nbsp;{fileName}
+                                </>
+                            ) : null}
+                            <input
+                                ref={fileRef}
+                                id={id}
+                                type="file"
+                                hidden
+                                onChange={rerender}
+                            />
+                            <button
+                                hidden={fileName === ''}
+                                type="button"
+                                onClick={() => {
+                                    if (fileRef.current != null) {
+                                        fileRef.current.value = '';
+                                        rerender();
+                                    }
+                                }}
+                                className="btn btn-outline-danger btn-icon"
+                                style={{
+                                    top: '0.5rem',
+                                    right: '0.5rem',
+                                    position: 'absolute',
+                                }}
+                            >
+                                <i className="fas fa-times fa-lg" />
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </>
+    );
+};

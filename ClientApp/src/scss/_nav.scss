@@ -74,6 +74,10 @@ button.navbar-toggler:focus {
     transform: $rotate;
 }
 
+.nav-link:not(.active) {
+    cursor: pointer;
+}
+
 #admin-nav {
     @extend .bg-warning;
     border-radius: 0 0 0.75rem 0.75rem;

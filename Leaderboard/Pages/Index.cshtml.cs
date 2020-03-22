@@ -1,15 +1,12 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Leaderboard.Areas.Identity.Managers;
-using Leaderboard.Areas.Leaderboards.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Leaderboard.ViewModels;
 using Leaderboard.Areas.Leaderboards.Models;
-using System.Threading;
-using Leaderboard.Pages.Shared;
 
 namespace Leaderboard.Pages
 {

@@ -1,0 +1,19 @@
+@{
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+
+@section styles {
+    @RenderSection("styles", required: false)
+}
+
+@section beforeContainer {
+    @RenderSection("beforeContainer", required: false)
+}
+
+<react-root>
+    @RenderBody()
+</react-root>
+
+@section scripts {
+    @RenderSection("scripts", required: false)
+}
