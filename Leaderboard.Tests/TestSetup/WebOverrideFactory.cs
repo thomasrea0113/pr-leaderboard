@@ -11,6 +11,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.TestHost;
 using Leaderboard.Extensions;
 using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace Leaderboard.Tests.TestSetup
 {
@@ -42,13 +45,15 @@ namespace Leaderboard.Tests.TestSetup
         /// </summary>
         /// <param name="builder"></param>
         /// <returns></returns>
-        protected override IHost CreateHost(IHostBuilder builder)
+        protected override TestServer CreateServer(IWebHostBuilder builder)
         {
-            var host = builder.Build();
-            var env = host.Services.GetRequiredService<IWebHostEnvironment>().EnvironmentName;
-            if (!host.MigrateAsync(env, true).Wait(8000))
+            var server = base.CreateServer(builder);
+            using var scope = server.Services.CreateScope();
+            var provider = scope.ServiceProvider;
+            var env = provider.GetRequiredService<IWebHostEnvironment>().EnvironmentName;
+            if (!provider.MigrateAsync(env, true).Wait(8000))
                 throw new TimeoutException("seed timeout");
-            return host;
+            return server;
         }
     }
 }

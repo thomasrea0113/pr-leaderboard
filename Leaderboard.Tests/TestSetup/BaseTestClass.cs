@@ -26,9 +26,9 @@ namespace Leaderboard.Tests.TestSetup
         {
             Factory = factory;
 
-            // Ensure the Host is created by resolving a service
-            using var scope = Factory.Services.CreateScope();
-            using var _ = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            // We need to wait for the server to be ready,
+            // so we send a request to the root page
+            using var client = factory.CreateClient();
         }
 
         protected IServiceScope CreateScope(out IServiceProvider provider)

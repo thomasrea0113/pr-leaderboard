@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using Leaderboard.Areas.Leaderboards.Models;
 using Leaderboard.Data;
-using Leaderboard.Models;
 using Leaderboard.Models.Features;
 using Leaderboard.Models.Relationships;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Leaderboard.Utilities.Extensions;
+using SampleApp.Models;
 
 namespace Leaderboard.Areas.Identity.Models
 {
@@ -31,8 +31,8 @@ namespace Leaderboard.Areas.Identity.Models
 
         public virtual ICollection<UserLeaderboard> UserLeaderboards { get; set; } = new List<UserLeaderboard>();
         public virtual ICollection<ScoreModel> Scores { get; set; } = new List<ScoreModel>();
-        public virtual ICollection<FileModel> UploadedFiles { get; set; } = new List<FileModel>();
-        
+        public virtual ICollection<AppFile> UploadedFiles { get; set; } = new List<AppFile>();
+
         public virtual ICollection<UserCategory> UserCategories { get; set; } = new List<UserCategory>();
 
         public bool? IsActive { get; set; }

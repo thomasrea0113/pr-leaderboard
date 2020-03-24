@@ -20,7 +20,10 @@ namespace Leaderboard
 
             // TODO log seed, catch Migrate exception and notify user that no changes to the database were applied
             if (config.GetValue("AutoMigrate:Enabled", false))
-                await host.MigrateAsync(env, config.GetValue("AutoMigrate:AutoSeed", false));
+            {
+                using var scope = host.Services.CreateScope();
+                await scope.ServiceProvider.MigrateAsync(env, config.GetValue("AutoMigrate:AutoSeed", false));
+            }
 
             await host.RunAsync();
         }

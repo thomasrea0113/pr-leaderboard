@@ -13,12 +13,10 @@ namespace Leaderboard.Extensions
 {
     public static class IHostExtensions
     {
-        public static async Task<IHost> MigrateAsync(this IHost host, string env, bool seed = false)
+        public static async Task MigrateAsync(this IServiceProvider provider, string env, bool seed = false)
         {
-            using var scope = host.Services.CreateScope();
-            var provider = scope.ServiceProvider;
             using var ctx = provider.GetRequiredService<ApplicationDbContext>();
-            
+
             var pending = await ctx.Database.GetPendingMigrationsAsync();
             var current = (await ctx.Database.GetAppliedMigrationsAsync()).LastOrDefault();
             if (pending.Any())
@@ -29,15 +27,14 @@ namespace Leaderboard.Extensions
                     try
                     {
                         await provider.SeedDataAsync(env);
-                    } catch
+                    }
+                    catch
                     {
                         // if the seed failed, then we want to remove the migration(s) we just added
                         await migrator.MigrateAsync(current ?? "0");
                         throw;
                     }
             }
-
-            return host;
         }
     }
 }

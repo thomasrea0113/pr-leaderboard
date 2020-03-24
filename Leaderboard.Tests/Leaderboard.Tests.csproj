@@ -31,6 +31,10 @@
     <Content Include="appsettings.unittest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <!-- Make sure settings get copied to output -->
+    <Content Include="TestFiles/*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

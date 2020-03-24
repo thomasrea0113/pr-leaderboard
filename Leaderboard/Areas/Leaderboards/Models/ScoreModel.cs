@@ -1,9 +1,9 @@
 using System.Text.Json.Serialization;
 using Leaderboard.Areas.Identity.Models;
-using Leaderboard.Models;
 using Leaderboard.Models.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SampleApp.Models;
 
 namespace Leaderboard.Areas.Leaderboards.Models
 {
@@ -14,15 +14,15 @@ namespace Leaderboard.Areas.Leaderboards.Models
         public bool? IsApproved { get; set; }
 
         [JsonIgnore]
-        public virtual FileModel VideoProof { get; set; }
+        public virtual AppFile VideoProof { get; set; }
 
         public string BoardId { get; set; }
-        
+
         [JsonIgnore]
         public virtual LeaderboardModel Board { get; set; }
 
         public string UserId { get; set; }
-        
+
         [JsonIgnore]
         public virtual ApplicationUser User { get; set; }
 

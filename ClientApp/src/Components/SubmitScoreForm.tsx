@@ -24,36 +24,10 @@ export const SubmitScoreForm: React.FC<SubmitScoreProps> = ({ unit }) => (
         </div>
         <div className="form-group">
             <label htmlFor="score">Video Proof</label>
-            <ul className="nav nav-tabs">
-                <li className="nav-item">
-                    <a
-                        id="direct-tab"
-                        className="nav-link active"
-                        data-toggle="tab"
-                        href="#direct"
-                    >
-                        Direct Upload
-                    </a>
-                </li>
-                <li className="nav-item">
-                    <a
-                        id="youtube-tab"
-                        className="nav-link"
-                        data-toggle="tab"
-                        href="#youtube"
-                    >
-                        YouTube
-                    </a>
-                </li>
-            </ul>
-            <div className="tab-content">
-                <div className="tab-pane fade show active" id="direct">
-                    <FileUploader id="video-prood" />
-                </div>
-                <div className="tab-pane fade show" id="youtube">
-                    YouTube
-                </div>
-            </div>
+            <p className="text-muted">
+                Don&apos;t want to provide a video? Don&apos;t worry about it!
+            </p>
+            <input type="text" className="form-control" />
         </div>
     </>
 );

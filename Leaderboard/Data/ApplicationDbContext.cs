@@ -7,7 +7,7 @@ using Leaderboard.Models.Relationships;
 using System.Threading.Tasks;
 using System.Threading;
 using Leaderboard.Areas.Leaderboards.Models;
-using Leaderboard.Models;
+using SampleApp.Models;
 using Leaderboard.Areas.Identity.Models;
 
 namespace Leaderboard.Data
@@ -23,7 +23,7 @@ namespace Leaderboard.Data
         public DbSet<WeightClass> WeightClasses { get; set; }
         public DbSet<ScoreModel> Scores { get; set; }
         public DbSet<UnitOfMeasureModel> UnitsOfMeasure { get; set; }
-        public DbSet<FileModel> UploadedFiles { get; set; }
+        public DbSet<AppFile> UploadedFiles { get; set; }
         public DbSet<Category> Categories { get; set; }
 
         #region relationship tables

@@ -142,6 +142,7 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
 
         public async Task<RedirectResult> OnPostSubmitScoreAsync()
         {
+            await Task.CompletedTask;
             var url = Request.ToString();
             return Redirect(url);
         }

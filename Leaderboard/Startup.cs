@@ -55,6 +55,7 @@ namespace Leaderboard
 
                 // disabling here so that we can handle email ourselves
                 options.User.RequireUniqueEmail = false;
+                options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._";
 
                 options.Password.RequireNonAlphanumeric = false;
 
@@ -67,7 +68,8 @@ namespace Leaderboard
                 .AddRoleStore<AppRoleStore>()
                 .AddDefaultUI()
                 .AddDefaultTokenProviders()
-                .AddUserValidator<EmailNotRequiredValidator>();
+                .AddUserValidator<EmailNotRequiredValidator>()
+                .AddUserValidator<UserNameValidator>();
 
             services.AddScoped<AppUserManager>();
             services.AddScoped<AppRoleManager>();
