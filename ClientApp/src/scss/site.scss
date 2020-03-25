@@ -1,12 +1,10 @@
 @import './mixins';
-@import './bootstrap-variables';
 @import './animations';
 
 @import url('https://fonts.googleapis.com/css?family=Signika&display=swap');
 $font-family-base: 'Signika', sans-serif, monospace !default;
 
-@import '../../node_modules/bootstrap/scss/bootstrap';
-@import './bootswatch';
+@import './themes/yeti';
 
 @import '../../node_modules/@fortawesome/fontawesome-free/scss/fontawesome';
 @import '../../node_modules/@fortawesome/fontawesome-free/scss/solid';
