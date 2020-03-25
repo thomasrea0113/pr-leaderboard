@@ -27,7 +27,7 @@ namespace SampleApp
                         model =>
                         {
                             model.Filters.Add(
-                                new GenerateAntiforgeryTokenCookieAttribute());
+                                new AntiforgeryTokenCookieAttribute());
                             model.Filters.Add(
                                 new DisableFormValueModelBindingAttribute());
                         });

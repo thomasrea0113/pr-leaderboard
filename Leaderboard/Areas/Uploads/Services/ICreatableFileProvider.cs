@@ -14,7 +14,7 @@ namespace Leaderboard.Areas.Uploads.Services
     public interface IWriteStreamFactory
     {
         string Root { get; }
-        Stream CreateStream(string fileName);
+        (Uri, Stream) CreateStream(string fileName);
     }
 
     public class CreatablePhysicalFileProvider : PhysicalFileProvider, ICreatableFileProvider
@@ -28,7 +28,7 @@ namespace Leaderboard.Areas.Uploads.Services
         }
 
         public IWriteStreamFactory GetWriteStreamFactory(string subPath)
-            => new CreatablePhysicalWriteStreamFactory(subPath);
+            => new CreatablePhysicalWriteStreamFactory(Path.Join(Root, subPath));
     }
 
     public class CreatablePhysicalWriteStreamFactory : IWriteStreamFactory
@@ -38,8 +38,13 @@ namespace Leaderboard.Areas.Uploads.Services
         public CreatablePhysicalWriteStreamFactory(string root)
         {
             Root = root;
+            Directory.CreateDirectory(root);
         }
 
-        public Stream CreateStream(string fileName) => File.Create(Path.Join(Root, fileName));
+        public (Uri, Stream) CreateStream(string fileName)
+        {
+            var path = Path.Join(Root, fileName);
+            return (new Uri(path), File.Create(path));
+        }
     }
 }

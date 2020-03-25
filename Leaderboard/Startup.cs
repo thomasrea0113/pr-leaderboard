@@ -17,6 +17,7 @@ using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using System.Text.Json.Serialization;
 using Leaderboard.Routing.Constraints;
+using SampleApp.Filters;
 
 namespace Leaderboard
 {
@@ -48,6 +49,8 @@ namespace Leaderboard
                         .EnableSensitiveDataLogging();
             });
 
+            services.AddScoped<DbContext>(services => services.GetRequiredService<ApplicationDbContext>());
+
             // adding the default user models
             services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {
@@ -63,19 +66,17 @@ namespace Leaderboard
                 options.SignIn.RequireConfirmedAccount = false;
                 options.SignIn.RequireConfirmedPhoneNumber = false;
             })
+                .AddUserManager<AppUserManager>()
+                .AddRoleManager<AppRoleManager>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddUserStore<AppUserStore>()
                 .AddRoleStore<AppRoleStore>()
                 .AddDefaultUI()
                 .AddDefaultTokenProviders()
+                // for adding additional user claims
+                .AddClaimsPrincipalFactory<ApplicationClaimsPrincipalFactory>()
                 .AddUserValidator<EmailNotRequiredValidator>()
                 .AddUserValidator<UserNameValidator>();
-
-            services.AddScoped<AppUserManager>();
-            services.AddScoped<AppRoleManager>();
-
-            // for adding additional user claims
-            services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, ApplicationClaimsPrincipalFactory>();
 
             // for persisting user messages across requests
             services.AddScoped<IMessageQueue, TempDataMessageQueue>();
@@ -95,7 +96,10 @@ namespace Leaderboard
                 o.ConstraintMap["gender"] = typeof(GenderConstraint);
             });
 
-            services.AddRazorPages().AddJsonOptions(options =>
+            services.AddRazorPages(options =>
+            {
+                options.Conventions.Add(new AntiforgeryTokenCookieConvention());
+            }).AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;

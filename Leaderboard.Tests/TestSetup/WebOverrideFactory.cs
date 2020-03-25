@@ -40,14 +40,9 @@ namespace Leaderboard.Tests.TestSetup
                     .AddJsonFile("appsettings.unittest.json", false));
         }
 
-        /// <summary>
-        /// Make sure we seed the database BEFORE the host is made available.
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <returns></returns>
-        protected override TestServer CreateServer(IWebHostBuilder builder)
+        protected override IHost CreateHost(IHostBuilder builder)
         {
-            var server = base.CreateServer(builder);
+            var server = base.CreateHost(builder);
             using var scope = server.Services.CreateScope();
             var provider = scope.ServiceProvider;
             var env = provider.GetRequiredService<IWebHostEnvironment>().EnvironmentName;
@@ -55,5 +50,10 @@ namespace Leaderboard.Tests.TestSetup
                 throw new TimeoutException("seed timeout");
             return server;
         }
+
+        // with .net core 2.1, a generic IHost was added in favor over IWebHost.
+        // for applications still using IWebHost, this function would be called instead
+        // of the above.
+        // protected override TestServer CreateServer(IWebHostBuilder builder);
     }
 }

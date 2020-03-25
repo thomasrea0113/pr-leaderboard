@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Leaderboard.Areas.Identity.Managers;
 using Leaderboard.Areas.Uploads.Exceptions;
-using Leaderboard.Areas.Uploads.Models;
 using Leaderboard.Areas.Uploads.Services;
 using Leaderboard.Areas.Uploads.Utilities;
 using Microsoft.AspNetCore.Identity;
@@ -21,12 +21,12 @@ namespace SampleApp.Pages
     {
         private readonly ILogger<UploadModel> _logger;
         private readonly DbContext _context;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly AppUserManager _userManager;
         private readonly IMultipartModelBinder _mpBinder;
         private readonly ICreatableFileProvider _fileProvider;
 
         public UploadModel(ILogger<UploadModel> logger,
-            DbContext context, UserManager<IdentityUser> userManager,
+            DbContext context, AppUserManager userManager,
             IMultipartModelBinder mpBinder, ICreatableFileProvider fileProvider)
         {
             _logger = logger;
@@ -36,42 +36,45 @@ namespace SampleApp.Pages
             _fileProvider = fileProvider;
         }
 
-        public async Task<IActionResult> OnPostAsync()
-        {
-            FileContent fileContent;
-            FormValueProvider provider;
+        // TODO implement file upload
+        public IActionResult OnGet() => NotFound();
 
-            var user = await _userManager.GetUserAsync(HttpContext.User);
+        // public async Task<IActionResult> OnPostAsync()
+        // {
+        //     IFileInfo fileInfo;
+        //     FormValueProvider provider;
 
-            // stores all files uploaded by a given user in the same directory
-            var streamFactory = _fileProvider.GetWriteStreamFactory(user.UserName);
+        //     var user = await _userManager.GetUserAsync(HttpContext.User);
 
-            try
-            {
-                (fileContent, provider) = await _mpBinder.ProcessMultipartRequestAsync(Request, streamFactory);
-            }
-            catch (MultipartBindingException ex)
-            {
-                _logger.LogError(ex, "Error binding posted file");
-                ModelState.TryAddModelException("", ex);
-                throw;
-            }
+        //     // stores all files uploaded by a given user in the same directory
+        //     var streamFactory = _fileProvider.GetWriteStreamFactory(user.UserName);
 
-            var model = new FileUploadModel();
-            await TryUpdateModelAsync(model, "", provider);
+        //     try
+        //     {
+        //         (fileInfo, provider) = await _mpBinder.ProcessMultipartRequestAsync(Request, streamFactory);
+        //     }
+        //     catch (MultipartBindingException ex)
+        //     {
+        //         _logger.LogError(ex, "Error binding posted file");
+        //         ModelState.TryAddModelException("", ex);
+        //         throw;
+        //     }
 
-            // TODO save file to disk and update database
-            var added = _context.Set<AppFile>().Add(new AppFile
-            {
-                Path = Path.Join(Path.GetRandomFileName(), model.File.Name),
-                CreatedById = _userManager.GetUserId(HttpContext.User),
-                Size = model.File.ContentStream.Length,
-                UploadDate = DateTime.UtcNow,
-            });
+        //     // var model = new FileUploadModel();
+        //     // await TryUpdateModelAsync(model, "", provider);
 
-            await _context.SaveChangesAsync();
+        //     // TODO save file to disk and update database
+        //     var added = _context.Set<AppFile>().Add(new AppFile
+        //     {
+        //         Path = fileInfo.PhysicalPath,
+        //         CreatedById = _userManager.GetUserId(HttpContext.User),
+        //         Size = fileInfo.Length,
+        //         UploadDate = DateTime.UtcNow,
+        //     });
 
-            return new CreatedResult(Url.Page(null), added.Entity);
-        }
+        //     await _context.SaveChangesAsync();
+
+        //     return new CreatedResult(Url.Page(null), added.Entity);
+        // }
     }
 }

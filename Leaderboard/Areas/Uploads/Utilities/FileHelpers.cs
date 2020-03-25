@@ -12,6 +12,8 @@ using Leaderboard.Areas.Uploads.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Net.Http.Headers;
 
 namespace SampleApp.Utilities
@@ -54,29 +56,31 @@ namespace SampleApp.Utilities
             },
         };
 
-        public static async Task<Stream> ProcessStreamedFileAsync(
+        public static async Task<IFileInfo> ProcessStreamedFileAsync(
             IWriteStreamFactory streamFactory,
             MultipartSection section, ContentDispositionHeaderValue contentDisposition,
             string[] permittedExtensions, long sizeLimit)
         {
-            var writeStream = streamFactory.CreateStream(contentDisposition.FileName.Value);
-            await section.Body.CopyToAsync(writeStream);
-
-            // Check if the file is empty or exceeds the size limit.
-            if (writeStream.Length == 0)
-                throw new MultipartBindingException("The file is empty.");
-            else if (writeStream.Length > sizeLimit)
+            (var uri, var writeStream) = streamFactory.CreateStream(contentDisposition.FileName.Value);
+            using (writeStream)
             {
-                var megabyteSizeLimit = sizeLimit / 1048576;
-                throw new MultipartBindingException($"The file exceeds {megabyteSizeLimit:N1} MB.");
-            }
-            else if (!IsValidFileExtensionAndSignature(
-                contentDisposition.FileName.Value, writeStream,
-                permittedExtensions))
-                throw new MultipartBindingException("The file type isn't permitted or the file's " +
-                    "signature doesn't match the file's extension.");
+                await section.Body.CopyToAsync(writeStream);
 
-            return writeStream;
+                // Check if the file is empty or exceeds the size limit.
+                if (writeStream.Length == 0)
+                    throw new MultipartBindingException("The file is empty.");
+                else if (writeStream.Length > sizeLimit)
+                {
+                    var megabyteSizeLimit = sizeLimit / 1048576;
+                    throw new MultipartBindingException($"The file exceeds {megabyteSizeLimit:N1} MB.");
+                }
+                else if (!IsValidFileExtensionAndSignature(
+                    contentDisposition.FileName.Value, writeStream,
+                    permittedExtensions))
+                    throw new MultipartBindingException("The file type isn't permitted or the file's " +
+                        "signature doesn't match the file's extension.");
+            }
+            return new PhysicalFileInfo(new FileInfo(uri.AbsolutePath));
         }
 
         public static bool IsValidFileExtensionAndSignature(string fileName, Stream data, string[] permittedExtensions)

@@ -12,6 +12,27 @@ import './scss/site.scss';
 
 import './utilities/modal-hash';
 
+/**
+ * The document cookie should contain the csrf token, but there's no gaurantee
+ */
+export interface Cookie {
+    [index: string]: string;
+    RequestVerificationToken: string;
+}
+
+export const parseCookie = (): Partial<Cookie> =>
+    document.cookie.split(';').reduce((res, c) => {
+        const [key, val] = c
+            .trim()
+            .split('=')
+            .map(decodeURIComponent);
+        try {
+            return Object.assign(res, { [key]: JSON.parse(val) });
+        } catch (e) {
+            return Object.assign(res, { [key]: val });
+        }
+    }, {});
+
 // store the page's scroll-y position as a data attribute on the root html element
 (function trackScroll() {
     const debounce = (fn: () => void) => {

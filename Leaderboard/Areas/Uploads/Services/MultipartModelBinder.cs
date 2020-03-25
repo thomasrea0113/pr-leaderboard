@@ -1,16 +1,17 @@
 using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Leaderboard.Areas.Uploads.Exceptions;
-using Leaderboard.Areas.Uploads.Models;
 using Leaderboard.Areas.Uploads.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Net.Http.Headers;
 using SampleApp.Utilities;
 using static SampleApp.Utilities.FileHelpers;
@@ -23,11 +24,12 @@ namespace Leaderboard.Areas.Uploads.Utilities
         public long FileSizeLimit { get; set; }
         public int ValueCountLimit { get; set; }
         public string StoredFilesPath { get; set; }
+        public string[] PermittedExtensions { get; set; }
     }
 
     public interface IMultipartModelBinder
     {
-        Task<(FileContent, FormValueProvider)> ProcessMultipartRequestAsync(HttpRequest request, IWriteStreamFactory streamFactory, params string[] permittedExtensions);
+        Task<(IFileInfo, FormValueProvider)> ProcessMultipartRequestAsync(HttpRequest request, IWriteStreamFactory streamFactory, params string[] permittedExtensions);
     }
 
     public class MultipartModelBinder : IMultipartModelBinder
@@ -40,7 +42,7 @@ namespace Leaderboard.Areas.Uploads.Utilities
             config.Bind(nameof(MultipartModelBinder), _defaultFormOptions);
         }
 
-        public async Task<(FileContent, FormValueProvider)> ProcessMultipartRequestAsync(
+        public async Task<(IFileInfo, FormValueProvider)> ProcessMultipartRequestAsync(
             HttpRequest request,
             IWriteStreamFactory streamFactory,
             params string[] permittedExtensions)
@@ -48,10 +50,13 @@ namespace Leaderboard.Areas.Uploads.Utilities
             if (!MultipartRequestHelper.IsMultipartContentType(request.ContentType))
                 throw new MultipartBindingException($"Content type must be multi-part");
 
+            if (!permittedExtensions.Any())
+                permittedExtensions = _defaultFormOptions.PermittedExtensions;
+
             // Accumulate the form data key-value pairs in the request (formAccumulator).
             var formAccumulator = new KeyValueAccumulator();
 
-            FileContent fileContent = null;
+            IFileInfo fileContent = null;
 
             var boundary = MultipartRequestHelper.GetBoundary(
                 MediaTypeHeaderValue.Parse(request.ContentType),
@@ -70,10 +75,8 @@ namespace Leaderboard.Areas.Uploads.Utilities
                     if (MultipartRequestHelper
                         .HasFileContentDisposition(contentDisposition))
                     {
-                        fileContent = new FileContent(
-                            contentDisposition.FileName.Value,
-                            await ProcessStreamedFileAsync(streamFactory, section, contentDisposition,
-                                permittedExtensions, _defaultFormOptions.FileSizeLimit));
+                        fileContent = await ProcessStreamedFileAsync(streamFactory, section, contentDisposition,
+                                permittedExtensions, _defaultFormOptions.FileSizeLimit);
                     }
                     else if (MultipartRequestHelper
                         .HasFormDataContentDisposition(contentDisposition))

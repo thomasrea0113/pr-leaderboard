@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace SampleApp.Filters
 {
-    #region snippet_GenerateAntiforgeryTokenCookieAttribute
-    public class GenerateAntiforgeryTokenCookieAttribute : ResultFilterAttribute
+    public class AntiforgeryTokenCookieAttribute : ResultFilterAttribute
     {
         public override void OnResultExecuting(ResultExecutingContext context)
         {
@@ -25,6 +25,16 @@ namespace SampleApp.Filters
         {
         }
     }
-    #endregion
+
+    /// <summary>
+    /// Makes the antiforgery token available as a cookie parameter
+    /// </summary>
+    public class AntiforgeryTokenCookieConvention : IPageApplicationModelConvention
+    {
+        public void Apply(PageApplicationModel model)
+        {
+            model.Filters.Add(new AntiforgeryTokenCookieAttribute());
+        }
+    }
 }
 

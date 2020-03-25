@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Leaderboard.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200310185345_Initial")]
+    [Migration("20200325185559_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -406,8 +406,8 @@ namespace Leaderboard.Migrations
                     b.Property<decimal>("Value")
                         .HasColumnType("decimal(12,4)");
 
-                    b.Property<string>("VideoProofId")
-                        .HasColumnType("text");
+                    b.Property<int?>("VideoProofId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -490,33 +490,6 @@ namespace Leaderboard.Migrations
                     b.ToTable("WeightClasses");
                 });
 
-            modelBuilder.Entity("Leaderboard.Models.FileModel", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Path")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("UploadDate")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Path")
-                        .IsUnique();
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UploadedFiles");
-                });
-
             modelBuilder.Entity("Leaderboard.Models.Relationships.UserCategory", b =>
                 {
                     b.Property<string>("Id")
@@ -561,6 +534,37 @@ namespace Leaderboard.Migrations
                         .IsUnique();
 
                     b.ToTable("UserLeaderboards");
+                });
+
+            modelBuilder.Entity("SampleApp.Models.AppFile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("Size")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("UploadDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("Path")
+                        .IsUnique();
+
+                    b.ToTable("UploadedFiles");
                 });
 
             modelBuilder.Entity("Leaderboard.Areas.Identity.Models.ApplicationRoleClaim", b =>
@@ -677,18 +681,9 @@ namespace Leaderboard.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Leaderboard.Models.FileModel", "VideoProof")
+                    b.HasOne("SampleApp.Models.AppFile", "VideoProof")
                         .WithMany()
                         .HasForeignKey("VideoProofId");
-                });
-
-            modelBuilder.Entity("Leaderboard.Models.FileModel", b =>
-                {
-                    b.HasOne("Leaderboard.Areas.Identity.Models.ApplicationUser", "CreatedBy")
-                        .WithMany("UploadedFiles")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Leaderboard.Models.Relationships.UserCategory", b =>
@@ -715,6 +710,15 @@ namespace Leaderboard.Migrations
                     b.HasOne("Leaderboard.Areas.Identity.Models.ApplicationUser", "User")
                         .WithMany("UserLeaderboards")
                         .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("SampleApp.Models.AppFile", b =>
+                {
+                    b.HasOne("Leaderboard.Areas.Identity.Models.ApplicationUser", "CreatedBy")
+                        .WithMany("UploadedFiles")
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

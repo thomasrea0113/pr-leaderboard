@@ -34,7 +34,7 @@ const ViewBoardComponent: React.FC<Props> = ({ scoresUrl, submitScoreUrl }) => {
         <>
             <h4>Scores</h4>
             <p>hello {user?.userName}!</p>
-            <button
+            {/* <button
                 id="submit-score"
                 type="button"
                 data-toggle="modal"
@@ -44,15 +44,18 @@ const ViewBoardComponent: React.FC<Props> = ({ scoresUrl, submitScoreUrl }) => {
                 <i className="far fa-clipboard" />
                 &nbsp;&nbsp;
                 <label htmlFor="submit-score">Submit a Score</label>
-            </button>
+            </button> */}
             {isMounted && !isLoading && board != null && unit != null ? (
                 <>
+                    <div className="mb-1">
+                        <SubmitScoreForm unit={unit} />
+                    </div>
                     <ScoreTable
                         reloadAsync={reloadAsync}
                         scores={scores ?? []}
                         unit={board.uom.unit}
                     />
-                    <form
+                    {/* <form
                         method="post"
                         action={submitScoreUrl}
                         id="score-modal"
@@ -101,7 +104,7 @@ const ViewBoardComponent: React.FC<Props> = ({ scoresUrl, submitScoreUrl }) => {
                                 </div>
                             </div>
                         </div>
-                    </form>
+                    </form> */}
                 </>
             ) : null}
         </>
