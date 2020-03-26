@@ -1,5 +1,9 @@
 @import './mixins';
 
+body {
+    margin-bottom: 75px !important;
+}
+
 .center-vertical {
     @include center-vertical();
 }
@@ -15,7 +19,11 @@ div.center-vertical {
 }
 
 .navbar-fixed-offset {
-    margin-top: $navbar-height + 0.5rem;
+    margin-top: $navbar-height;
+
+    &-mt {
+        margin-top: $navbar-height + 0.5rem;
+    }
 }
 
 .navbar-left-offset {

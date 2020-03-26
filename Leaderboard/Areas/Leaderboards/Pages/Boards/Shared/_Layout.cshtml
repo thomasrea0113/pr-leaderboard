@@ -6,8 +6,12 @@
     @RenderSection("styles", required: false)
 }
 
-@section beforeContainer {
-    @RenderSection("beforeContainer", required: false)
+
+@if (IsSectionDefined("beforeContainer"))
+{
+    @section beforeContainer {
+        @RenderSection("beforeContainer", required: false)
+    }
 }
 
 <react-root>
