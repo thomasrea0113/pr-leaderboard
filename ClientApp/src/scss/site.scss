@@ -19,6 +19,11 @@ $transition-collapse-width: width 0.35s ease !default;
 
 @import './position';
 
+.container {
+    @extend .bg-white;
+    @extend .shadow;
+}
+
 html {
     letter-spacing: 0.05rem;
     font-size: 12px;

@@ -15,7 +15,7 @@ div.center-vertical {
 }
 
 .navbar-fixed-offset {
-    margin-top: $navbar-height;
+    margin-top: $navbar-height + 0.5rem;
 }
 
 .navbar-left-offset {
