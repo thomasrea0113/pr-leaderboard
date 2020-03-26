@@ -23,66 +23,19 @@ namespace Leaderboard.Services
 
     public class PartialRenderer : IPartialRenderer
     {
-        private readonly IRazorViewEngine _viewEngine;
-        private readonly IModelMetadataProvider _metadataProvider;
-        private readonly ActionContext _context;
-        private readonly ITempDataDictionary _tempData;
+        private readonly IViewContextGenerator _generator;
 
-        public PartialRenderer(
-            IRazorViewEngine viewEngine,
-            IActionContextAccessor _accessor,
-            IModelMetadataProvider metadataProvider,
-            ITempDataDictionaryFactory _factory)
+        public PartialRenderer(IViewContextGenerator generator)
         {
-            _viewEngine = viewEngine;
-            _metadataProvider = metadataProvider;
-            _context = _accessor.ActionContext;
-            _tempData = _factory.GetTempData(_context.HttpContext);
+            _generator = generator;
         }
 
         public async Task<string> RenderPartialToStringAsync<TModel>(string partialName, TModel model, object additionalViewData = null, HtmlHelperOptions options = null)
         {
-            var partial = FindView(_context, partialName);
-
             var writer = new StringWriter();
-
-            var viewData = new ViewDataDictionary(_metadataProvider, _context.ModelState)
-            {
-                Model = model
-            };
-
-            // if additional view data was provided, add each property
-            if(additionalViewData != default)
-            {
-                foreach (var prop in additionalViewData.GetType().GetProperties())
-                    viewData[prop.Name] = prop.GetValue(additionalViewData);
-            }
-
-            var _viewContext = new ViewContext(
-                _context,
-                partial,
-                viewData,
-                _tempData,
-                writer,
-                options ?? new HtmlHelperOptions()
-            );
-
-            await partial.RenderAsync(_viewContext);
+            var context = _generator.GenerateViewContext(partialName, model, writer, additionalViewData, options);
+            await context.View.RenderAsync(context);
             return writer.GetStringBuilder().ToString();
-        }
-
-        private IView FindView(ActionContext actionContext, string partialName)
-        {
-            var result = _viewEngine.GetView(null, partialName, false);
-            if (result.Success)
-                return result.View;
-
-            result = _viewEngine.FindView(actionContext, partialName, false);
-            if (result.Success)
-                return result.View;
-
-            var searchedLocations = String.Join(Environment.NewLine, result.SearchedLocations.Concat(result.SearchedLocations));
-            throw new InvalidOperationException($"Unable to find partial '{partialName}'. The following locations were searched: {searchedLocations}");
         }
     }
 }

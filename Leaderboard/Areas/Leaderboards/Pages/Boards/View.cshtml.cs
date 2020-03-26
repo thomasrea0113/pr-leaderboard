@@ -11,6 +11,7 @@ using Leaderboard.Areas.Leaderboards.ViewModels;
 using Leaderboard.Data;
 using Leaderboard.Extensions;
 using Leaderboard.Services;
+using Leaderboard.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +31,7 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
         private readonly ApplicationDbContext _ctx;
         private readonly IMessageQueue _messages;
         private readonly AppUserManager _userManager;
+        private readonly IInputDataProvider _inputDataProvider;
 
         public LeaderboardModel Board { get; private set; }
 
@@ -60,15 +62,17 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
             public IEnumerable<ScoreViewModel> Scores { get; set; }
         }
 
-        public ViewModel(ApplicationDbContext ctx, IMessageQueue messages, AppUserManager userManager)
+        public ViewModel(ApplicationDbContext ctx, IMessageQueue messages, AppUserManager userManager, IInputDataProvider inputDataProvider)
         {
             _ctx = ctx;
             _messages = messages;
             _userManager = userManager;
+            _inputDataProvider = inputDataProvider;
         }
 
         private void Init()
         {
+            var attrs = _inputDataProvider.GetFieldAttriutesForModel<ContactViewModel>();
             RouteArgs = RouteData.ToObject<BoardRouteArgs>();
 
             var tinfo = CultureInfo.CurrentCulture.TextInfo;

@@ -86,6 +86,7 @@ namespace Leaderboard
             // for rendering partial views in emails. PartialRenderer depends on
             // ActionContextAccessor
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+            services.AddTransient<IViewContextGenerator, ViewContextGenerator>();
             services.AddTransient<IPartialRenderer, PartialRenderer>();
 
             services.AddRouting(o =>
@@ -110,6 +111,8 @@ namespace Leaderboard
             {
                 cnf.RootPath = "../ClientApp/dist";
             });
+
+            services.AddScoped<IInputDataProvider, InputDataProvider>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
