@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { HttpMethodsEnum } from '../types/types';
 
 export interface LoadingState<D> {
     isLoading: boolean;
@@ -12,7 +13,8 @@ export interface UseLoadingProps<D> extends LoadingState<D> {
 
 export const useLoading = <D extends {}>(
     initialUrl: string,
-    loadOnMount: boolean = false
+    loadOnMount: boolean = false,
+    method: keyof typeof HttpMethodsEnum = 'GET'
 ): UseLoadingProps<D> => {
     const [loadingState, setState] = useState<LoadingState<D>>({
         isMounted: false,
@@ -32,7 +34,7 @@ export const useLoading = <D extends {}>(
         new Promise<void>((resolve, reject) => {
             if (!isLoading) {
                 mergeState({ isLoading: true });
-                fetch(initialUrl)
+                fetch(initialUrl, { method })
                     .then(resp => resp.json())
                     .then(j => j as D) // assume the returned json matches the typescript interface
                     .then(data => mergeState({ isLoading: false, data }))

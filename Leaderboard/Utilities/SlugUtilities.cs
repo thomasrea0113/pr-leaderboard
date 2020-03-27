@@ -7,6 +7,9 @@ namespace Leaderboard.Utilities
 {
     public static class SlugUtilities
     {
+        const string SLUG_PATTERN = "^[a-z0-9]+(?:-[a-z0-9]+)*$";
+        public static Regex SlugRegex { get; } = new Regex(SLUG_PATTERN);
+
         public static string Slugify(string name)
         {
             string str = RemoveAccent(name).ToLower();
@@ -19,6 +22,8 @@ namespace Leaderboard.Utilities
             str = Regex.Replace(str, @"\s", "-"); // hyphens   
             return str;
         }
+
+        public static bool IsSlug(string name) => SlugRegex.IsMatch(name);
 
         private static string RemoveAccent(string text)
         {

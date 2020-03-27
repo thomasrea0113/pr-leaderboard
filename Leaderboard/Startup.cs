@@ -107,12 +107,15 @@ namespace Leaderboard
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(default, false));
             });
 
+            // controllers will be used for api CRUD actions
+            services.AddControllers();
+
             services.AddSpaStaticFiles(cnf =>
             {
                 cnf.RootPath = "../ClientApp/dist";
             });
 
-            services.AddScoped<IInputDataProvider, InputDataProvider>();
+            services.AddScoped<IFormFieldAttributeProvider, FormFieldAttributeProvider>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -141,6 +144,7 @@ namespace Leaderboard
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
+                endpoints.MapControllers();
             });
         }
     }

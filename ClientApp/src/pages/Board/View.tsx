@@ -3,12 +3,17 @@ import 'react-dom'; // only needed if this is to be placed directly on the page
 import { ScoreTable } from '../../Components/tables/ScoreTable';
 import { useLoading } from '../../hooks/useLoading';
 import { User, UserView, Score } from '../../types/dotnet-types';
-import { SubmitScoreForm } from '../../Components/SubmitScoreForm';
+import {
+    SubmitScoreForm,
+    SubmitScore,
+} from '../../Components/forms/SubmitScoreForm';
 import { attachHashEvents } from '../../utilities/modal-hash';
+import { FetchForm, FieldProps } from '../../Components/forms/FetchForm';
 
 interface Props {
     scoresUrl: string;
     submitScoreUrl: string;
+    fieldAttributes: FieldProps<SubmitScore>;
 }
 
 interface State {
@@ -17,11 +22,16 @@ interface State {
     scores: Score[];
 }
 
-const ViewBoardComponent: React.FC<Props> = ({ scoresUrl, submitScoreUrl }) => {
+const ViewBoardComponent: React.FC<Props> = ({
+    scoresUrl,
+    submitScoreUrl,
+    fieldAttributes,
+}) => {
     const { isLoading, isMounted, reloadAsync, data } = useLoading<State>(
         scoresUrl,
         true
     );
+
     const { board, user, scores } = { ...data };
     const { unit } = { ...board?.uom };
 
@@ -47,9 +57,17 @@ const ViewBoardComponent: React.FC<Props> = ({ scoresUrl, submitScoreUrl }) => {
             </button> */}
             {isMounted && !isLoading && board != null && unit != null ? (
                 <>
-                    <div className="mb-1">
-                        <SubmitScoreForm unit={unit} />
-                    </div>
+                    <FetchForm
+                        className="mb-1"
+                        method="post"
+                        action={submitScoreUrl}
+                    >
+                        <SubmitScoreForm
+                            fieldAttributes={fieldAttributes}
+                            unit={unit}
+                        />
+                        <button type="submit">Submit</button>
+                    </FetchForm>
                     <ScoreTable
                         reloadAsync={reloadAsync}
                         scores={scores ?? []}

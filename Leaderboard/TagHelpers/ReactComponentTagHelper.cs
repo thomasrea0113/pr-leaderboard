@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.AspNetCore.SpaServices.StaticFiles;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Leaderboard.TagHelpers
 {
@@ -29,9 +31,9 @@ namespace Leaderboard.TagHelpers
 
             var props = "{}";
             if (Props != null)
-                props = JsonSerializer.Serialize(Props, Props.GetType(), new JsonSerializerOptions()
+                props = JsonConvert.SerializeObject(Props, new JsonSerializerSettings
                 {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                    ContractResolver = new CamelCasePropertyNamesContractResolver()
                 });
 
             output.TagMode = TagMode.StartTagAndEndTag;

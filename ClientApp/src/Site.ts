@@ -17,7 +17,7 @@ import './utilities/modal-hash';
  */
 export interface Cookie {
     [index: string]: string;
-    RequestVerificationToken: string;
+    requestVerificationToken: string;
 }
 
 export const parseCookie = (): Partial<Cookie> =>
@@ -32,6 +32,8 @@ export const parseCookie = (): Partial<Cookie> =>
             return Object.assign(res, { [key]: val });
         }
     }, {});
+
+export const getCookie = (name: string) => parseCookie()[name];
 
 // store the page's scroll-y position as a data attribute on the root html element
 (function trackScroll() {
@@ -66,9 +68,3 @@ export const parseCookie = (): Partial<Cookie> =>
     // Update scroll position for first time
     storeScroll();
 })();
-
-$(() => {
-    $('.upload-control::after').on('click', ({ target }) => {
-        const ctrl = $(target).closest('input["type=file"]');
-    });
-});

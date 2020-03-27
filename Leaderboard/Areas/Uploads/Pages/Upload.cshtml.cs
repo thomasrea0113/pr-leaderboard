@@ -19,22 +19,22 @@ namespace SampleApp.Pages
 {
     public class UploadModel : PageModel
     {
-        private readonly ILogger<UploadModel> _logger;
-        private readonly DbContext _context;
-        private readonly AppUserManager _userManager;
-        private readonly IMultipartModelBinder _mpBinder;
-        private readonly ICreatableFileProvider _fileProvider;
+        // private readonly ILogger<UploadModel> _logger;
+        // private readonly DbContext _context;
+        // private readonly AppUserManager _userManager;
+        // private readonly IMultipartModelBinder _mpBinder;
+        // private readonly ICreatableFileProvider _fileProvider;
 
-        public UploadModel(ILogger<UploadModel> logger,
-            DbContext context, AppUserManager userManager,
-            IMultipartModelBinder mpBinder, ICreatableFileProvider fileProvider)
-        {
-            _logger = logger;
-            _context = context;
-            _userManager = userManager;
-            _mpBinder = mpBinder;
-            _fileProvider = fileProvider;
-        }
+        // public UploadModel(ILogger<UploadModel> logger,
+        //     DbContext context, AppUserManager userManager,
+        //     IMultipartModelBinder mpBinder, ICreatableFileProvider fileProvider)
+        // {
+        //     _logger = logger;
+        //     _context = context;
+        //     _userManager = userManager;
+        //     _mpBinder = mpBinder;
+        //     _fileProvider = fileProvider;
+        // }
 
         // TODO implement file upload
         public IActionResult OnGet() => NotFound();

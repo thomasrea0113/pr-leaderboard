@@ -14,6 +14,7 @@ using Leaderboard.Services;
 using Leaderboard.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 
 namespace Leaderboard.Areas.Leaderboards.Pages.Boards
@@ -31,7 +32,7 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
         private readonly ApplicationDbContext _ctx;
         private readonly IMessageQueue _messages;
         private readonly AppUserManager _userManager;
-        private readonly IInputDataProvider _inputDataProvider;
+        private readonly IFormFieldAttributeProvider _formFieldAttributeProvider;
 
         public LeaderboardModel Board { get; private set; }
 
@@ -52,6 +53,7 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
         {
             public string ScoresUrl { get; set; }
             public string SubmitScoreUrl { get; set; }
+            public ClientFormFieldAttribuleMap<SubmitScoreViewModel> FieldAttributes { get; set; }
         }
         public ReactProps Props { get; private set; }
 
@@ -62,17 +64,20 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
             public IEnumerable<ScoreViewModel> Scores { get; set; }
         }
 
-        public ViewModel(ApplicationDbContext ctx, IMessageQueue messages, AppUserManager userManager, IInputDataProvider inputDataProvider)
+        public ViewModel(
+            ApplicationDbContext ctx,
+            IMessageQueue messages,
+            AppUserManager userManager,
+            IFormFieldAttributeProvider formFieldAttributeProvider)
         {
             _ctx = ctx;
             _messages = messages;
             _userManager = userManager;
-            _inputDataProvider = inputDataProvider;
+            _formFieldAttributeProvider = formFieldAttributeProvider;
         }
 
         private void Init()
         {
-            var attrs = _inputDataProvider.GetFieldAttriutesForModel<ContactViewModel>();
             RouteArgs = RouteData.ToObject<BoardRouteArgs>();
 
             var tinfo = CultureInfo.CurrentCulture.TextInfo;
@@ -93,7 +98,8 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
             Props ??= new ReactProps
             {
                 ScoresUrl = Url.Page(null, "initial"),
-                SubmitScoreUrl = Url.Page(null, "submitScore")
+                SubmitScoreUrl = Url.Action("create", "scores"),
+                FieldAttributes = _formFieldAttributeProvider.GetFieldAttriutesForModel<SubmitScoreViewModel>()
             };
         }
 
@@ -142,13 +148,6 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
 
             _messages.PushMessage("You've joined this board!");
             return RedirectToPage();
-        }
-
-        public async Task<RedirectResult> OnPostSubmitScoreAsync()
-        {
-            await Task.CompletedTask;
-            var url = Request.ToString();
-            return Redirect(url);
         }
     }
 }

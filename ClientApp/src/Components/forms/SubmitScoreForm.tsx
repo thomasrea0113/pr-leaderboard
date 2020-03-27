@@ -1,12 +1,23 @@
 import React from 'react';
-import { Unit } from '../types/dotnet-types';
-import { UnitIcon } from './StyleComponents';
+import { Unit } from '../../types/dotnet-types';
+import { UnitIcon } from '../StyleComponents';
+import { FieldProps } from './FetchForm';
 
 export interface SubmitScoreProps {
+    fieldAttributes?: FieldProps<SubmitScore>;
     unit: keyof typeof Unit;
 }
 
-export const SubmitScoreForm: React.FC<SubmitScoreProps> = ({ unit }) => (
+export interface SubmitScore {
+    userName: string;
+    boardSlug: string;
+    score: number;
+}
+
+export const SubmitScoreForm: React.FC<SubmitScoreProps> = ({
+    unit,
+    fieldAttributes,
+}) => (
     <>
         <div className="form-group">
             <label htmlFor="score">Score</label>
@@ -16,7 +27,10 @@ export const SubmitScoreForm: React.FC<SubmitScoreProps> = ({ unit }) => (
                         <UnitIcon forUnit={Unit[unit]} />
                     </span>
                 </div>
-                <input type="text" className="form-control" />
+                <input
+                    {...fieldAttributes?.score.attributes}
+                    className="form-control"
+                />
                 <div className="input-group-append">
                     <span className="input-group-text">{unit}</span>
                 </div>

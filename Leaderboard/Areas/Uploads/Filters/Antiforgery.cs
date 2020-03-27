@@ -16,7 +16,7 @@ namespace SampleApp.Filters
             var tokens = antiforgery.GetAndStoreTokens(context.HttpContext);
 
             context.HttpContext.Response.Cookies.Append(
-                "RequestVerificationToken",
+                "requestVerificationToken",
                 tokens.RequestToken,
                 new CookieOptions() { HttpOnly = false });
         }

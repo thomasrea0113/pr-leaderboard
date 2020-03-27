@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Leaderboard.ViewModels;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -12,7 +11,7 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Leaderboard.Services
 {
-    public class ClientValidationField
+    public class ClientFormField
     {
         /// <summary>
         /// The client HTML tag name
@@ -26,21 +25,23 @@ namespace Leaderboard.Services
         /// <typeparam name="string"></typeparam>
         /// <typeparam name="string"></typeparam>
         /// <returns></returns>
-        public Dictionary<string, string> Attributes = new Dictionary<string, string>();
+        public Dictionary<string, string> Attributes;
     }
 
     /// <summary>
-    /// maps property names to their client attributes, in a format that can be easily serialized for the client
+    /// maps property names to their client attributes, in a format that can be easily serialized for the client.
+    /// When serialized to json, the dictionary will be parsed to a JSON object, so then the typescript type
+    /// can be generic and have an indexer of type 'keyof typeof T'
     /// </summary>
     /// <typeparam name="TModel"></typeparam>
-    public class ClientValidationModelMap<TModel> : ReadOnlyDictionary<string, ClientValidationField>
+    public class ClientFormFieldAttribuleMap<TModel> : ReadOnlyDictionary<string, ClientFormField>
     {
-        public ClientValidationModelMap(IDictionary<string, ClientValidationField> dictionary) : base(dictionary)
+        public ClientFormFieldAttribuleMap(IDictionary<string, ClientFormField> dictionary) : base(dictionary)
         {
         }
 
         // A convenient way to access validators for a dynamic object, by providing a member expression like t => t.Property
-        public ClientValidationField this[Expression<Func<TModel, object>> propertyExpression]
+        public ClientFormField this[Expression<Func<TModel, object>> propertyExpression]
         {
             get
             {
@@ -55,19 +56,19 @@ namespace Leaderboard.Services
         }
     }
 
-    public interface IInputDataProvider
+    public interface IFormFieldAttributeProvider
     {
-        object GetFieldAttriutesForModel<T>();
+        ClientFormFieldAttribuleMap<T> GetFieldAttriutesForModel<T>();
     }
 
-    public class InputDataProvider : IInputDataProvider
+    public class FormFieldAttributeProvider : IFormFieldAttributeProvider
     {
         private readonly IHtmlGenerator _generator;
         private readonly IViewContextGenerator _viewContextGenerator;
         private readonly IModelExpressionProvider _expressionProvider;
         private readonly IModelMetadataProvider _metadataProvider;
 
-        public InputDataProvider(
+        public FormFieldAttributeProvider(
             IModelMetadataProvider metadataProvider,
             IModelExpressionProvider expressionProvider,
             IHtmlGenerator generator,
@@ -79,23 +80,31 @@ namespace Leaderboard.Services
             _metadataProvider = metadataProvider;
         }
 
-        public object GetFieldAttriutesForModel<T>()
+        public ClientFormFieldAttribuleMap<T> GetFieldAttriutesForModel<T>()
         {
             var modelState = new ModelStateDictionary();
             var viewData = new ViewDataDictionary<T>(_metadataProvider, modelState);
             var viewContext = _viewContextGenerator.GenerateViewContext<T>();
-            var expressionParam = Expression.Parameter(typeof(ContactViewModel), "m");
+            var expressionParam = Expression.Parameter(typeof(T), "m");
 
+            // map the methods to the interface, and then get the methods implementation from the class
+            var expressionMethod = _expressionProvider.GetType()
+                .GetInterfaceMap(typeof(IModelExpressionProvider)).InterfaceMethods
+                .Single(m => m.Name == nameof(_expressionProvider.CreateModelExpression));
 
-            var propertyAttributes = new Dictionary<string, ClientValidationField>();
+            var propertyAttributes = new Dictionary<string, ClientFormField>();
             foreach (var prop in typeof(T).GetProperties())
             {
                 var propExpression = Expression.Property(expressionParam, prop);
-                var expression = Expression.Lambda<Func<T, object>>(propExpression, expressionParam);
+                var expression = Expression.Lambda(propExpression, expressionParam);
+
+                var genericExpressionMethod = expressionMethod
+                    .MakeGenericMethod(typeof(T), prop.PropertyType);
 
                 var helper = new InputTagHelper(_generator)
                 {
-                    For = _expressionProvider.CreateModelExpression(viewData, expression),
+                    For = (ModelExpression)genericExpressionMethod
+                        .Invoke(_expressionProvider, new object[] { viewData, expression }),
                     ViewContext = viewContext
                 };
 
@@ -103,14 +112,14 @@ namespace Leaderboard.Services
                 var tagContext = new TagHelperContext(attrs, new Dictionary<object, object>(), Guid.NewGuid().ToString("N"));
                 var output = new TagHelperOutput("input", attrs, (_, e) => Task.FromResult<TagHelperContent>(new DefaultTagHelperContent()));
                 helper.ProcessAsync(tagContext, output);
-                propertyAttributes.Add(prop.Name, new ClientValidationField
+                propertyAttributes.Add(prop.Name, new ClientFormField
                 {
                     TagName = output.TagName,
                     Attributes = output.Attributes.ToDictionary(a => a.Name, a => $"{a.Value}")
                 });
             }
 
-            return new ClientValidationModelMap<T>(propertyAttributes);
+            return new ClientFormFieldAttribuleMap<T>(propertyAttributes);
         }
     }
 }

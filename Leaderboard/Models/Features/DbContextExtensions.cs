@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -10,6 +11,20 @@ namespace Leaderboard.Models.Features
 {
     public static class DbContextExtensions
     {
+        public static IQueryable Query(this DbContext context, Type entityType)
+        {
+            var SetMethod = typeof(DbContext).GetMethod(nameof(DbContext.Set));
+            return (IQueryable)SetMethod.MakeGenericMethod(entityType).Invoke(context, null);
+        }
+
+        // same as the above, except it assumes the return type. Useful for models that
+        // share a common interface
+        public static IQueryable<T> Query<T>(this DbContext context, Type entityType)
+        {
+            var queryable = Query(context, entityType);
+            return (IQueryable<T>)queryable;
+        }
+
         public static void ForEachDbSetEntity(this DbContext ctx, Action<Type> action, Func<Type, bool> condition = default)
         {
             var dbSetType = typeof(DbSet<>);
