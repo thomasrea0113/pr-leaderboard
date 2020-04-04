@@ -1,7 +1,7 @@
 import React from 'react';
 import { Unit } from '../../types/dotnet-types';
 import { UnitIcon } from '../StyleComponents';
-import { FieldProps } from './FetchForm';
+import { FieldProps } from './Validation';
 
 export interface SubmitScoreProps {
     fieldAttributes?: FieldProps<SubmitScore>;

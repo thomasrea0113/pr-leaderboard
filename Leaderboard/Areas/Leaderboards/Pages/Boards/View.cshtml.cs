@@ -99,7 +99,7 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
             {
                 ScoresUrl = Url.Page(null, "initial"),
                 SubmitScoreUrl = Url.Action("create", "scores"),
-                FieldAttributes = _formFieldAttributeProvider.GetFieldAttriutesForModel<SubmitScoreViewModel>()
+                FieldAttributes = _formFieldAttributeProvider.GetFieldAttriutesForModel<SubmitScoreViewModel>(true)
             };
         }
 

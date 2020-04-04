@@ -8,7 +8,8 @@ import {
     SubmitScore,
 } from '../../Components/forms/SubmitScoreForm';
 import { attachHashEvents } from '../../utilities/modal-hash';
-import { FetchForm, FieldProps } from '../../Components/forms/FetchForm';
+import { useFetchForm } from '../../Components/forms/FetchForm';
+import { FieldProps } from '../../Components/forms/Validation';
 
 interface Props {
     scoresUrl: string;
@@ -32,99 +33,45 @@ const ViewBoardComponent: React.FC<Props> = ({
         true
     );
 
-    const { board, user, scores } = { ...data };
-    const { unit } = { ...board?.uom };
-
     useEffect(() => {
         if (isMounted && !isLoading) attachHashEvents();
     }, [isMounted, isLoading]);
+
+    const {
+        board: {
+            uom: { unit },
+        },
+        user,
+        scores,
+    } = data ?? { board: { uom: { unit: 'Kilograms' } } };
+
+    const { formProps, fieldAttributes: fieldProps } = useFetchForm<
+        SubmitScore
+    >({
+        fieldAttributes,
+    });
+
+    if (!isMounted || isLoading) return <>loading...</>;
 
     // TODO display loading
     return (
         <>
             <h4>Scores</h4>
             <p>hello {user?.userName}!</p>
-            {/* <button
-                id="submit-score"
-                type="button"
-                data-toggle="modal"
-                data-target="#score-modal"
-                className="btn btn-primary"
+            <form
+                {...formProps}
+                className="mb-1"
+                method="post"
+                action={submitScoreUrl}
             >
-                <i className="far fa-clipboard" />
-                &nbsp;&nbsp;
-                <label htmlFor="submit-score">Submit a Score</label>
-            </button> */}
-            {isMounted && !isLoading && board != null && unit != null ? (
-                <>
-                    <FetchForm
-                        className="mb-1"
-                        method="post"
-                        action={submitScoreUrl}
-                    >
-                        <SubmitScoreForm
-                            fieldAttributes={fieldAttributes}
-                            unit={unit}
-                        />
-                        <button type="submit">Submit</button>
-                    </FetchForm>
-                    <ScoreTable
-                        reloadAsync={reloadAsync}
-                        scores={scores ?? []}
-                        unit={board.uom.unit}
-                    />
-                    {/* <form
-                        method="post"
-                        action={submitScoreUrl}
-                        id="score-modal"
-                        tabIndex={-1}
-                        role="dialog"
-                        className="modal fade"
-                    >
-                        <div
-                            className="modal-dialog modal-dialog-centered"
-                            role="document"
-                        >
-                            <div className="modal-content">
-                                <div className="modal-header">
-                                    <h5
-                                        className="modal-title"
-                                        id="exampleModalLabel"
-                                    >
-                                        Submit a Score
-                                    </h5>
-                                    <button
-                                        type="button"
-                                        className="close"
-                                        data-dismiss="modal"
-                                        aria-label="Close"
-                                    >
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div className="modal-body">
-                                    <SubmitScoreForm unit={unit} />
-                                </div>
-                                <div className="modal-footer">
-                                    <button
-                                        type="button"
-                                        className="btn btn-secondary"
-                                        data-dismiss="modal"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        className="btn btn-primary"
-                                    >
-                                        Submit
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </form> */}
-                </>
-            ) : null}
+                <SubmitScoreForm fieldAttributes={fieldProps} unit={unit} />
+                <button type="submit">Submit</button>
+            </form>
+            <ScoreTable
+                reloadAsync={reloadAsync}
+                scores={scores ?? []}
+                unit={unit}
+            />
         </>
     );
 };

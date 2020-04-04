@@ -58,7 +58,7 @@ namespace Leaderboard.Services
 
     public interface IFormFieldAttributeProvider
     {
-        ClientFormFieldAttribuleMap<T> GetFieldAttriutesForModel<T>();
+        ClientFormFieldAttribuleMap<T> GetFieldAttriutesForModel<T>(bool camelcasePropertyNames = false);
     }
 
     public class FormFieldAttributeProvider : IFormFieldAttributeProvider
@@ -80,7 +80,7 @@ namespace Leaderboard.Services
             _metadataProvider = metadataProvider;
         }
 
-        public ClientFormFieldAttribuleMap<T> GetFieldAttriutesForModel<T>()
+        public ClientFormFieldAttribuleMap<T> GetFieldAttriutesForModel<T>(bool camelcasePropertyNames = false)
         {
             var modelState = new ModelStateDictionary();
             var viewData = new ViewDataDictionary<T>(_metadataProvider, modelState);
