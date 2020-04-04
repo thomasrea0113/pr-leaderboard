@@ -12,7 +12,7 @@ namespace Leaderboard.Routing.Constraints
         public bool Match(HttpContext httpContext, IRouter route, string routeKey, RouteValueDictionary values, RouteDirection routeDirection)
         {
             var routeVal = values[routeKey]?.ToString();
-            return routeVal != default ? _rangeRegex.IsMatch(values[routeKey]?.ToString()) : false;
+            return routeVal != default && _rangeRegex.IsMatch(values[routeKey]?.ToString());
         }
     }
 }
