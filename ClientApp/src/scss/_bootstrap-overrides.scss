@@ -1,4 +1,8 @@
 // variables that overwrite all global bootstrap variables, regardless of theme
+$theme-colors: (
+    'success': #6abf4b,
+);
+$primary: theme-color('success');
 $body-bg: $light;
 
 $enable-gradients: true;
