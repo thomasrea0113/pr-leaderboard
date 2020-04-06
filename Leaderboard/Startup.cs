@@ -97,10 +97,21 @@ namespace Leaderboard
                 o.ConstraintMap["gender"] = typeof(GenderConstraint);
             });
 
-            services.AddRazorPages(options =>
+            services.AddAntiforgery(o =>
             {
-                options.Conventions.Add(new AntiforgeryTokenCookieConvention());
-            }).AddJsonOptions(options =>
+                // this should make the csrf token available in the cookies, but it
+                // was inconsistent and seemed to be bugged. We'll use the
+                // custom Razor Page convention below instead.
+                o.Cookie.HttpOnly = false;
+                o.Cookie.Name = "csrfToken";
+
+                // This should be set explicitly so that we can use it dynamically in
+                // our react components.
+                o.FormFieldName = "__RequestVerificationToken";
+                o.HeaderName = "X-CSRF-TOKEN";
+            });
+
+            services.AddRazorPages().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;

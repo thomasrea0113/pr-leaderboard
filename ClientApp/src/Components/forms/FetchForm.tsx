@@ -71,7 +71,7 @@ export const fetchFormReducerGenerator = <T extends {}>() => (
 export const useFetchForm = <T extends {}>({
     fieldAttributes,
 }: UseFetchFormProps<T>): FetchForm<T> => {
-    const csrf = parseCookie().requestVerificationToken;
+    const csrf = parseCookie().csrfToken;
     if (csrf == null) throw new Error('csrf token not found');
 
     const [formState, formDispatch] = useReducer(
@@ -123,7 +123,7 @@ export const useFetchForm = <T extends {}>({
                 await fetch(action ?? '/', {
                     method: method ?? 'get',
                     headers: {
-                        RequestVerificationToken: csrf,
+                        'X-CSRF-TOKEN': csrf,
                         'Content-Type': 'application/json',
                     },
                     body: new FormData(target),

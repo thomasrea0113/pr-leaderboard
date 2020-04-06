@@ -17,7 +17,7 @@ import './utilities/modal-hash';
  */
 export interface Cookie {
     [index: string]: string;
-    requestVerificationToken: string;
+    csrfToken: string;
 }
 
 export const parseCookie = (): Partial<Cookie> =>
