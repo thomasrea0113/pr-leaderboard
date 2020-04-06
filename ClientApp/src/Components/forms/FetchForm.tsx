@@ -3,7 +3,7 @@ import flow from 'lodash/fp/flow';
 import toPairs from 'lodash/fp/toPairs';
 import fromPairs from 'lodash/fp/fromPairs';
 import map from 'lodash/fp/map';
-import { parseCookie } from '../../Site';
+import { parseCookie, formToObject } from '../../Site';
 import { neverReached } from '../../utilities/neverReached';
 import { FieldProps, FieldPropInfo } from './Validation';
 
@@ -120,13 +120,14 @@ export const useFetchForm = <T extends {}>({
                 e.preventDefault();
                 const target = e.target as HTMLFormElement;
                 const { action, method } = target;
+                const formData = formToObject<T>(target);
                 await fetch(action ?? '/', {
                     method: method ?? 'get',
                     headers: {
                         'X-CSRF-TOKEN': csrf,
                         'Content-Type': 'application/json',
                     },
-                    body: new FormData(target),
+                    body: JSON.stringify(formData),
                 });
             },
         },
