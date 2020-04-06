@@ -1,4 +1,4 @@
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Models.Features;
 using Microsoft.EntityFrameworkCore;

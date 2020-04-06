@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Areas.Leaderboards.Models;
 using Leaderboard.Models.Features;
@@ -38,8 +38,8 @@ namespace Leaderboard.Models.Relationships
 
             builder.Property(b => b.UserId).IsRequired();
             builder.Property(b => b.CategoryId).IsRequired();
-        
-            builder.HasIndex(b => new 
+
+            builder.HasIndex(b => new
             {
                 b.CategoryId,
                 b.UserId

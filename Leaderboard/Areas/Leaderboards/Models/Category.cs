@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 using Leaderboard.Models.Features;
 using Leaderboard.Models.Relationships;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -18,7 +18,7 @@ namespace Leaderboard.Areas.Leaderboards.Models
 
         [JsonIgnore]
         public virtual ICollection<DivisionCategory> DivisionCategories { get; set; } = new List<DivisionCategory>();
-        
+
         [JsonIgnore]
         public virtual ICollection<UserCategory> UserCategories { get; set; } = new List<UserCategory>();
 
@@ -27,13 +27,16 @@ namespace Leaderboard.Areas.Leaderboards.Models
             builder.Property(b => b.Name).IsRequired();
             builder.HasIndex(b => b.Name).IsUnique();
 
-            builder.HasData(new Category {
+            builder.HasData(new Category
+            {
                 Id = "642313a2-1f0c-4329-a676-7a9cdac045bd",
                 Name = "Powerlifting"
-            },new Category {
+            }, new Category
+            {
                 Id = "9edc53a6-34ec-4cde-8eb0-cac009579b72",
                 Name = "Weightlifting"
-            },new Category {
+            }, new Category
+            {
                 Id = "6772a358-e5b7-49dd-a49b-9d855ed46c5e",
                 Name = "Running"
             });

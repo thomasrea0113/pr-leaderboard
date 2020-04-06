@@ -13,11 +13,10 @@ using Leaderboard.Areas.Identity;
 using Leaderboard.Services;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using System.Text.Json;
 using Microsoft.Extensions.Logging;
-using System.Text.Json.Serialization;
 using Leaderboard.Routing.Constraints;
-using SampleApp.Filters;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Leaderboard
 {
@@ -111,11 +110,10 @@ namespace Leaderboard
                 o.HeaderName = "X-CSRF-TOKEN";
             });
 
-            services.AddRazorPages().AddJsonOptions(options =>
+            services.AddRazorPages().AddNewtonsoftJson(o =>
             {
-                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(default, false));
+                o.UseCamelCasing(true);
+                o.SerializerSettings.Converters.Add(new StringEnumConverter());
             });
 
             // controllers will be used for api CRUD actions

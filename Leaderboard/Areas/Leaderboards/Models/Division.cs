@@ -8,7 +8,7 @@ using Leaderboard.Models;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Leaderboard.Areas.Identity.Models;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 using static Leaderboard.Utilities.SlugUtilities;
 
 namespace Leaderboard.Areas.Leaderboards.Models
