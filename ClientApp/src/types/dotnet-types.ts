@@ -62,6 +62,7 @@ export interface Leaderboard {
     uom: UnitOfMeasure;
     division: Division;
     weightClass: WeightClass;
+    slug: string;
 }
 
 export interface UserView extends Leaderboard {

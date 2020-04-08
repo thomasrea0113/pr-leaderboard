@@ -19,12 +19,14 @@ namespace Leaderboard.Areas.Leaderboards.ViewModels
         public UnitOfMeasureViewModel UOM { get; private set; }
         public DivisionViewModel Division { get; private set; }
         public WeightClassViewModel WeightClass { get; private set; }
+        public string Slug { get; private set; }
 
         public LeaderboardViewModel(LeaderboardModel model)
         {
             Id = model.Id;
             Name = model.Name;
             Division = new DivisionViewModel(model.Division);
+            Slug = model.Slug;
             UOM = new UnitOfMeasureViewModel(model.UOM);
             if (model.WeightClass != null)
                 WeightClass = new WeightClassViewModel(model.WeightClass);

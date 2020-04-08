@@ -33,31 +33,60 @@ const ViewBoardComponent: React.FC<Props> = ({
         true
     );
 
-    useEffect(() => {
-        if (isMounted && !isLoading) attachHashEvents();
-    }, [isMounted, isLoading]);
-
     const {
         board: {
+            slug,
             uom: { unit },
         },
         user,
         scores,
     } = data ?? { board: { uom: { unit: 'Kilograms' } } };
 
-    const { formProps, fieldAttributes: fieldProps } = useFetchForm<
-        SubmitScore
-    >({
+    const {
+        formDispatch,
+        formProps,
+        fieldAttributes: fieldProps,
+    } = useFetchForm({
         fieldAttributes,
+        initialValues: {
+            boardSlug: 'SHOULD BE OVERWRITTEN',
+            score: 'TEST SCORE',
+        },
     });
 
+    useEffect(() => {
+        if (isMounted && !isLoading) {
+            attachHashEvents();
+
+            if (slug == null || user?.userName == null)
+                throw new Error('Server returned invalid data');
+
+            // after we're done loading, update the form fields
+            formDispatch({
+                type: 'UPDATE_FIELDS',
+                fields: [
+                    {
+                        property: 'boardSlug',
+                        value: slug,
+                    },
+                    {
+                        property: 'userName',
+                        value: user.userName,
+                    },
+                ],
+            });
+        }
+    }, [isMounted, isLoading]);
+
     if (!isMounted || isLoading) return <>loading...</>;
+
+    if (user == null) throw new Error('user not provided');
 
     // TODO display loading
     return (
         <>
             <h4>Scores</h4>
-            <p>hello {user?.userName}!</p>
+            <p>hello {user.userName}!</p>
             <form
                 {...formProps}
                 className="mb-1"
