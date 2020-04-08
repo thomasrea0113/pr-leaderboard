@@ -1,12 +1,12 @@
 import React, { useReducer, ChangeEventHandler } from 'react';
-import { parseCookie } from '../../Site';
-import { neverReached } from '../../utilities/neverReached';
+import { parseCookie } from '../Site';
+import { neverReached } from '../utilities/neverReached';
 import {
     FieldProps,
     FormValues,
     fieldValues,
     mergeAttributes,
-} from './Validation';
+} from '../Components/forms/Validation';
 
 export type ReactFormProps = React.DetailedHTMLProps<
     React.FormHTMLAttributes<HTMLFormElement>,

@@ -8,7 +8,7 @@ import {
     SubmitScore,
 } from '../../Components/forms/SubmitScoreForm';
 import { attachHashEvents } from '../../utilities/modal-hash';
-import { useFetchForm } from '../../Components/forms/FetchForm';
+import { useFetchForm } from '../../hooks/useFetchForm';
 import { FieldProps } from '../../Components/forms/Validation';
 
 interface Props {
