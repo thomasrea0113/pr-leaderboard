@@ -17,6 +17,7 @@ import {
     Unit,
 } from '../types/dotnet-types';
 import { NumberRange } from '../types/types';
+import { FieldPropInfo } from './forms/Validation';
 
 /**
  * the color to use when a give icon is active
@@ -198,6 +199,29 @@ export const ThumbnailImage: React.FC<{
             />
         </div>
     );
+};
+
+export interface ValidatorProps {
+    forProp?: FieldPropInfo;
+}
+export const Validator: React.FC<ValidatorProps> = ({ forProp }) => {
+    // TODO This feels sloppy to allow forProp to be null. I'm doing it
+    // because it makes building the form easier
+    if (forProp == null) return <></>;
+
+    if (forProp.attributes.id == null)
+        throw new Error('field must have an id to bind a validator');
+    return forProp.errors != null ? (
+        <ul
+            className="text-danger field-validation-error"
+            data-valmsg-for={forProp.attributes.id}
+            data-valmsg-replace="true"
+        >
+            {forProp.errors?.map(e => (
+                <li>{e}</li>
+            ))}
+        </ul>
+    ) : null;
 };
 
 export const RefreshButton: React.FC<DetailedHTMLProps<

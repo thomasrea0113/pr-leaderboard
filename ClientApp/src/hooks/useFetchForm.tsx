@@ -1,12 +1,18 @@
 import React, { useReducer, ChangeEventHandler } from 'react';
-import { parseCookie } from '../Site';
+import flow from 'lodash/fp/flow';
+import toPairs from 'lodash/fp/toPairs';
+import fromPairs from 'lodash/fp/fromPairs';
+import map from 'lodash/fp/map';
 import { neverReached } from '../utilities/neverReached';
 import {
     FieldProps,
     FormValues,
     fieldValues,
     mergeAttributes,
+    FieldPropInfo,
 } from '../Components/forms/Validation';
+import { useLoading, TypedResponse } from './useLoading';
+import { HttpMethodsEnum } from '../types/types';
 
 export type ReactFormProps = React.DetailedHTMLProps<
     React.FormHTMLAttributes<HTMLFormElement>,
@@ -45,6 +51,8 @@ export interface FetchForm<T> {
     formProps: ReactFormProps;
     formDispatch: React.Dispatch<FormActions<T>>;
     fieldAttributes: FieldProps<T>;
+    isSubmitting: boolean;
+    response?: TypedResponse<T>;
 }
 
 export interface UseFetchFormProps<T> {
@@ -105,9 +113,6 @@ export const useFetchForm = <T extends {}>({
     fieldAttributes,
     initialValues,
 }: UseFetchFormProps<T>): FetchForm<T> => {
-    const csrf = parseCookie().csrfToken;
-    if (csrf == null) throw new Error('csrf token not found');
-
     const initialAttributes =
         initialValues != null
             ? mergeAttributes(fieldAttributes, ([k]) => {
@@ -143,10 +148,25 @@ export const useFetchForm = <T extends {}>({
         return evt;
     };
 
-    // automatically handle the onChange event with ease
-    const fieldProps = mergeAttributes(formState, ([k]) => ({
-        onChange: onChangeGenerator(k),
-    }));
+    const { isLoading, response, loadAsync } = useLoading<T>();
+
+    // automatically handle the onChange event with ease, then
+    // merge in the errors from the response
+    const fieldProps = flow(
+        toPairs,
+        map<[keyof T, FieldPropInfo], [keyof T, FieldPropInfo]>(kv => [
+            kv[0],
+            {
+                ...kv[1],
+                errors: response?.errors?.errors[kv[0]],
+            },
+        ]),
+        fromPairs
+    )(
+        mergeAttributes(formState, ([k]) => ({
+            onChange: onChangeGenerator(k),
+        }))
+    );
 
     return {
         formProps: {
@@ -155,17 +175,20 @@ export const useFetchForm = <T extends {}>({
                 const target = e.target as HTMLFormElement;
                 const { action, method } = target;
                 const formValues = fieldValues(formState);
-                await fetch(action ?? '/', {
-                    method: method ?? 'get',
-                    headers: {
-                        'X-CSRF-TOKEN': csrf,
+
+                loadAsync({
+                    actionUrl: action,
+                    actionMethod: method.toLowerCase() as HttpMethodsEnum,
+                    body: JSON.stringify(formValues),
+                    additionalHeaders: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(formValues),
                 });
             },
         },
         formDispatch,
         fieldAttributes: fieldProps,
+        isSubmitting: isLoading,
+        response,
     };
 };

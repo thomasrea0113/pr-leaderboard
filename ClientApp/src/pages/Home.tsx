@@ -20,7 +20,7 @@ interface LocalState {
 }
 
 const HomeComponent: React.FC<ReactProps> = ({ initialUrl }) => {
-    const { isLoading, data, reloadAsync } = useLoading<ServerData>(initialUrl);
+    const { isLoading, response, loadAsync } = useLoading<ServerData>();
 
     const [{ delayed }, setState] = useState<LocalState>({
         delayed: false,
@@ -32,7 +32,7 @@ const HomeComponent: React.FC<ReactProps> = ({ initialUrl }) => {
     // We want to slow down the load for visual affect. If the load takes less than 3
     // seconds, we pause
     const reload = () =>
-        ensureDelay(3000, reloadAsync()).then(() =>
+        ensureDelay(3000, loadAsync({ actionUrl: initialUrl })).then(() =>
             mergeState({ delayed: true })
         );
 
@@ -48,7 +48,7 @@ const HomeComponent: React.FC<ReactProps> = ({ initialUrl }) => {
     }, []);
     if (!isLoaded.current) return null;
 
-    const featured = data?.featured ?? [];
+    const featured = response?.data?.featured ?? [];
 
     return (
         <>

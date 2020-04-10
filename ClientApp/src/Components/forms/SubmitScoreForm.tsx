@@ -1,6 +1,6 @@
 import React from 'react';
 import { Unit } from '../../types/dotnet-types';
-import { UnitIcon } from '../StyleComponents';
+import { UnitIcon, Validator } from '../StyleComponents';
 import { FieldProps } from './Validation';
 
 export interface SubmitScoreProps {
@@ -35,6 +35,7 @@ export const SubmitScoreForm: React.FC<SubmitScoreProps> = ({
                     <span className="input-group-text">{unit}</span>
                 </div>
             </div>
+            <Validator forProp={fieldAttributes?.score} />
         </div>
         <input {...fieldAttributes?.boardSlug.attributes} type="hidden" />
         <input {...fieldAttributes?.userName.attributes} type="hidden" />

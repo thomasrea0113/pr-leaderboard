@@ -15,11 +15,11 @@ import { BoardColumns as columns } from '../Components/tables/columns/boards-col
 import { Checkbox, RefreshButton } from '../Components/StyleComponents';
 import { UserView, User } from '../types/dotnet-types';
 import Board from '../Components/Board';
-import { useLoading } from '../hooks/useLoading';
 import {
     renderCell,
     renderHeader,
 } from '../Components/tables/render-utilities';
+import { useLoading } from '../hooks/useLoading';
 
 interface ServerData {
     user?: User;
@@ -29,9 +29,12 @@ interface ServerData {
 const RecommendationsComponent: React.FC<{
     initialUrl: string;
 }> = ({ initialUrl }) => {
-    const { isLoading, reloadAsync, data } = useLoading<ServerData>(initialUrl);
+    const { isLoading, loadAsync, response } = useLoading<ServerData>();
 
-    const recommendations = useMemo(() => data?.recommendations ?? [], [data]);
+    const recommendations = useMemo(
+        () => response?.data?.recommendations ?? [],
+        [response?.data]
+    );
 
     const initialState = useMemo(() => {
         const tableState: Partial<TableState<UserView>> = {
@@ -74,7 +77,7 @@ const RecommendationsComponent: React.FC<{
     );
 
     useEffect(() => {
-        reloadAsync().then(() => {
+        loadAsync({ actionUrl: initialUrl }).then(() => {
             if (!isAllRowsExpanded && !isLoading) toggleAllRowsExpanded(true);
         });
     }, []);
@@ -130,6 +133,8 @@ const RecommendationsComponent: React.FC<{
 
     const groupById = uniqueId('select');
     const expandId = uniqueId('check');
+
+    const reloadAsync = () => loadAsync({ actionUrl: initialUrl });
 
     return (
         <>

@@ -3,6 +3,34 @@ import fromPairs from 'lodash/fp/fromPairs';
 import map from 'lodash/fp/map';
 import toPairs from 'lodash/fp/toPairs';
 import mapValues from 'lodash/fp/mapValues';
+import { HttpStatusCode } from '../../types/types';
+
+export type ErrorRecord<T> = Record<keyof T, string[]>;
+
+export interface ErrorData<T> {
+    type: string;
+    status: HttpStatusCode;
+    title: string;
+    traceId: string;
+    errors: ErrorRecord<T>;
+}
+
+export function isErrorData<T>(
+    responseData: ErrorData<T> | T
+): responseData is ErrorData<T> {
+    const errorResp = responseData as ErrorData<T>;
+    if (
+        typeof errorResp.type !== 'string' ||
+        typeof errorResp.status !== 'number' ||
+        typeof errorResp.title !== 'string' ||
+        typeof errorResp.traceId !== 'string'
+    )
+        return false;
+
+    // TODO also verify that errors is strictly a record of T?
+
+    return true;
+}
 
 /**
  * Has all the same properties as the standard input element, except the
@@ -18,6 +46,7 @@ export type HtmlInputProps = React.DetailedHTMLProps<
 export interface FieldPropInfo {
     tagName: 'input';
     attributes: HtmlInputProps;
+    errors?: string[];
 }
 
 /**

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import 'react-dom'; // only needed if this is to be placed directly on the page
 import { ScoreTable } from '../../Components/tables/ScoreTable';
 import { useLoading } from '../../hooks/useLoading';
-import { User, UserView, Score } from '../../types/dotnet-types';
+import { User, UserView, Score, UnitOfMeasure } from '../../types/dotnet-types';
 import {
     SubmitScoreForm,
     SubmitScore,
@@ -28,10 +28,28 @@ const ViewBoardComponent: React.FC<Props> = ({
     submitScoreUrl,
     fieldAttributes,
 }) => {
-    const { isLoading, isMounted, reloadAsync, data } = useLoading<State>(
-        scoresUrl,
-        true
-    );
+    const { isLoading, isLoaded, loadAsync, response } = useLoading<State>();
+
+    if (response?.errors !== undefined) {
+        // TODO display errors
+    }
+
+    // load on mount
+    useEffect(() => {
+        loadAsync({ actionUrl: scoresUrl });
+    }, []);
+
+    const initial = {
+        board: {
+            slug: '',
+            // eslint-disable-next-line @typescript-eslint/no-object-literal-type-assertion
+            uom: {
+                unit: 'Kilograms',
+            } as UnitOfMeasure,
+        },
+        user: undefined,
+        scores: undefined,
+    };
 
     const {
         board: {
@@ -40,7 +58,7 @@ const ViewBoardComponent: React.FC<Props> = ({
         },
         user,
         scores,
-    } = data ?? { board: { uom: { unit: 'Kilograms' } } };
+    } = response?.data != null ? response.data : initial;
 
     const {
         formDispatch,
@@ -48,14 +66,10 @@ const ViewBoardComponent: React.FC<Props> = ({
         fieldAttributes: fieldProps,
     } = useFetchForm({
         fieldAttributes,
-        initialValues: {
-            boardSlug: 'SHOULD BE OVERWRITTEN',
-            score: 'TEST SCORE',
-        },
     });
 
     useEffect(() => {
-        if (isMounted && !isLoading) {
+        if (isLoaded && !isLoading) {
             attachHashEvents();
 
             if (slug == null || user?.userName == null)
@@ -76,11 +90,13 @@ const ViewBoardComponent: React.FC<Props> = ({
                 ],
             });
         }
-    }, [isMounted, isLoading]);
+    }, [isLoaded, isLoading]);
 
-    if (!isMounted || isLoading) return <>loading...</>;
+    if (!isLoaded || isLoading) return <>loading...</>;
 
     if (user == null) throw new Error('user not provided');
+
+    const reloadAsync = () => loadAsync({ actionUrl: scoresUrl });
 
     // TODO display loading
     return (
