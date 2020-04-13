@@ -23,7 +23,7 @@ interface Props {
 }
 
 interface State {
-    user: User;
+    user?: User;
     board: UserView;
     scores: Score[];
 }
@@ -47,7 +47,7 @@ const ViewBoardComponent: React.FC<Props> = ({
 
     const initial = {
         board: {
-            slug: '',
+            id: undefined,
             // eslint-disable-next-line @typescript-eslint/no-object-literal-type-assertion
             uom: {
                 unit: 'Kilograms',
@@ -59,7 +59,7 @@ const ViewBoardComponent: React.FC<Props> = ({
 
     const {
         board: {
-            slug,
+            id,
             uom: { unit },
         },
         user,
@@ -79,20 +79,19 @@ const ViewBoardComponent: React.FC<Props> = ({
         if (isLoaded && !isLoading) {
             attachHashEvents();
 
-            if (slug == null || user?.userName == null)
-                throw new Error('Server returned invalid data');
+            if (id == null) throw new Error('Server returned invalid data');
 
             // after we're done loading, update the form fields
             formDispatch({
                 type: 'UPDATE_FIELDS',
                 fields: [
                     {
-                        property: 'boardSlug',
-                        value: slug,
+                        property: 'boardId',
+                        value: id,
                     },
                     {
                         property: 'userName',
-                        value: user.userName,
+                        value: user?.userName ?? '',
                     },
                 ],
             });
@@ -101,25 +100,26 @@ const ViewBoardComponent: React.FC<Props> = ({
 
     if (!isLoaded || isLoading) return <>loading...</>;
 
-    if (user == null) throw new Error('user not provided');
-
     const reloadAsync = () => loadAsync({ actionUrl: scoresUrl });
 
     // TODO display loading
     return (
         <>
             <h4>Scores</h4>
-            <p>hello {user.userName}!</p>
-            <form
-                {...formProps}
-                className="mb-1"
-                method="post"
-                action={submitScoreUrl}
-                ref={formRef}
-            >
-                <SubmitScoreForm fieldAttributes={fieldProps} unit={unit} />
-                <button type="submit">Submit</button>
-            </form>
+            {user != null ? (
+                <form
+                    {...formProps}
+                    className="form-sm mb-1"
+                    method="post"
+                    action={submitScoreUrl}
+                    ref={formRef}
+                >
+                    <SubmitScoreForm fieldAttributes={fieldProps} unit={unit} />
+                    <button type="submit" className="btn btn-primary">
+                        Submit
+                    </button>
+                </form>
+            ) : null}
             <ScoreTable
                 reloadAsync={reloadAsync}
                 scores={scores ?? []}

@@ -10,7 +10,7 @@ export interface SubmitScoreProps {
 
 export interface SubmitScore {
     userName: string;
-    boardSlug: string;
+    boardId: string;
     score: number;
 }
 
@@ -36,8 +36,10 @@ export const SubmitScoreForm: React.FC<SubmitScoreProps> = ({
                 </div>
             </div>
             <Validator forProp={fieldAttributes?.score} />
+            <Validator forProp={fieldAttributes?.boardId} />
+            <Validator forProp={fieldAttributes?.userName} />
         </div>
-        <input {...fieldAttributes?.boardSlug.attributes} type="hidden" />
+        <input {...fieldAttributes?.boardId.attributes} type="hidden" />
         <input {...fieldAttributes?.userName.attributes} type="hidden" />
     </>
 );

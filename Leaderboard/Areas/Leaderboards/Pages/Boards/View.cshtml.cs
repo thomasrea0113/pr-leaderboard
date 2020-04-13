@@ -93,7 +93,9 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
                     (b.Division.Gender == null && RouteArgs.Gender == "any") ||
                     (b.Division.Gender == genderValue)
                 )
-            );
+            )
+                .Include(b => b.Division)
+                .Include(b => b.UOM);
 
             Props ??= new ReactProps
             {
@@ -113,19 +115,32 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
             Init();
 
             var board = await BoardQuery.SingleAsync();
-            var scores = await _ctx.Scores.AsQueryable().Where(s => s.BoardId == board.Id).ToArrayAsync();
-            var user = await _userManager.GetCompleteUserAsync(User);
+            var scores = (await _ctx.Scores.AsQueryable()
+                .Where(s => s.BoardId == board.Id)
+                .ToArrayAsync())
+                .Select(s => new ScoreViewModel(s));
 
-            var isMember = await _ctx.Entry(user).Collection(b => b.UserLeaderboards).Query()
-                .AnyAsync(ub => ub.LeaderboardId == board.Id);
-            var isRecommended = await _userManager.GetRecommendedBoardsQuery(user)
-                .AnyAsync(b => b.Id == board.Id);
+            if (User.Identity.IsAuthenticated)
+            {
+                var user = await _userManager.GetCompleteUserAsync(User);
+
+                var isMember = await _ctx.Entry(user).Collection(b => b.UserLeaderboards).Query()
+                    .AnyAsync(ub => ub.LeaderboardId == board.Id);
+                var isRecommended = await _userManager.GetRecommendedBoardsQuery(user)
+                    .AnyAsync(b => b.Id == board.Id);
+
+                return new JsonResult(new ReactState
+                {
+                    User = new UserViewModel(user),
+                    Board = new UserLeaderboardViewModel(board, isMember, isRecommended),
+                    Scores = scores,
+                });
+            }
 
             return new JsonResult(new ReactState
             {
-                User = new UserViewModel(user),
-                Board = new UserLeaderboardViewModel(board, isMember, isRecommended),
-                Scores = scores.Select(s => new ScoreViewModel(s))
+                Board = new UserLeaderboardViewModel(board, false, false),
+                Scores = scores,
             });
         }
 

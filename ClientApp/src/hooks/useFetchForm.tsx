@@ -5,9 +5,10 @@ import React, {
     useMemo,
 } from 'react';
 import flow from 'lodash/fp/flow';
-import toPairs from 'lodash/fp/toPairs';
-import reduce from 'lodash/fp/reduce';
-import startCase from 'lodash/fp/startCase';
+import mapKeys from 'lodash/fp/mapKeys';
+import mapValues from 'lodash/fp/mapValues';
+import join from 'lodash/fp/join';
+import upperFirst from 'lodash/fp/upperFirst';
 import { neverReached } from '../utilities/neverReached';
 import {
     FieldProps,
@@ -157,24 +158,6 @@ export const useFetchForm = <T extends {}>({
 
     const { isLoading, response, loadAsync } = useLoading<T>();
 
-    // automatically handle the onChange event with ease, then
-    // merge in the errors from the response
-    // const fieldProps = flow(
-    //     toPairs,
-    //     map<[keyof T, FieldPropInfo], [keyof T, FieldPropInfo]>(kv => [
-    //         kv[0],
-    //         {
-    //             ...kv[1],
-    //             errors: response?.errorData?.errors[kv[0]],
-    //         },
-    //     ]),
-    //     fromPairs
-    // )(
-    //     mergeAttributes(formState, ([k]) => ({
-    //         onChange: onChangeGenerator(k),
-    //     }))
-    // );
-
     const fieldProps = mergeAttributes(formState, ([k]) => ({
         onChange: onChangeGenerator(k),
     }));
@@ -191,38 +174,20 @@ export const useFetchForm = <T extends {}>({
         formRef.current != null &&
         response != null &&
         response.errorData?.errors != null
-    ) {
-        const errorArray: JQueryValidation.ErrorListItem[] = flow(
-            toPairs,
-            reduce<[keyof T, string[]], JQueryValidation.ErrorListItem[]>(
-                (list, [k, errors]) => {
-                    if (typeof k === 'string' && errors.length > 0) {
-                        const element = formRef.current?.elements.namedItem(
-                            startCase(k)
-                        );
-                        if (element instanceof HTMLElement)
-                            return [
-                                ...list,
-                                {
-                                    message: errors.join(', '),
-                                    element,
-                                },
-                            ];
-                    }
-                    return list;
-                },
-                []
-            )
-        )(response.errorData.errors);
-        // TODO test that server-side errors are appended correctly
-        validator?.errorList.push(...errorArray);
-    }
+    )
+        validator?.showErrors(
+            flow(
+                // mapValues(join(', ')), // convert array of errors to single string
+                mapKeys(upperFirst) // the form expects TitleCase
+            )(response.errorData.errors)
+        );
 
     return {
         formProps: {
             onSubmit: async e => {
                 // if the validator is not present, we need to prevent the form from
-                // submitting
+                // submitting. If validation is enabled, the validator will prevent
+                // submission if the form is invalid for us
                 if (validator == null) {
                     e.preventDefault();
                     return;

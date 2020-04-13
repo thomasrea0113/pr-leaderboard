@@ -4,11 +4,13 @@ using Leaderboard.Models.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SampleApp.Models;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Leaderboard.Areas.Leaderboards.Models
 {
     public class ScoreModel : IDbEntity<ScoreModel>
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string Id { get; set; }
 
         public bool? IsApproved { get; set; }
