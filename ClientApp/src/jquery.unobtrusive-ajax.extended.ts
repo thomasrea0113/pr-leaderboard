@@ -31,7 +31,9 @@
 /* jslint white: true, browser: true, onevar: true, undef: true, nomen: true, eqeqeq: true, plusplus: true, bitwise: true, regexp: true, newcap: true, immed: true, strict: false */
 /* global window: false, jQuery: false */
 
-import 'jquery-validation-unobtrusive';
+// This isn't a module because we're just attaching JQuery events, but we need it to be a module
+// for ts not to complain
+export {};
 
 (function($) {
     // region my-additions

@@ -4,8 +4,9 @@
 // jQuery
 import 'jquery';
 import 'jquery-validation';
-import 'bootstrap';
+import 'jquery-validation-unobtrusive';
 import './jquery.unobtrusive-ajax.extended';
+import 'bootstrap';
 
 // Styles
 import './scss/site.scss';
