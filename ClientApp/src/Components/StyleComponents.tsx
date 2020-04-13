@@ -211,17 +211,13 @@ export const Validator: React.FC<ValidatorProps> = ({ forProp }) => {
 
     if (forProp.attributes.id == null)
         throw new Error('field must have an id to bind a validator');
-    return forProp.errors != null ? (
-        <ul
+    return (
+        <span
             className="text-danger field-validation-error"
             data-valmsg-for={forProp.attributes.id}
             data-valmsg-replace="true"
-        >
-            {forProp.errors?.map(e => (
-                <li>{e}</li>
-            ))}
-        </ul>
-    ) : null;
+        />
+    );
 };
 
 export const RefreshButton: React.FC<DetailedHTMLProps<

@@ -22,7 +22,7 @@ export type FetchHeaders =
 
 export interface TypedResponse<T> extends Response {
     data?: T;
-    errors?: ErrorData<T>;
+    errorData?: ErrorData<T>;
 }
 
 export interface UseLoadingState<D> {
@@ -79,7 +79,7 @@ export const useLoading = <D extends {}>(): UseLoadingProps<D> => {
                             // Note we make no assumptions about the data here...
                             // that's the responsibility of the caller
                             response: isErrorData<D>(data)
-                                ? { ...resp, errors: data }
+                                ? { ...resp, errorData: data }
                                 : { ...resp, data },
                         });
                     })

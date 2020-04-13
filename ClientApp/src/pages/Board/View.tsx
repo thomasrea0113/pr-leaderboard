@@ -1,4 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
+
+// JQuery is expected to be included outside of the component, so we don't
+// need to import it here to use it
+// import $ from 'jquery';
+
 import 'react-dom'; // only needed if this is to be placed directly on the page
 import { ScoreTable } from '../../Components/tables/ScoreTable';
 import { useLoading } from '../../hooks/useLoading';
@@ -29,8 +34,9 @@ const ViewBoardComponent: React.FC<Props> = ({
     fieldAttributes,
 }) => {
     const { isLoading, isLoaded, loadAsync, response } = useLoading<State>();
+    const formRef = useRef<HTMLFormElement>(null);
 
-    if (response?.errors !== undefined) {
+    if (response?.errorData !== undefined) {
         // TODO display errors
     }
 
@@ -66,6 +72,7 @@ const ViewBoardComponent: React.FC<Props> = ({
         fieldAttributes: fieldProps,
     } = useFetchForm({
         fieldAttributes,
+        formRef,
     });
 
     useEffect(() => {
@@ -108,6 +115,7 @@ const ViewBoardComponent: React.FC<Props> = ({
                 className="mb-1"
                 method="post"
                 action={submitScoreUrl}
+                ref={formRef}
             >
                 <SubmitScoreForm fieldAttributes={fieldProps} unit={unit} />
                 <button type="submit">Submit</button>

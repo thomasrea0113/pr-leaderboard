@@ -1,15 +1,19 @@
-import React, { useReducer, ChangeEventHandler } from 'react';
+import React, {
+    useReducer,
+    ChangeEventHandler,
+    RefObject,
+    useMemo,
+} from 'react';
 import flow from 'lodash/fp/flow';
 import toPairs from 'lodash/fp/toPairs';
-import fromPairs from 'lodash/fp/fromPairs';
-import map from 'lodash/fp/map';
+import reduce from 'lodash/fp/reduce';
+import startCase from 'lodash/fp/startCase';
 import { neverReached } from '../utilities/neverReached';
 import {
     FieldProps,
     FormValues,
     fieldValues,
     mergeAttributes,
-    FieldPropInfo,
 } from '../Components/forms/Validation';
 import { useLoading, TypedResponse } from './useLoading';
 import { HttpMethodsEnum } from '../types/types';
@@ -58,6 +62,8 @@ export interface FetchForm<T> {
 export interface UseFetchFormProps<T> {
     fieldAttributes: FieldProps<T>;
     initialValues?: FormValues<T>;
+    // if provided, automatic validation will be performed
+    formRef: RefObject<HTMLFormElement>;
 }
 
 export const fetchFormReducerGenerator = <T extends {}>() => (
@@ -112,6 +118,7 @@ export const fetchFormReducerGenerator = <T extends {}>() => (
 export const useFetchForm = <T extends {}>({
     fieldAttributes,
     initialValues,
+    formRef,
 }: UseFetchFormProps<T>): FetchForm<T> => {
     const initialAttributes =
         initialValues != null
@@ -152,38 +159,89 @@ export const useFetchForm = <T extends {}>({
 
     // automatically handle the onChange event with ease, then
     // merge in the errors from the response
-    const fieldProps = flow(
-        toPairs,
-        map<[keyof T, FieldPropInfo], [keyof T, FieldPropInfo]>(kv => [
-            kv[0],
-            {
-                ...kv[1],
-                errors: response?.errors?.errors[kv[0]],
-            },
-        ]),
-        fromPairs
-    )(
-        mergeAttributes(formState, ([k]) => ({
-            onChange: onChangeGenerator(k),
-        }))
-    );
+    // const fieldProps = flow(
+    //     toPairs,
+    //     map<[keyof T, FieldPropInfo], [keyof T, FieldPropInfo]>(kv => [
+    //         kv[0],
+    //         {
+    //             ...kv[1],
+    //             errors: response?.errorData?.errors[kv[0]],
+    //         },
+    //     ]),
+    //     fromPairs
+    // )(
+    //     mergeAttributes(formState, ([k]) => ({
+    //         onChange: onChangeGenerator(k),
+    //     }))
+    // );
+
+    const fieldProps = mergeAttributes(formState, ([k]) => ({
+        onChange: onChangeGenerator(k),
+    }));
+
+    const validator = useMemo(() => {
+        if (formRef.current != null) {
+            $.validator.unobtrusive.parse(formRef.current);
+            return $(formRef.current).validate();
+        }
+        return null;
+    }, [formRef?.current]);
+
+    if (
+        formRef.current != null &&
+        response != null &&
+        response.errorData?.errors != null
+    ) {
+        const errorArray: JQueryValidation.ErrorListItem[] = flow(
+            toPairs,
+            reduce<[keyof T, string[]], JQueryValidation.ErrorListItem[]>(
+                (list, [k, errors]) => {
+                    if (typeof k === 'string' && errors.length > 0) {
+                        const element = formRef.current?.elements.namedItem(
+                            startCase(k)
+                        );
+                        if (element instanceof HTMLElement)
+                            return [
+                                ...list,
+                                {
+                                    message: errors.join(', '),
+                                    element,
+                                },
+                            ];
+                    }
+                    return list;
+                },
+                []
+            )
+        )(response.errorData.errors);
+        // TODO test that server-side errors are appended correctly
+        validator?.errorList.push(...errorArray);
+    }
 
     return {
         formProps: {
             onSubmit: async e => {
-                e.preventDefault();
-                const target = e.target as HTMLFormElement;
-                const { action, method } = target;
-                const formValues = fieldValues(formState);
+                // if the validator is not present, we need to prevent the form from
+                // submitting
+                if (validator == null) {
+                    e.preventDefault();
+                    return;
+                }
 
-                loadAsync({
-                    actionUrl: action,
-                    actionMethod: method.toLowerCase() as HttpMethodsEnum,
-                    body: JSON.stringify(formValues),
-                    additionalHeaders: {
-                        'Content-Type': 'application/json',
-                    },
-                });
+                // if the validator is present and the form is valid, we submit
+                if (validator.form()) {
+                    e.preventDefault();
+                    const { action, method } = e.target as HTMLFormElement;
+                    const formValues = fieldValues(formState);
+                    loadAsync({
+                        actionUrl: action,
+                        actionMethod: method.toLowerCase() as HttpMethodsEnum,
+                        body: JSON.stringify(formValues),
+                        additionalHeaders: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                }
             },
         },
         formDispatch,
