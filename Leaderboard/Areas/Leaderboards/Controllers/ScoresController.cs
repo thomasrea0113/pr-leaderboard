@@ -29,23 +29,21 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
         [Route("[action]")]
         public async Task<ActionResult<SubmitScoreViewModel>> Create(SubmitScoreViewModel model)
         {
-            if (ModelState.IsValid)
+            // because this is an ApiController, the model state is automatically verified before
+            // the action is called. We don't have to explicitly check it here.
+            // TODO how to add custom server-side validation here?
+            var boardId = await _ctx.Set<LeaderboardModel>().AsQueryable()
+                .Where(b => b.Slug == model.BoardSlug)
+                .Select(b => b.Id)
+                .SingleAsync();
+            var score = _ctx.Set<ScoreModel>().Add(new ScoreModel
             {
-                var boardId = await _ctx.Set<LeaderboardModel>().AsQueryable()
-                    .Where(b => b.Slug == model.BoardSlug)
-                    .Select(b => b.Id)
-                    .SingleAsync();
-                var score = _ctx.Set<ScoreModel>().Add(new ScoreModel
-                {
-                    IsApproved = false,
-                    BoardId = boardId,
-                    UserId = _um.GetUserId(User),
-                    Value = model.Score
-                }).Entity;
-                return Created(Url.Page("Boards/View", null, null, null, null, $"score={score.Id}"), score);
-            }
-            else
-                return BadRequest(ModelState);
+                IsApproved = false,
+                BoardId = boardId,
+                UserId = _um.GetUserId(User),
+                Value = model.Score
+            }).Entity;
+            return Created(Url.Page("Boards/View", null, null, null, null, $"score={score.Id}"), score);
         }
     }
 }

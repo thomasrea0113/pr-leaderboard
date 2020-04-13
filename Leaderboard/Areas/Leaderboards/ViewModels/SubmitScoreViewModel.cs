@@ -14,7 +14,6 @@ namespace Leaderboard.Areas.Leaderboards.ViewModels
         [ValidSlug(typeof(LeaderboardModel), "'{0}' is not a valid slug for an existing leaderboard")]
         public string BoardSlug { get; set; }
 
-        [Required]
         public decimal Score { get; set; }
     }
 }
