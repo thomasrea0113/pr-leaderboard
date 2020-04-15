@@ -15,7 +15,6 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Leaderboard.Routing.Constraints;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace Leaderboard
