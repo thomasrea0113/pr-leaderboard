@@ -202,13 +202,10 @@ export const ThumbnailImage: React.FC<{
 };
 
 export interface ValidatorProps {
-    forProp?: FieldPropInfo;
+    forProp: FieldPropInfo;
 }
-export const Validator: React.FC<ValidatorProps> = ({ forProp }) => {
-    // TODO This feels sloppy to allow forProp to be null. I'm doing it
-    // because it makes building the form easier
-    if (forProp == null) return <></>;
 
+export const ValidatorFor: React.FC<ValidatorProps> = ({ forProp }) => {
     if (forProp.attributes.id == null)
         throw new Error('field must have an id to bind a validator');
     return (

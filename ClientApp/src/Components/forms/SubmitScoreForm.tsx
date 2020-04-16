@@ -1,7 +1,7 @@
 import React from 'react';
 import { Unit } from '../../types/dotnet-types';
-import { UnitIcon, Validator } from '../StyleComponents';
-import { FieldProps } from './Validation';
+import { UnitIcon, ValidatorFor } from '../StyleComponents';
+import { FieldProps, FieldPropInfo } from './Validation';
 
 export interface SubmitScoreProps {
     fieldAttributes?: FieldProps<SubmitScore>;
@@ -13,6 +13,9 @@ export interface SubmitScore {
     boardId: string;
     score: number;
 }
+
+const validatorFor = (field?: FieldPropInfo) =>
+    field != null ? <ValidatorFor forProp={field} /> : null;
 
 export const SubmitScoreForm: React.FC<SubmitScoreProps> = ({
     unit,
@@ -35,9 +38,9 @@ export const SubmitScoreForm: React.FC<SubmitScoreProps> = ({
                     <span className="input-group-text">{unit}</span>
                 </div>
             </div>
-            <Validator forProp={fieldAttributes?.score} />
-            <Validator forProp={fieldAttributes?.boardId} />
-            <Validator forProp={fieldAttributes?.userName} />
+            {validatorFor(fieldAttributes?.score)}
+            {validatorFor(fieldAttributes?.boardId)}
+            {validatorFor(fieldAttributes?.userName)}
         </div>
         <input {...fieldAttributes?.boardId.attributes} type="hidden" />
         <input {...fieldAttributes?.userName.attributes} type="hidden" />

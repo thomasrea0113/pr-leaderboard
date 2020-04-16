@@ -47,7 +47,7 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
             if (!isMember)
             {
                 ModelState.AddModelError(nameof(SubmitScoreViewModel.UserName), $"You are not a member of board '{board.Slug}'");
-                return this.ModelValidationError();
+                return this.ValidationError();
             };
 
             var score = _ctx.Set<ScoreModel>().Add(new ScoreModel

@@ -6,8 +6,6 @@ import React, {
 } from 'react';
 import flow from 'lodash/fp/flow';
 import mapKeys from 'lodash/fp/mapKeys';
-import mapValues from 'lodash/fp/mapValues';
-import join from 'lodash/fp/join';
 import upperFirst from 'lodash/fp/upperFirst';
 import { neverReached } from '../utilities/neverReached';
 import {
@@ -65,6 +63,11 @@ export interface UseFetchFormProps<T> {
     initialValues?: FormValues<T>;
     // if provided, automatic validation will be performed
     formRef: RefObject<HTMLFormElement>;
+
+    onValidSubmit?: (event: React.FormEvent<HTMLFormElement>) => void;
+    // this is the signature for catching a promise
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onSubmitError?: (reason: any) => any;
 }
 
 export const fetchFormReducerGenerator = <T extends {}>() => (
@@ -120,6 +123,8 @@ export const useFetchForm = <T extends {}>({
     fieldAttributes,
     initialValues,
     formRef,
+    onValidSubmit,
+    onSubmitError: onError,
 }: UseFetchFormProps<T>): FetchForm<T> => {
     const initialAttributes =
         initialValues != null
@@ -196,6 +201,9 @@ export const useFetchForm = <T extends {}>({
                 // if the validator is present and the form is valid, we submit
                 if (validator.form()) {
                     e.preventDefault();
+
+                    if (onValidSubmit != null) onValidSubmit(e);
+
                     const { action, method } = e.target as HTMLFormElement;
                     const formValues = fieldValues(formState);
                     loadAsync({
@@ -205,7 +213,7 @@ export const useFetchForm = <T extends {}>({
                         additionalHeaders: {
                             'Content-Type': 'application/json',
                         },
-                    });
+                    }).catch(onError);
                 }
             },
         },

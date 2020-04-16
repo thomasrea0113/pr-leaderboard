@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 // JQuery is expected to be included outside of the component, so we don't
 // need to import it here to use it
@@ -36,9 +36,7 @@ const ViewBoardComponent: React.FC<Props> = ({
     const { isLoading, isLoaded, loadAsync, response } = useLoading<State>();
     const formRef = useRef<HTMLFormElement>(null);
 
-    if (response?.errorData !== undefined) {
-        // TODO display errors
-    }
+    const [error, setError] = useState<unknown>();
 
     // load on mount
     useEffect(() => {
@@ -66,6 +64,9 @@ const ViewBoardComponent: React.FC<Props> = ({
         scores,
     } = response?.data != null ? response.data : initial;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const onSubmitError = (reason: any) => setError(reason);
+
     const {
         formDispatch,
         formProps,
@@ -73,6 +74,7 @@ const ViewBoardComponent: React.FC<Props> = ({
     } = useFetchForm({
         fieldAttributes,
         formRef,
+        onSubmitError,
     });
 
     useEffect(() => {
@@ -115,6 +117,11 @@ const ViewBoardComponent: React.FC<Props> = ({
                     ref={formRef}
                 >
                     <SubmitScoreForm fieldAttributes={fieldProps} unit={unit} />
+                    {error != null ? (
+                        <div className="text-danger mb-2">
+                            Oops! Looks like something went wrong. {`${error}`}
+                        </div>
+                    ) : null}
                     <button type="submit" className="btn btn-primary">
                         Submit
                     </button>
