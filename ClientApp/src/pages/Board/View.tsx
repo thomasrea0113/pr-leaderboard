@@ -71,6 +71,7 @@ const ViewBoardComponent: React.FC<Props> = ({
         formDispatch,
         formProps,
         fieldAttributes: fieldProps,
+        SubmitButton,
     } = useFetchForm({
         fieldAttributes,
         formRef,
@@ -122,9 +123,9 @@ const ViewBoardComponent: React.FC<Props> = ({
                             Oops! Looks like something went wrong. {`${error}`}
                         </div>
                     ) : null}
-                    <button type="submit" className="btn btn-primary">
+                    <SubmitButton className="btn btn-primary">
                         Submit
-                    </button>
+                    </SubmitButton>
                 </form>
             ) : null}
             <ScoreTable

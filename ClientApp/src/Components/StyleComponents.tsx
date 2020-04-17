@@ -217,6 +217,20 @@ export const ValidatorFor: React.FC<ValidatorProps> = ({ forProp }) => {
     );
 };
 
+export const LoadingIcon: React.FC<{
+    isLoading: boolean;
+    iconClass?: string;
+}> = ({ isLoading, iconClass }) =>
+    isLoading ? (
+        <>
+            <i
+                className={`fas fa-sync-alt fa-spin ${iconClass ??
+                    activeClass}`}
+            />
+            &nbsp;&nbsp;
+        </>
+    ) : null;
+
 export const RefreshButton: React.FC<DetailedHTMLProps<
     ButtonHTMLAttributes<HTMLButtonElement>,
     HTMLButtonElement

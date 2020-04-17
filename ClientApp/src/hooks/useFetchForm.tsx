@@ -16,6 +16,7 @@ import {
 } from '../Components/forms/Validation';
 import { useLoading, TypedResponse } from './useLoading';
 import { HttpMethodsEnum } from '../types/types';
+import { LoadingIcon } from '../Components/StyleComponents';
 
 export type ReactFormProps = React.DetailedHTMLProps<
     React.FormHTMLAttributes<HTMLFormElement>,
@@ -50,11 +51,19 @@ export type FormActions<T> =
     | UpdateFieldAction<T>
     | SubmitFormAction;
 
+export type Button = React.FC<
+    React.DetailedHTMLProps<
+        React.ButtonHTMLAttributes<HTMLButtonElement>,
+        HTMLButtonElement
+    >
+>;
+
 export interface FetchForm<T> {
     formProps: ReactFormProps;
     formDispatch: React.Dispatch<FormActions<T>>;
     fieldAttributes: FieldProps<T>;
     isSubmitting: boolean;
+    SubmitButton: Button;
     response?: TypedResponse<T>;
 }
 
@@ -165,6 +174,7 @@ export const useFetchForm = <T extends {}>({
 
     const fieldProps = mergeAttributes(formState, ([k]) => ({
         onChange: onChangeGenerator(k),
+        disabled: isLoading,
     }));
 
     const validator = useMemo(() => {
@@ -186,6 +196,16 @@ export const useFetchForm = <T extends {}>({
                 mapKeys(upperFirst) // the form expects TitleCase
             )(response.errorData.errors)
         );
+
+    const SubmitButton: Button = props => {
+        const { children } = props;
+        return (
+            <button {...props} type="submit" disabled={isLoading}>
+                <LoadingIcon isLoading={isLoading} />
+                {children}
+            </button>
+        );
+    };
 
     return {
         formProps: {
@@ -218,6 +238,7 @@ export const useFetchForm = <T extends {}>({
             },
         },
         formDispatch,
+        SubmitButton,
         fieldAttributes: fieldProps,
         isSubmitting: isLoading,
         response,
