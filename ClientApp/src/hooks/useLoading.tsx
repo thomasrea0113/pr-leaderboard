@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { HttpMethodsEnum } from '../types/types';
 import { ErrorData, isErrorData } from '../Components/forms/Validation';
-import { parseCookie } from '../Site';
+import { parseCookie, attachJQueryEvents } from '../Site';
 
 export type FetchBody =
     | string
@@ -85,6 +85,7 @@ export const useLoading = <D extends {}>(): UseLoadingProps<D> => {
                     })
                     .then(
                         fullfilled => {
+                            attachJQueryEvents();
                             resolve(fullfilled);
                         },
                         error => {

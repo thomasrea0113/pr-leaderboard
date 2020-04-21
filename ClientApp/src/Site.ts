@@ -11,7 +11,17 @@ import 'bootstrap';
 // Styles
 import './scss/site.scss';
 
-import './utilities/modal-hash';
+import { attachHashEvents } from './utilities/modal-hash';
+import { attachToggleEvents } from './utilities/toggle';
+
+// Important to prevent transitions from firing on page load
+$(() => $('body').removeClass('preload'));
+
+// after the react components load, we will need to call these functions again
+export const attachJQueryEvents = () => {
+    attachHashEvents();
+    attachToggleEvents();
+};
 
 /**
  * converts the given form to a object. Note, this will provide a partial

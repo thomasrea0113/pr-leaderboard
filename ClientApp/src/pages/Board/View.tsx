@@ -12,7 +12,6 @@ import {
     SubmitScoreForm,
     SubmitScore,
 } from '../../Components/forms/SubmitScoreForm';
-import { attachHashEvents } from '../../utilities/modal-hash';
 import { useFetchForm } from '../../hooks/useFetchForm';
 import { FieldProps } from '../../Components/forms/Validation';
 
@@ -80,8 +79,6 @@ const ViewBoardComponent: React.FC<Props> = ({
 
     useEffect(() => {
         if (isLoaded && !isLoading) {
-            attachHashEvents();
-
             if (id == null) throw new Error('Server returned invalid data');
 
             // after we're done loading, update the form fields
