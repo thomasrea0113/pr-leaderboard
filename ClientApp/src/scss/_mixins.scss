@@ -5,6 +5,14 @@
     -o-transform: $trans;
 }
 
+@mixin tranform-origin($trans) {
+    transform-origin: $trans;
+    -ms-transform-origin: $trans;
+    -webkit-transform-origin: $trans;
+    -moz-transform-origin: $trans;
+    -o-transform-origin: $trans;
+}
+
 @mixin transition($trans) {
     -webkit-transition: $trans;
     -ms-transition: $trans;

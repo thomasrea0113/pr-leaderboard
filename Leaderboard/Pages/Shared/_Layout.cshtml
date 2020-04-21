@@ -22,6 +22,18 @@
 </head>
 
 <body>
+    @* <div id="sidebar" class="bg-light border-right">
+        <div class="sidebar-heading">Start Bootstrap</div>
+        <div class="list-group list-group-flush">
+            <a href="#" class="list-group-item list-group-item-action bg-light">Dashboard</a>
+            <a href="#" class="list-group-item list-group-item-action bg-light">Shortcuts</a>
+            <a href="#" class="list-group-item list-group-item-action bg-light">Overview</a>
+            <a href="#" class="list-group-item list-group-item-action bg-light">Events</a>
+            <a href="#" class="list-group-item list-group-item-action bg-light">Profile</a>
+            <a href="#" class="list-group-item list-group-item-action bg-light">Status</a>
+        </div>
+        <div class="sidebar-slider" data-toggle-class="expanded" data-toggle-target="#sidebar">Actions</div>
+    </div> *@
     <header>
         <nav class="navbar fixed-top navbar-bold navbar-expand-sm navbar-toggleable-sm box-shadow">
             <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Leaderboard</a>
@@ -41,20 +53,6 @@
                 </ul>
             </div>
         </nav>
-        @* Usually, I avoid styling by ID, but admin-nav is unique *@
-        @* <div id="admin-nav">
-            <nav id="admin-nav-links" class="nav flex-column navbar-collapse collapse">
-                <a href="" class="nav-item nav-link">words</a>
-                <a href="" class="nav-item nav-link">words</a>
-                <a href="" class="nav-item nav-link">words</a>
-                <a href="" class="nav-item nav-link">words</a>
-            </nav>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#admin-nav-links"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <strong>admin</strong>&nbsp;
-                <span class="navbar-toggler-icon"></span>
-            </button>
-        </div> *@
     </header>
     @RenderSection("beforeContainer", required: false)
     <partial name="_StatusMessages" model="Messages.GetAllMessages()" />
