@@ -1,6 +1,3 @@
-import $ from 'jquery';
-import 'bootstrap';
-
 /*
  * A simple plugin that tracks the active modal on the page at loadtime
  */
