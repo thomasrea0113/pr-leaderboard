@@ -109,10 +109,23 @@ namespace Leaderboard
                 o.HeaderName = "X-CSRF-TOKEN";
             });
 
-            services.AddRazorPages().AddNewtonsoftJson(o =>
+            services.AddRazorPages(o =>
+            {
+                o.Conventions.AuthorizeAreaFolder("Admin", "/", "AppAdmin");
+                // o.Conventions.AddAreaFolderApplicationModelConvention("Admin", "/", a =>
+                //     a.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder()
+                //         .RequireRole("Admin")
+                //         .Build())));
+            }).AddNewtonsoftJson(o =>
             {
                 o.UseCamelCasing(true);
                 o.SerializerSettings.Converters.Add(new StringEnumConverter());
+            });
+
+            services.AddAuthorization(o =>
+            {
+                // It's important that the role name be all lowercase
+                o.AddPolicy("AppAdmin", p => p.RequireRole("admin"));
             });
 
             // controllers will be used for api CRUD actions
