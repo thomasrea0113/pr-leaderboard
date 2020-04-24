@@ -27,10 +27,6 @@ export interface Action {
     readonly type: string;
 }
 
-export interface SubmitFormAction extends Action {
-    readonly type: 'SUBMIT_FORM';
-}
-
 export interface FieldValue<T> {
     property: keyof T;
     value: string;
@@ -46,10 +42,14 @@ export interface UpdateFieldsAction<T> extends Action {
     readonly fields: FieldValue<T>[];
 }
 
+export interface ResetForm extends Action {
+    readonly type: 'RESET_FORM';
+}
+
 export type FormActions<T> =
     | UpdateFieldsAction<T>
     | UpdateFieldAction<T>
-    | SubmitFormAction;
+    | ResetForm;
 
 export type Button = React.FC<
     React.DetailedHTMLProps<
@@ -73,7 +73,7 @@ export interface UseFetchFormProps<T> {
     // if provided, automatic validation will be performed
     formRef: RefObject<HTMLFormElement>;
 
-    onValidSubmit?: (event: React.FormEvent<HTMLFormElement>) => void;
+    onValidSubmit?: (value: void) => void | PromiseLike<void>;
     // this is the signature for catching a promise
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onSubmitError?: (reason: any) => any;
@@ -115,8 +115,9 @@ export const fetchFormReducerGenerator = <T extends {}>() => (
                 ...fields,
             };
         }
-        case 'SUBMIT_FORM':
-            break;
+        // reset all form values
+        case 'RESET_FORM':
+            return mergeAttributes(state, () => ({ value: '' }));
         default:
             // If you don't handle all possible values for action.type, ESLint will complain here
             neverReached(reducerAction);
@@ -222,8 +223,6 @@ export const useFetchForm = <T extends {}>({
                 if (validator.form()) {
                     e.preventDefault();
 
-                    if (onValidSubmit != null) onValidSubmit(e);
-
                     const { action, method } = e.target as HTMLFormElement;
                     const formValues = fieldValues(formState);
                     loadAsync({
@@ -233,7 +232,9 @@ export const useFetchForm = <T extends {}>({
                         additionalHeaders: {
                             'Content-Type': 'application/json',
                         },
-                    }).catch(onError);
+                    })
+                        .then(onValidSubmit)
+                        .catch(onError);
                 }
             },
         },

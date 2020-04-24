@@ -37,9 +37,11 @@ const ViewBoardComponent: React.FC<Props> = ({
 
     const [error, setError] = useState<unknown>();
 
+    const reloadAsync = () => loadAsync({ actionUrl: scoresUrl });
+
     // load on mount
     useEffect(() => {
-        loadAsync({ actionUrl: scoresUrl });
+        reloadAsync();
     }, []);
 
     const initial = {
@@ -63,18 +65,21 @@ const ViewBoardComponent: React.FC<Props> = ({
         scores,
     } = response?.data != null ? response.data : initial;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const onSubmitError = (reason: any) => setError(reason);
-
     const {
         formDispatch,
         formProps,
         fieldAttributes: fieldProps,
         SubmitButton,
+        response: submitResponse,
     } = useFetchForm({
         fieldAttributes,
         formRef,
-        onSubmitError,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        onSubmitError: (reason: any) => setError(reason),
+        onValidSubmit: () => {
+            reloadAsync();
+            formDispatch({ type: 'RESET_FORM' });
+        },
     });
 
     useEffect(() => {
@@ -98,10 +103,6 @@ const ViewBoardComponent: React.FC<Props> = ({
         }
     }, [isLoaded, isLoading]);
 
-    if (!isLoaded || isLoading) return <>loading...</>;
-
-    const reloadAsync = () => loadAsync({ actionUrl: scoresUrl });
-
     // TODO display loading
     return (
         <>
@@ -114,12 +115,18 @@ const ViewBoardComponent: React.FC<Props> = ({
                     action={submitScoreUrl}
                     ref={formRef}
                 >
-                    <SubmitScoreForm fieldAttributes={fieldProps} unit={unit} />
+                    {submitResponse?.data != null ? (
+                        <span className="text-primary">
+                            You&apos;re score has been submitted! It will appear
+                            here once it has been been reviewed by an admin.
+                        </span>
+                    ) : null}
                     {error != null ? (
                         <div className="text-danger mb-2">
                             Oops! Looks like something went wrong. {`${error}`}
                         </div>
                     ) : null}
+                    <SubmitScoreForm fieldAttributes={fieldProps} unit={unit} />
                     <SubmitButton className="btn btn-primary">
                         Submit
                     </SubmitButton>
