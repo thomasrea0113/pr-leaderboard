@@ -24,4 +24,3 @@ export const attachHashEvents = () => {
     if (modal != null) $(`#${modal}`).modal('show');
     else $('[data-show=true]').modal('show');
 };
-$(attachHashEvents);

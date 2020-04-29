@@ -11,15 +11,25 @@ namespace Leaderboard.Areas.Identity.ViewModels
     {
         public string UserName { get; private set; }
         public string Email { get; private set; }
+        public bool IsAdmin { get; private set; }
         public List<CategoryViewModel> Interests { get; private set; }
         public List<LeaderboardViewModel> Leaderboards { get; private set; }
 
-        public UserViewModel(ApplicationUser user)
+        public UserViewModel(ApplicationUser user, bool isAdmin = false)
         {
             UserName = user.UserName;
             Email = user.Email;
-            Interests = CategoryViewModel.Create(user.UserCategories.Select(uc => uc.Category)).ToList();
-            Leaderboards = LeaderboardViewModel.Create(user.UserLeaderboards.Select(uc => uc.Leaderboard)).ToList();
+            IsAdmin = isAdmin;
+
+            // if the passed in user was fully loaded (including all navigation properties)
+            // go ahead and include the below collections
+            Interests = user.UserCategories != null ?
+                CategoryViewModel.Create(user.UserCategories.Select(uc => uc.Category)).ToList()
+                : null;
+
+            Leaderboards = user.UserLeaderboards != null ?
+                LeaderboardViewModel.Create(user.UserLeaderboards.Select(uc => uc.Leaderboard)).ToList()
+                : null;
         }
     }
 }

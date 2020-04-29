@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Leaderboard.Areas.Identity.Managers;
 using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Areas.Identity.ViewModels;
+using Leaderboard.Areas.Leaderboards.Controllers;
 using Leaderboard.Areas.Leaderboards.Models;
 using Leaderboard.Areas.Leaderboards.ViewModels;
 using Leaderboard.Data;
@@ -33,6 +34,7 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
         private readonly IMessageQueue _messages;
         private readonly AppUserManager _userManager;
         private readonly IFormFieldAttributeProvider _formFieldAttributeProvider;
+        private readonly ScoresController _scoresController;
 
         public LeaderboardModel Board { get; private set; }
 
@@ -68,12 +70,14 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
             ApplicationDbContext ctx,
             IMessageQueue messages,
             AppUserManager userManager,
-            IFormFieldAttributeProvider formFieldAttributeProvider)
+            IFormFieldAttributeProvider formFieldAttributeProvider,
+            ScoresController scoresController)
         {
             _ctx = ctx;
             _messages = messages;
             _userManager = userManager;
             _formFieldAttributeProvider = formFieldAttributeProvider;
+            _scoresController = scoresController;
         }
 
         private void Init()
@@ -115,10 +119,8 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
             Init();
 
             var board = await BoardQuery.SingleAsync();
-            var scores = (await _ctx.Scores.AsQueryable()
-                .Where(s => s.BoardId == board.Id)
-                .ToArrayAsync())
-                .Select(s => new ScoreViewModel(s));
+
+            var scores = await _scoresController.All();
 
             if (User.Identity.IsAuthenticated)
             {

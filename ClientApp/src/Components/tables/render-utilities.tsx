@@ -1,9 +1,10 @@
-import React, { PropsWithChildren, ReactNode } from 'react';
+import React, { PropsWithChildren, ReactNode, Fragment } from 'react';
 
 import flow from 'lodash/fp/flow';
 import uniq from 'lodash/fp/uniq';
 import join from 'lodash/fp/join';
-import { CellProps, Cell, HeaderGroup } from 'react-table';
+import { CellProps, Cell, HeaderGroup, Row } from 'react-table';
+import omit from 'lodash/fp/omit';
 import { Expander, Grouper, Sorter } from '../StyleComponents';
 
 export const joinVals = <T extends {}>(vals: T[]): string =>
@@ -112,3 +113,25 @@ export const renderCell = <T extends {}>(
 
     return <td {...getCellProps()}>{innerCell}</td>;
 };
+
+// render row is dependent on the prepareRow function returned by useTable, so this
+// method simply returns a render function using the passed in prepare fuction
+/**
+ * render row is dependent on the prepareRow function returned by useTable,
+ * so this method simply returns a render function using the passed in prepare fuction
+ * @param prepareRow method returned by the useTable hook
+ */
+export const getRowRender = <T extends {}>(prepareRow: (row: Row<T>) => void) =>
+    function renderRow(r: Row<T>): React.ReactFragment {
+        prepareRow(r);
+        const props = r.getRowProps();
+        const { key } = props;
+        return (
+            <Fragment key={key}>
+                <tr {...omit(['key'], props)}>
+                    {r.cells.map(cell => renderCell(cell))}
+                </tr>
+                {r.isExpanded ? r.subRows.map(sr => renderRow(sr)) : null}
+            </Fragment>
+        );
+    };

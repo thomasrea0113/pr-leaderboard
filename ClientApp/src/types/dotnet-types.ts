@@ -74,7 +74,8 @@ export interface UserView extends Leaderboard {
 
 export interface User {
     userName: string;
-    email: string;
+    email?: string;
+    isAdmin: boolean;
     interests: Category[];
     leaderboards: Leaderboard[];
 }
@@ -84,6 +85,7 @@ export interface UnitOfMeasure {
 }
 
 export interface Score {
+    id: string;
     isApproved: boolean;
     leaderboardId: string;
     userId: string;

@@ -5,6 +5,7 @@ namespace Leaderboard.Areas.Leaderboards.ViewModels
 {
     public class ScoreViewModel
     {
+        public string Id { get; set; }
         public bool IsApproved { get; set; }
         public string LeaderboardId { get; set; }
         public string UserId { get; set; }
@@ -12,7 +13,8 @@ namespace Leaderboard.Areas.Leaderboards.ViewModels
 
         public ScoreViewModel(ScoreModel score)
         {
-            IsApproved = Convert.ToBoolean(score.IsApproved);
+            Id = score.Id;
+            IsApproved = score.IsApproved;
             LeaderboardId = score.BoardId;
             UserId = score.UserId;
             Value = score.Value;

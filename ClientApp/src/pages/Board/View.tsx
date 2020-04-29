@@ -7,13 +7,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import 'react-dom'; // only needed if this is to be placed directly on the page
 import { ScoreTable } from '../../Components/tables/ScoreTable';
 import { useLoading } from '../../hooks/useLoading';
-import { User, UserView, Score, UnitOfMeasure } from '../../types/dotnet-types';
+import { User, UserView, Score } from '../../types/dotnet-types';
 import {
     SubmitScoreForm,
     SubmitScore,
 } from '../../Components/forms/SubmitScoreForm';
 import { useFetchForm } from '../../hooks/useFetchForm';
 import { FieldProps } from '../../Components/forms/Validation';
+import { HttpMethodsEnum } from '../../types/types';
 
 interface Props {
     scoresUrl: string;
@@ -44,18 +45,6 @@ const ViewBoardComponent: React.FC<Props> = ({
         reloadAsync();
     }, []);
 
-    const initial = {
-        board: {
-            id: undefined,
-            // eslint-disable-next-line @typescript-eslint/no-object-literal-type-assertion
-            uom: {
-                unit: 'Kilograms',
-            } as UnitOfMeasure,
-        },
-        user: undefined,
-        scores: undefined,
-    };
-
     const {
         board: {
             id,
@@ -63,7 +52,17 @@ const ViewBoardComponent: React.FC<Props> = ({
         },
         user,
         scores,
-    } = response?.data != null ? response.data : initial;
+    } = response?.data ?? {
+        // the initial data. It's here for convient type assumptions made by the typescript transpiler
+        board: {
+            id: undefined,
+            uom: {
+                unit: 'Kilograms',
+            },
+        },
+        user: undefined,
+        scores: undefined,
+    };
 
     const {
         formDispatch,
@@ -71,7 +70,9 @@ const ViewBoardComponent: React.FC<Props> = ({
         fieldAttributes: fieldProps,
         SubmitButton,
         response: submitResponse,
-    } = useFetchForm({
+    } = useFetchForm<SubmitScore>({
+        actionUrl: submitScoreUrl,
+        actionMethod: HttpMethodsEnum.POST,
         fieldAttributes,
         formRef,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -108,13 +109,7 @@ const ViewBoardComponent: React.FC<Props> = ({
         <>
             <h4>Scores</h4>
             {user != null ? (
-                <form
-                    {...formProps}
-                    className="form-sm mb-1"
-                    method="post"
-                    action={submitScoreUrl}
-                    ref={formRef}
-                >
+                <form {...formProps} className="form-sm mb-1" ref={formRef}>
                     {submitResponse?.data != null ? (
                         <span className="text-primary">
                             You&apos;re score has been submitted! It will appear

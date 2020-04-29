@@ -31,7 +31,7 @@ export const SubmitScoreForm: React.FC<SubmitScoreProps> = ({
                     </span>
                 </div>
                 <input
-                    {...fieldAttributes?.score.attributes}
+                    {...fieldAttributes?.score?.attributes}
                     className="form-control"
                 />
                 <div className="input-group-append">
@@ -42,7 +42,7 @@ export const SubmitScoreForm: React.FC<SubmitScoreProps> = ({
             {validatorFor(fieldAttributes?.boardId)}
             {validatorFor(fieldAttributes?.userName)}
         </div>
-        <input {...fieldAttributes?.boardId.attributes} type="hidden" />
-        <input {...fieldAttributes?.userName.attributes} type="hidden" />
+        <input {...fieldAttributes?.boardId?.attributes} type="hidden" />
+        <input {...fieldAttributes?.userName?.attributes} type="hidden" />
     </>
 );

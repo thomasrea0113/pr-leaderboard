@@ -13,7 +13,7 @@ namespace Leaderboard.Areas.Leaderboards.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string Id { get; set; }
 
-        public bool? IsApproved { get; set; }
+        public bool IsApproved { get; set; }
 
         [JsonIgnore]
         public virtual AppFile VideoProof { get; set; }

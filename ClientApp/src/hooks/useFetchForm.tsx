@@ -58,22 +58,28 @@ export type Button = React.FC<
     >
 >;
 
-export interface FetchForm<T> {
+export interface FetchForm<T, R = unknown> {
     formProps: ReactFormProps;
     formDispatch: React.Dispatch<FormActions<T>>;
     fieldAttributes: FieldProps<T>;
     isSubmitting: boolean;
+    submitForm: () => boolean;
     SubmitButton: Button;
-    response?: TypedResponse<T>;
+    response?: TypedResponse<R>;
 }
 
 export interface UseFetchFormProps<T> {
-    fieldAttributes: FieldProps<T>;
+    actionUrl: string;
+    actionMethod: HttpMethodsEnum;
+
+    fieldAttributes?: FieldProps<T>;
     initialValues?: FormValues<T>;
+
     // if provided, automatic validation will be performed
-    formRef: RefObject<HTMLFormElement>;
+    formRef?: RefObject<HTMLFormElement>;
 
     onValidSubmit?: (value: void) => void | PromiseLike<void>;
+
     // this is the signature for catching a promise
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onSubmitError?: (reason: any) => any;
@@ -91,7 +97,7 @@ export const fetchFormReducerGenerator = <T extends {}>() => (
             [field.property]: {
                 ...state[field.property],
                 attributes: {
-                    ...state[field.property].attributes,
+                    ...state[field.property]?.attributes,
                     value: field.value,
                 },
             },
@@ -129,15 +135,18 @@ export const fetchFormReducerGenerator = <T extends {}>() => (
  * A hook that allows for easily converting any form to an asyncronous fetch operation
  * @param props props needed for fetch overloads
  */
-export const useFetchForm = <T extends {}>({
+export const useFetchForm = <T extends {}, R = unknown>({
+    actionUrl,
+    actionMethod,
+
     fieldAttributes,
     initialValues,
     formRef,
     onValidSubmit,
     onSubmitError: onError,
-}: UseFetchFormProps<T>): FetchForm<T> => {
+}: UseFetchFormProps<T>): FetchForm<T, R> => {
     const initialAttributes =
-        initialValues != null
+        initialValues != null && fieldAttributes != null
             ? mergeAttributes(fieldAttributes, ([k]) => {
                   // only set the value if it was provided in initial
                   if (initialValues[k] != null)
@@ -152,7 +161,7 @@ export const useFetchForm = <T extends {}>({
         fetchFormReducerGenerator<T>(),
         // if initial values are provided, we need to merge it into the
         // attributes before initializing the state
-        initialAttributes
+        initialAttributes ?? {}
     );
 
     // a convenient function to generate an onChange event hanlder for
@@ -171,7 +180,7 @@ export const useFetchForm = <T extends {}>({
         return evt;
     };
 
-    const { isLoading, response, loadAsync } = useLoading<T>();
+    const { isLoading, response, loadAsync } = useLoading<R>();
 
     const fieldProps = mergeAttributes(formState, ([k]) => ({
         onChange: onChangeGenerator(k),
@@ -179,7 +188,7 @@ export const useFetchForm = <T extends {}>({
     }));
 
     const validator = useMemo(() => {
-        if (formRef.current != null) {
+        if (formRef?.current != null) {
             $.validator.unobtrusive.parse(formRef.current);
             return $(formRef.current).validate();
         }
@@ -187,7 +196,7 @@ export const useFetchForm = <T extends {}>({
     }, [formRef?.current]);
 
     if (
-        formRef.current != null &&
+        formRef?.current != null &&
         response != null &&
         response.errorData?.errors != null
     )
@@ -208,37 +217,39 @@ export const useFetchForm = <T extends {}>({
         );
     };
 
+    const submitForm = () => {
+        // if formRef is null, then validation isn't enabled. Otherwise, we take
+        // the result of the validation
+        const canSubmit = formRef == null || validator?.form() === true;
+
+        if (canSubmit) {
+            const formValues = fieldValues(formState);
+            loadAsync({
+                actionUrl,
+                actionMethod,
+                body: JSON.stringify(formValues),
+                additionalHeaders: {
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(onValidSubmit)
+                .catch(onError);
+            return true;
+        }
+        return false;
+    };
+
     return {
         formProps: {
             onSubmit: async e => {
-                // if the validator is not present, we need to prevent the form from
-                // submitting. If validation is enabled, the validator will prevent
-                // submission if the form is invalid for us
-                if (validator == null) {
-                    e.preventDefault();
-                    return;
-                }
-
-                // if the validator is present and the form is valid, we submit
-                if (validator.form()) {
-                    e.preventDefault();
-
-                    const { action, method } = e.target as HTMLFormElement;
-                    const formValues = fieldValues(formState);
-                    loadAsync({
-                        actionUrl: action,
-                        actionMethod: method.toLowerCase() as HttpMethodsEnum,
-                        body: JSON.stringify(formValues),
-                        additionalHeaders: {
-                            'Content-Type': 'application/json',
-                        },
-                    })
-                        .then(onValidSubmit)
-                        .catch(onError);
-                }
+                // if formRef is null, then validation isn't enabled. Otherwise, we take
+                // the result of the validation
+                e.preventDefault();
+                submitForm();
             },
         },
         formDispatch,
+        submitForm,
         SubmitButton,
         fieldAttributes: fieldProps,
         isSubmitting: isLoading,

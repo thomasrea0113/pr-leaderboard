@@ -52,9 +52,7 @@ export interface FieldPropInfo {
 /**
  * contains information about the type as it will appear in a form
  */
-export type FieldProps<T> = {
-    [key in keyof T]: FieldPropInfo;
-};
+export type FieldProps<T> = Partial<Record<keyof T, FieldPropInfo>>;
 
 /**
  * a convenient function to easily merge in additional html input properties

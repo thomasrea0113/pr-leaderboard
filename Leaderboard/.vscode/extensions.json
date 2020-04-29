@@ -3,6 +3,7 @@
         "msjsdiag.debugger-for-chrome",
         "ms-dotnettools.csharp",
         "k--kato.docomment",
-        "dotjoshjohnson.xml"
+        "dotjoshjohnson.xml",
+        "quicktype.quicktype"
     ]
 }

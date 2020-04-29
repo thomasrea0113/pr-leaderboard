@@ -15,7 +15,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>@ViewData["Title"] - Leaderboard</title>
     <react-bundle src="css/site.[hash].css" />
     @RenderSection("styles", required: false)
@@ -45,10 +45,18 @@
                 <partial name="_LoginPartial" />
                 <ul class="navbar-nav flex-grow-1">
                     <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-page="/index">Home</a>
+                        <a class="nav-link" asp-area="" asp-page="/Index">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-page="Contact">Contact</a>
+                        <a class="nav-link" asp-area="" asp-page="/Contact">Contact</a>
+                    </li>
+                    <li class="nav-item dropdown text-danger">
+                        <a class="nav-link dropdown-toggle" asp-area="Admin" id="navbarDropdown" data-toggle="dropdown">
+                        Admin
+                        </a>
+                        <div class="dropdown-menu">
+                        <a class="dropdown-item" asp-area="Admin" asp-route-action="ApproveScore/nested" asp-route-id="45">Approve Scores</a>
+                        </div>
                     </li>
                 </ul>
             </div>

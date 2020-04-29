@@ -1,0 +1,16 @@
+@*
+This page simple renders the admin react area. '**' matches all 
+characters, including forward slashes. It's important to also
+map this page as the fallback for the area, so that the react
+app can handle 404s (see Startup.cs)
+*@
+@page "/Admin/{**action}"
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper *, Leaderboard
+
+@{
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+
+<react-bundle src="js/admin.[hash].js" />
+<react-component component-name="admin" />

@@ -129,7 +129,7 @@ namespace Leaderboard
             });
 
             // controllers will be used for api CRUD actions
-            services.AddControllers();
+            services.AddControllers().AddControllersAsServices();
 
             services.AddSpaStaticFiles(cnf =>
             {
@@ -166,6 +166,11 @@ namespace Leaderboard
             {
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
+
+                // The Admin area is a react component that uses ReactRouter to
+                // handle routing inside the component, so all pages
+                // should route to the Index page
+                endpoints.MapFallbackToAreaPage("/Index", "Admin");
             });
         }
     }

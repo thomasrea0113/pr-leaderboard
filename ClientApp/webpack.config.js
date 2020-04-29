@@ -14,6 +14,7 @@ module.exports = env => {
             home: ['./src/pages/Home.tsx'],
             site: ['./src/Site.ts'],
             'board/view': ['./src/pages/Board/View.tsx'],
+            admin: ['./src/pages/Admin.tsx'],
         },
         output: {
             path: outDir,

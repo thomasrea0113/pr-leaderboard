@@ -9,6 +9,3 @@ export const attachToggleEvents = () => {
         );
     });
 };
-
-// initToggle immediately
-$(attachToggleEvents);
