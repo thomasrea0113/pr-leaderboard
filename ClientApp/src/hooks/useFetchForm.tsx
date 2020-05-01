@@ -1,4 +1,9 @@
-import React, { useReducer, ChangeEventHandler, RefObject } from 'react';
+import React, {
+    useReducer,
+    ChangeEventHandler,
+    RefObject,
+    useEffect,
+} from 'react';
 import flow from 'lodash/fp/flow';
 import toPairs from 'lodash/fp/toPairs';
 import map from 'lodash/fp/map';
@@ -127,7 +132,7 @@ export const useFetchForm = <T extends {}, R = T>({
             : null;
 
     // initialize reducer
-    const [formState, formDispatch] = useReducer(
+    const [{ props: formFieldProps, triggerSubmit }, formDispatch] = useReducer(
         fetchFormReducerGenerator<T>(),
         // if initial values are provided, we need to merge it into the
         // attributes before initializing the state
@@ -166,7 +171,7 @@ export const useFetchForm = <T extends {}, R = T>({
             { ...v, onChange: onChangeGenerator(k), disabled: isLoading },
         ]),
         fromPairs
-    )(formState.props);
+    )(formFieldProps);
 
     const SubmitButton: ReactButtonProps = props => {
         const { children } = props;
@@ -180,7 +185,7 @@ export const useFetchForm = <T extends {}, R = T>({
 
     const submitForm = (): Promise<boolean> => {
         if (validator == null || validator.form()) {
-            const formValues = getFormValues(formState.props);
+            const formValues = getFormValues(formFieldProps);
             return loadAsync({
                 actionUrl,
                 actionMethod,
@@ -195,6 +200,10 @@ export const useFetchForm = <T extends {}, R = T>({
         }
         return new Promise(() => false);
     };
+
+    useEffect(() => {
+        if (triggerSubmit > 0) submitForm();
+    }, [triggerSubmit]);
 
     if (
         showErrors != null &&

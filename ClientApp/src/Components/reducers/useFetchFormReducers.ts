@@ -32,13 +32,18 @@ export interface ResetForm {
     readonly type: 'RESET_FORM';
 }
 
+export interface SubmitForm {
+    readonly type: 'SUBMIT_FORM';
+}
+
 /**
  * Type determining all possible form actions
  */
 export type FormActions<T> =
     | UpdateFieldsAction<T>
     | UpdateFieldAction<T>
-    | ResetForm;
+    | ResetForm
+    | SubmitForm;
 
 export interface FetchFormReducerState<T> {
     props: FormFieldProps<T>;
@@ -92,68 +97,11 @@ export const fetchFormReducerGenerator = <T extends {}>() => (
         }
         case 'RESET_FORM':
             return resetAllFieldValues(state);
+        case 'SUBMIT_FORM':
+            return { ...state, triggerSubmit: state.triggerSubmit + 1 };
         default:
             // If you don't handle all possible values for action.type, ESLint will complain here
             neverReached(reducerAction);
     }
     return state;
 };
-
-/**
- * The reducer can't be generic, so we have to wrap it in a generator function
- */
-// export const fetchFormReducerGenerator = <T extends {}>() => (
-//     state: {
-//         props: FormFieldProps<T>;
-//         triggerSubmit: number;
-//     },
-//     reducerAction: FormActions<T>
-// ): {
-//     props: FormFieldProps<T>;
-//     triggerSubmit: number;
-// } => {
-//     // a function which updates just the specified field state
-//     const getFieldState = (field: FieldValue<T>) =>
-//         // TODO the typing wouldn't pick up that these are compatible, so I explicitly typed it
-//         // eslint-disable-next-line @typescript-eslint/no-object-literal-type-assertion
-//         ({
-//             [field.property]: {
-//                 ...state.props[field.property],
-//                 attributes: {
-//                     ...state.props[field.property]?.attributes,
-//                     value: field.value,
-//                 },
-//             },
-//         } as FieldProps<T>);
-
-//     switch (reducerAction.type) {
-//         case 'UPDATE_FIELD':
-//             return {
-//                 ...state,
-//                 ...getFieldState(reducerAction.field),
-//             };
-//         case 'UPDATE_FIELDS': {
-//             // fist, map all the fields to there updated state, then reduce
-//             // to a single instance of FieldProps, and finally merge with
-//             // existing state.
-//             const fields = reducerAction.fields
-//                 .map(getFieldState)
-//                 .reduce((s: FieldProps<T>, p) => ({ ...s, ...p }));
-
-//             return {
-//                 ...state,
-//                 ...fields,
-//             };
-//         }
-//         // reset all form values
-//         case 'RESET_FORM':
-//             return {
-//                 ...state,
-//                 ...mergeAttributes(state.props, () => ({ value: '' })),
-//             };
-//         default:
-//             // If you don't handle all possible values for action.type, ESLint will complain here
-//             neverReached(reducerAction);
-//     }
-//     return state;
-// };

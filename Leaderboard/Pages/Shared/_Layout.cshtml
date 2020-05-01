@@ -51,11 +51,11 @@
                         <a class="nav-link" asp-area="" asp-page="/Contact">Contact</a>
                     </li>
                     <li class="nav-item dropdown text-danger">
-                        <a class="nav-link dropdown-toggle" asp-area="Admin" id="navbarDropdown" data-toggle="dropdown">
+                        <a class="nav-link dropdown-toggle" asp-area="Admin" asp-page="/Index" id="navbarDropdown" data-toggle="dropdown">
                         Admin
                         </a>
                         <div class="dropdown-menu">
-                        <a class="dropdown-item" asp-area="Admin" asp-route-action="ApproveScore/nested" asp-route-id="45">Approve Scores</a>
+                        <a class="dropdown-item" asp-area="Admin" asp-page="/Index" asp-route-action="ApproveScore">Approve Scores</a>
                         </div>
                     </li>
                 </ul>

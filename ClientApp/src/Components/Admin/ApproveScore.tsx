@@ -1,4 +1,5 @@
 import React, { useMemo, useEffect, useState } from 'react';
+
 import {
     TableState,
     useTable,
@@ -15,6 +16,8 @@ import { ScoreColumns } from '../tables/columns/score-columns';
 import { useFetchForm } from '../../hooks/useFetchForm';
 import { HttpMethodsEnum } from '../../types/types';
 import { isValidationErrorResponseData } from '../../types/ValidationErrorResponse';
+import { isArrayOf } from '../../types/guards/isArrayOf';
+import { isScore } from '../../types/guards/isScore';
 
 interface ApproveScore {
     ids: string[];
@@ -51,12 +54,14 @@ export const ApproveScoreComponent: React.FC<{}> = () => {
         []
     );
 
-    const { formProps, submitForm, SubmitButton, formDispatch } = useFetchForm<
-        ApproveScore
+    const { formProps, SubmitButton, formDispatch } = useFetchForm<
+        ApproveScore,
+        Score[]
     >({
         actionUrl: '/api/Scores/Approve',
         actionMethod: HttpMethodsEnum.PATCH,
         onValidSubmit: triggerRefresh,
+        guard: isArrayOf(isScore),
     });
 
     const approveColumns: Column<Score>[] = [
@@ -82,22 +87,32 @@ export const ApproveScoreComponent: React.FC<{}> = () => {
                             type: 'UPDATE_FIELD',
                             field: {
                                 property: 'ids',
-                                value,
+                                value: [value],
                             },
                         });
-                        submitForm();
+                        formDispatch({ type: 'SUBMIT_FORM' });
                     }}
                 >
                     Approve
                 </SubmitButton>
             ),
+            aggregate: scores => scores,
             Aggregated: ({ cell: { value } }) => {
                 return (
                     <SubmitButton
                         className="btn btn-success"
                         name="Ids"
                         value={value}
-                        onSubmitCapture={() => <></>}
+                        onClick={() => {
+                            formDispatch({
+                                type: 'UPDATE_FIELD',
+                                field: {
+                                    property: 'ids',
+                                    value,
+                                },
+                            });
+                            formDispatch({ type: 'SUBMIT_FORM' });
+                        }}
                     >
                         Approve All
                     </SubmitButton>

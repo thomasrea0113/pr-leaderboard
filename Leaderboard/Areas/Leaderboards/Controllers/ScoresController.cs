@@ -14,6 +14,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Leaderboard.Areas.Leaderboards.Controllers
 {
+    public class ApproveModel
+    {
+        public string[] Ids { get; set; }
+    }
+
     [ApiController]
     [Route("api/[controller]")]
     public class ScoresController : ControllerBase
@@ -30,16 +35,20 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
         [Authorize(Roles = "admin")]
         [HttpPatch]
         [Route("[action]")]
-        public async Task Approve(string[] Ids)
+        public async Task<IEnumerable<ScoreModel>> Approve(ApproveModel m)
         {
-            var scores = _ctx.Scores.AsQueryable()
+            var ids = m.Ids;
+            var scores = await _ctx.Scores.AsQueryable()
                 .Where(s => !s.IsApproved)
-                .Where(s => Ids.Contains(s.Id));
+                .Where(s => ids.Contains(s.Id))
+                .ToArrayAsync();
 
             foreach (var score in scores)
                 score.IsApproved = true;
 
             await _ctx.SaveChangesAsync();
+
+            return scores;
         }
 
         /// <summary>
