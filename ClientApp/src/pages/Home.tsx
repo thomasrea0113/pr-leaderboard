@@ -6,6 +6,7 @@ import { Featured } from '../types/dotnet-types';
 import { FeaturedCard } from '../Components/FeaturedCard';
 import { ensureDelay } from '../utilities/ensureDelay';
 import { animationDelay } from '../utilities/animation';
+import { isValidationErrorResponseData } from '../types/ValidationErrorResponse';
 
 interface ReactProps {
     initialUrl: string;
@@ -48,7 +49,9 @@ const HomeComponent: React.FC<ReactProps> = ({ initialUrl }) => {
     }, []);
     if (!isLoaded.current) return null;
 
-    const featured = response?.data?.featured ?? [];
+    const featured = !isValidationErrorResponseData(response?.data)
+        ? response?.data?.featured ?? []
+        : [];
 
     return (
         <>

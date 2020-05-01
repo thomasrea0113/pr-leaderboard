@@ -14,6 +14,7 @@ import { renderHeader, getRowRender } from '../tables/render-utilities';
 import { ScoreColumns } from '../tables/columns/score-columns';
 import { useFetchForm } from '../../hooks/useFetchForm';
 import { HttpMethodsEnum } from '../../types/types';
+import { isValidationErrorResponseData } from '../../types/ValidationErrorResponse';
 
 interface ApproveScore {
     ids: string[];
@@ -34,7 +35,12 @@ export const ApproveScoreComponent: React.FC<{}> = () => {
 
     // data must be memo-ized, or it will cause a render loop
     const data = useMemo(
-        () => (isLoaded && !isLoading ? response?.data ?? [] : []),
+        () =>
+            isLoaded &&
+            !isLoading &&
+            !isValidationErrorResponseData(response?.data)
+                ? response?.data ?? []
+                : [],
         [isLoaded, isLoading]
     );
 

@@ -11,21 +11,15 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Leaderboard.Services
 {
-    public class ClientFormField
+    /// <summary>
+    /// a mapping of html attributes keys and values. Stubbed as a class
+    /// in case we eventually want to pass down more than just attributes
+    /// </summary>
+    public class ClientFormField : Dictionary<string, string>
     {
-        /// <summary>
-        /// The client HTML tag name
-        /// </summary>
-        /// <value></value>
-        public string TagName { get; set; }
-
-        /// <summary>
-        /// The html attributes to apply to to the tag
-        /// </summary>
-        /// <typeparam name="string"></typeparam>
-        /// <typeparam name="string"></typeparam>
-        /// <returns></returns>
-        public Dictionary<string, string> Attributes;
+        public ClientFormField(IDictionary<string, string> dictionary) : base(dictionary)
+        {
+        }
     }
 
     /// <summary>
@@ -112,11 +106,8 @@ namespace Leaderboard.Services
                 var tagContext = new TagHelperContext(attrs, new Dictionary<object, object>(), Guid.NewGuid().ToString("N"));
                 var output = new TagHelperOutput("input", attrs, (_, e) => Task.FromResult<TagHelperContent>(new DefaultTagHelperContent()));
                 helper.ProcessAsync(tagContext, output);
-                propertyAttributes.Add(prop.Name, new ClientFormField
-                {
-                    TagName = output.TagName,
-                    Attributes = output.Attributes.ToDictionary(a => a.Name, a => $"{a.Value}")
-                });
+                propertyAttributes.Add(prop.Name, new ClientFormField(
+                    output.Attributes.ToDictionary(a => a.Name, a => $"{a.Value}")));
             }
 
             return new ClientFormFieldAttribuleMap<T>(propertyAttributes);

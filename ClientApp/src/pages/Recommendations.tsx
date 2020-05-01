@@ -20,6 +20,7 @@ import {
     renderHeader,
 } from '../Components/tables/render-utilities';
 import { useLoading } from '../hooks/useLoading';
+import { isValidationErrorResponseData } from '../types/ValidationErrorResponse';
 
 interface ServerData {
     user?: User;
@@ -32,7 +33,10 @@ const RecommendationsComponent: React.FC<{
     const { isLoading, loadAsync, response } = useLoading<ServerData>();
 
     const recommendations = useMemo(
-        () => response?.data?.recommendations ?? [],
+        () =>
+            !isValidationErrorResponseData(response?.data)
+                ? response?.data?.recommendations ?? []
+                : [],
         [response?.data]
     );
 

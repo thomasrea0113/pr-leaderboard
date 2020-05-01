@@ -11,15 +11,18 @@ import { User, UserView, Score } from '../../types/dotnet-types';
 import {
     SubmitScoreForm,
     SubmitScore,
+    isSubmitScore,
 } from '../../Components/forms/SubmitScoreForm';
 import { useFetchForm } from '../../hooks/useFetchForm';
-import { FieldProps } from '../../Components/forms/Validation';
 import { HttpMethodsEnum } from '../../types/types';
+import { isValidationErrorResponseData } from '../../types/ValidationErrorResponse';
+import { FormFieldProps } from '../../types/react-tag-props';
+import { useValidation } from '../../hooks/useValidation';
 
 interface Props {
     scoresUrl: string;
     submitScoreUrl: string;
-    fieldAttributes: FieldProps<SubmitScore>;
+    fieldAttributes: FormFieldProps<SubmitScore>;
 }
 
 interface State {
@@ -36,7 +39,9 @@ const ViewBoardComponent: React.FC<Props> = ({
     const { isLoading, isLoaded, loadAsync, response } = useLoading<State>();
     const formRef = useRef<HTMLFormElement>(null);
 
-    const [error, setError] = useState<unknown>();
+    const [error, setError] = useState<string>();
+
+    const validationInstance = useValidation<SubmitScore>({ formRef });
 
     const reloadAsync = () => loadAsync({ actionUrl: scoresUrl });
 
@@ -45,19 +50,13 @@ const ViewBoardComponent: React.FC<Props> = ({
         reloadAsync();
     }, []);
 
-    const {
-        board: {
-            id,
-            uom: { unit },
-        },
-        user,
-        scores,
-    } = response?.data ?? {
-        // the initial data. It's here for convient type assumptions made by the typescript transpiler
+    // the intial data, to display before load or in the vent of an error.
+    // just need to defined the properites so that we can spread it below
+    const initial = {
         board: {
             id: undefined,
             uom: {
-                unit: 'Kilograms',
+                unit: undefined,
             },
         },
         user: undefined,
@@ -65,18 +64,33 @@ const ViewBoardComponent: React.FC<Props> = ({
     };
 
     const {
+        board: {
+            id,
+            uom: { unit },
+        },
+        user,
+        scores,
+    } =
+        response?.data && !isValidationErrorResponseData(response.data)
+            ? response.data
+            : initial;
+
+    const {
         formDispatch,
         formProps,
         fieldAttributes: fieldProps,
         SubmitButton,
-        response: submitResponse,
+        loadingProps: { response: submitResponse },
     } = useFetchForm<SubmitScore>({
         actionUrl: submitScoreUrl,
         actionMethod: HttpMethodsEnum.POST,
         fieldAttributes,
         formRef,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        onSubmitError: (reason: any) => setError(reason),
+        guard: isSubmitScore,
+
+        validationInstance,
+
+        onSubmitError: (reason: Error) => setError(reason.message),
         onValidSubmit: () => {
             reloadAsync();
             formDispatch({ type: 'RESET_FORM' });
@@ -110,18 +124,21 @@ const ViewBoardComponent: React.FC<Props> = ({
             <h4>Scores</h4>
             {user != null ? (
                 <form {...formProps} className="form-sm mb-1" ref={formRef}>
-                    {submitResponse?.data != null ? (
+                    {submitResponse?.data != null &&
+                    !isValidationErrorResponseData(submitResponse.data) ? (
                         <span className="text-primary">
                             You&apos;re score has been submitted! It will appear
                             here once it has been been reviewed by an admin.
                         </span>
-                    ) : null}
-                    {error != null ? (
+                    ) : error != null ? (
                         <div className="text-danger mb-2">
-                            Oops! Looks like something went wrong. {`${error}`}
+                            Oops! Looks like something went wrong. {error}
                         </div>
                     ) : null}
-                    <SubmitScoreForm fieldAttributes={fieldProps} unit={unit} />
+                    <SubmitScoreForm
+                        fieldAttributes={fieldProps}
+                        unit={unit ?? 'Kilograms'}
+                    />
                     <SubmitButton className="btn btn-primary">
                         Submit
                     </SubmitButton>
@@ -130,7 +147,7 @@ const ViewBoardComponent: React.FC<Props> = ({
             <ScoreTable
                 reloadAsync={reloadAsync}
                 scores={scores ?? []}
-                unit={unit}
+                unit={unit ?? 'Kilograms'}
             />
         </>
     );

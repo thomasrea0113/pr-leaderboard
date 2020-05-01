@@ -1,79 +1,57 @@
-import React, {
-    useReducer,
-    ChangeEventHandler,
-    RefObject,
-    useMemo,
-} from 'react';
+import React, { useReducer, ChangeEventHandler, RefObject } from 'react';
 import flow from 'lodash/fp/flow';
-import mapKeys from 'lodash/fp/mapKeys';
-import upperFirst from 'lodash/fp/upperFirst';
-import { neverReached } from '../utilities/neverReached';
-import {
-    FieldProps,
-    FormValues,
-    fieldValues,
-    mergeAttributes,
-} from '../Components/forms/Validation';
-import { useLoading, TypedResponse } from './useLoading';
+import toPairs from 'lodash/fp/toPairs';
+import map from 'lodash/fp/map';
+import fromPairs from 'lodash/fp/fromPairs';
+
+import { useLoading, UseLoading } from './useLoading';
 import { HttpMethodsEnum } from '../types/types';
 import { LoadingIcon } from '../Components/StyleComponents';
+import {
+    ReactFormProps,
+    ReactButtonProps,
+    FormFieldProps,
+    FormFieldValues,
+    ReactFormFieldProps,
+    HTMLInputValue,
+} from '../types/react-tag-props';
+import {
+    FormActions,
+    fetchFormReducerGenerator,
+    FetchFormReducerState,
+    FieldValue,
+    mergeFieldValue,
+} from '../Components/reducers/useFetchFormReducers';
+import { ValidationInstance } from './useValidation';
+import { isValidationErrorResponseData } from '../types/ValidationErrorResponse';
 
-export type ReactFormProps = React.DetailedHTMLProps<
-    React.FormHTMLAttributes<HTMLFormElement>,
-    HTMLFormElement
->;
-
-export interface Action {
-    readonly type: string;
-}
-
-export interface FieldValue<T> {
-    property: keyof T;
-    value: string;
-}
-
-export interface UpdateFieldAction<T> extends Action {
-    readonly type: 'UPDATE_FIELD';
-    readonly field: FieldValue<T>;
-}
-
-export interface UpdateFieldsAction<T> extends Action {
-    readonly type: 'UPDATE_FIELDS';
-    readonly fields: FieldValue<T>[];
-}
-
-export interface ResetForm extends Action {
-    readonly type: 'RESET_FORM';
-}
-
-export type FormActions<T> =
-    | UpdateFieldsAction<T>
-    | UpdateFieldAction<T>
-    | ResetForm;
-
-export type Button = React.FC<
-    React.DetailedHTMLProps<
-        React.ButtonHTMLAttributes<HTMLButtonElement>,
-        HTMLButtonElement
-    >
->;
-
-export interface FetchForm<T, R = unknown> {
+/**
+ * The FetchForm instance. T is the type of the form, the type that is
+ * returned from the server
+ */
+export interface FetchForm<T> {
     formProps: ReactFormProps;
     formDispatch: React.Dispatch<FormActions<T>>;
-    fieldAttributes: FieldProps<T>;
-    isSubmitting: boolean;
-    submitForm: () => boolean;
-    SubmitButton: Button;
-    response?: TypedResponse<R>;
+    fieldAttributes: FormFieldProps<T>;
+
+    /**
+     * submits the form, and returns a promise that indicates whether or not
+     * the form was submitted
+     */
+    submitForm: () => Promise<boolean>;
+    SubmitButton: ReactButtonProps;
+    loadingProps: UseLoading<T>;
 }
 
+/**
+ * props to be passed to useFetchForm
+ */
 export interface UseFetchFormProps<T> {
     actionUrl: string;
     actionMethod: HttpMethodsEnum;
 
-    fieldAttributes?: FieldProps<T>;
-    initialValues?: FormValues<T>;
+    fieldAttributes?: FormFieldProps<T>;
+    initialValues?: FormFieldValues<T>;
 
     // if provided, automatic validation will be performed
     formRef?: RefObject<HTMLFormElement>;
@@ -81,93 +59,87 @@ export interface UseFetchFormProps<T> {
     onValidSubmit?: (value: void) => void | PromiseLike<void>;
 
     // this is the signature for catching a promise
+    onSubmitError?: (reason: Error) => void;
+
+    /**
+     * gaurd the data returned after submit
+     */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onSubmitError?: (reason: any) => any;
+    guard?: (responseData: any) => responseData is T;
+
+    /**
+     * if provided, will enforce form validation
+     */
+    validationInstance?: ValidationInstance<T>;
 }
 
-export const fetchFormReducerGenerator = <T extends {}>() => (
-    state: FieldProps<T>,
-    reducerAction: FormActions<T>
-): FieldProps<T> => {
-    // a function which updates just the specified field state
-    const getFieldState = (field: FieldValue<T>) =>
-        // TODO the typing wouldn't pick up that these are compatible, so I explicitly typed it
-        // eslint-disable-next-line @typescript-eslint/no-object-literal-type-assertion
-        ({
-            [field.property]: {
-                ...state[field.property],
-                attributes: {
-                    ...state[field.property]?.attributes,
-                    value: field.value,
-                },
-            },
-        } as FieldProps<T>);
-
-    switch (reducerAction.type) {
-        case 'UPDATE_FIELD':
-            return {
-                ...state,
-                ...getFieldState(reducerAction.field),
-            };
-        case 'UPDATE_FIELDS': {
-            // fist, map all the fields to there updated state, then reduce
-            // to a single instance of FieldProps, and finally merge with
-            // existing state.
-            const fields = reducerAction.fields
-                .map(getFieldState)
-                .reduce((s: FieldProps<T>, p) => ({ ...s, ...p }));
-            return {
-                ...state,
-                ...fields,
-            };
-        }
-        // reset all form values
-        case 'RESET_FORM':
-            return mergeAttributes(state, () => ({ value: '' }));
-        default:
-            // If you don't handle all possible values for action.type, ESLint will complain here
-            neverReached(reducerAction);
-    }
-    return state;
-};
+/**
+ * extracts just the form values
+ */
+const getFormValues = <T extends {}>(
+    props: FormFieldProps<T>
+): FormFieldValues<T> =>
+    Object.keys(props).reduce<FormFieldValues<T>>((values, p) => {
+        // we know p is a key of T, based on the type of props
+        const pKey = p as keyof T;
+        const propAtributes: ReactFormFieldProps | undefined = props[pKey];
+        return {
+            ...values,
+            [pKey]: propAtributes?.value,
+        };
+    }, {});
 
 /**
  * A hook that allows for easily converting any form to an asyncronous fetch operation
  * @param props props needed for fetch overloads
  */
-export const useFetchForm = <T extends {}, R = unknown>({
+export const useFetchForm = <T extends {}>({
     actionUrl,
     actionMethod,
 
     fieldAttributes,
     initialValues,
-    formRef,
     onValidSubmit,
     onSubmitError: onError,
-}: UseFetchFormProps<T>): FetchForm<T, R> => {
-    const initialAttributes =
-        initialValues != null && fieldAttributes != null
-            ? mergeAttributes(fieldAttributes, ([k]) => {
-                  // only set the value if it was provided in initial
-                  if (initialValues[k] != null)
-                      return {
-                          value: initialValues[k],
-                      };
-                  return {};
-              })
-            : fieldAttributes;
+    validationInstance,
+    guard,
+}: UseFetchFormProps<T>): FetchForm<T> => {
+    const { validator, showErrors } = { ...validationInstance };
 
+    const initialReducerState: FetchFormReducerState<T> = {
+        triggerSubmit: 0,
+        props: fieldAttributes ?? {},
+    };
+
+    // if initial values are provided, convert them to a FieldValue array
+    const initialFieldValues =
+        initialValues != null
+            ? Object.keys(initialValues).map<FieldValue<T>>(k => {
+                  const fieldKey = k as keyof T;
+                  const initialValue = initialValues[fieldKey];
+                  return {
+                      property: fieldKey,
+                      value: initialValue,
+                  };
+              })
+            : null;
+
+    // initialize reducer
     const [formState, formDispatch] = useReducer(
         fetchFormReducerGenerator<T>(),
         // if initial values are provided, we need to merge it into the
         // attributes before initializing the state
-        initialAttributes ?? {}
+        initialFieldValues != null
+            ? initialFieldValues.reduce(mergeFieldValue, initialReducerState)
+            : initialReducerState
     );
 
     // a convenient function to generate an onChange event hanlder for
     // a given property of T
     const onChangeGenerator = (property: keyof T) => {
-        const evt: ChangeEventHandler<HTMLInputElement> = ({
+        // we don't care what type of event we're handling, as long as
+        // the element has an input value attribute
+        const evt: ChangeEventHandler<{ value: HTMLInputValue }> = ({
             currentTarget: { value },
         }) =>
             formDispatch({
@@ -180,34 +152,21 @@ export const useFetchForm = <T extends {}, R = unknown>({
         return evt;
     };
 
-    const { isLoading, response, loadAsync } = useLoading<R>();
+    const loadingProps = useLoading<T>({ guard });
+    const { isLoading, loadAsync, response } = loadingProps;
 
-    const fieldProps = mergeAttributes(formState, ([k]) => ({
-        onChange: onChangeGenerator(k),
-        disabled: isLoading,
-    }));
+    // merge in the onChange generator, and disabled property
+    type ReactFormFieldPropPair = [keyof T, ReactFormFieldProps];
+    const fieldProps: FormFieldProps<T> = flow(
+        toPairs,
+        map<ReactFormFieldPropPair, ReactFormFieldPropPair>(([k, v]) => [
+            k,
+            { ...v, onChange: onChangeGenerator(k), disabled: isLoading },
+        ]),
+        fromPairs
+    )(formState.props);
 
-    const validator = useMemo(() => {
-        if (formRef?.current != null) {
-            $.validator.unobtrusive.parse(formRef.current);
-            return $(formRef.current).validate();
-        }
-        return null;
-    }, [formRef?.current]);
-
-    if (
-        formRef?.current != null &&
-        response != null &&
-        response.errorData?.errors != null
-    )
-        validator?.showErrors(
-            flow(
-                // mapValues(join(', ')), // convert array of errors to single string
-                mapKeys(upperFirst) // the form expects TitleCase
-            )(response.errorData.errors)
-        );
-
-    const SubmitButton: Button = props => {
+    const SubmitButton: ReactButtonProps = props => {
         const { children } = props;
         return (
             <button {...props} type="submit" disabled={isLoading}>
@@ -217,14 +176,10 @@ export const useFetchForm = <T extends {}, R = unknown>({
         );
     };
 
-    const submitForm = () => {
-        // if formRef is null, then validation isn't enabled. Otherwise, we take
-        // the result of the validation
-        const canSubmit = formRef == null || validator?.form() === true;
-
-        if (canSubmit) {
-            const formValues = fieldValues(formState);
-            loadAsync({
+    const submitForm = (): Promise<boolean> => {
+        if (validator == null || validator.form()) {
+            const formValues = getFormValues(formState.props);
+            return loadAsync({
                 actionUrl,
                 actionMethod,
                 body: JSON.stringify(formValues),
@@ -233,26 +188,31 @@ export const useFetchForm = <T extends {}, R = unknown>({
                 },
             })
                 .then(onValidSubmit)
-                .catch(onError);
-            return true;
+                .catch(onError)
+                .then(() => true); // this is here to prevent the returned promised from having any information
         }
-        return false;
+        return new Promise(() => false);
     };
+
+    if (
+        showErrors != null &&
+        response?.data != null &&
+        isValidationErrorResponseData<T>(response.data)
+    )
+        showErrors(response.data.errors);
 
     return {
         formProps: {
             onSubmit: async e => {
-                // if formRef is null, then validation isn't enabled. Otherwise, we take
-                // the result of the validation
+                // make sure the form submits using our handler
                 e.preventDefault();
                 submitForm();
             },
         },
         formDispatch,
         submitForm,
+        loadingProps,
         SubmitButton,
         fieldAttributes: fieldProps,
-        isSubmitting: isLoading,
-        response,
     };
 };
