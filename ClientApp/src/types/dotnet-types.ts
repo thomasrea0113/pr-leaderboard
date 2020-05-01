@@ -87,7 +87,7 @@ export interface UnitOfMeasure {
 export interface Score {
     id: string;
     isApproved: boolean;
-    leaderboardId: string;
+    boardId: string;
     userId: string;
     value: number;
 }

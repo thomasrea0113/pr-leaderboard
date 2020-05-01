@@ -6,7 +6,7 @@ export const isScore = (obj: any): obj is Score => {
     if (
         score != null &&
         typeof score.id === 'string' &&
-        typeof score.leaderboardId === 'string' &&
+        typeof score.boardId === 'string' &&
         typeof score.userId === 'string' &&
         typeof score.value === 'number' &&
         typeof score.isApproved === 'boolean'

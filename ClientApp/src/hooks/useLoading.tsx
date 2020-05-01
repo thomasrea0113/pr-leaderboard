@@ -109,6 +109,11 @@ export const useLoading = <D extends {}>(
                     body,
                 })
                     .then(async resp => {
+                        if (!resp.ok)
+                            throw new Error(
+                                `(${resp.status}) ${resp.statusText}`
+                            );
+
                         const data = await resp.json();
 
                         // ensure that the response data was either the type we expected,
@@ -141,7 +146,10 @@ export const useLoading = <D extends {}>(
                             resolve(fullfilled);
                         },
                         error => {
-                            mergeState({ isLoading: false });
+                            mergeState({
+                                response: undefined,
+                                isLoading: false,
+                            });
                             return reject(error);
                         }
                     );

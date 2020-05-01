@@ -64,7 +64,7 @@ export const ApproveScoreComponent: React.FC<{}> = () => {
         {
             Header: 'Leaderboard',
             id: 'leaderboard',
-            accessor: s => s.leaderboardId,
+            accessor: s => s.boardId,
         },
         {
             Header: 'Approve',

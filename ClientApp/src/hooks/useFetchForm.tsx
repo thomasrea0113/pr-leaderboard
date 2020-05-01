@@ -26,10 +26,10 @@ import { ValidationInstance } from './useValidation';
 import { isValidationErrorResponseData } from '../types/ValidationErrorResponse';
 
 /**
- * The FetchForm instance. T is the type of the form, the type that is
+ * The FetchForm instance. T is the type of the form, R is the type that is
  * returned from the server
  */
-export interface FetchForm<T> {
+export interface FetchForm<T, R = T> {
     formProps: ReactFormProps;
     formDispatch: React.Dispatch<FormActions<T>>;
     fieldAttributes: FormFieldProps<T>;
@@ -40,13 +40,14 @@ export interface FetchForm<T> {
      */
     submitForm: () => Promise<boolean>;
     SubmitButton: ReactButtonProps;
-    loadingProps: UseLoading<T>;
+    loadingProps: UseLoading<R>;
 }
 
 /**
- * props to be passed to useFetchForm
+ * props to be passed to useFetchForm. T is the type of the posted
+ * object, R is the response object
  */
-export interface UseFetchFormProps<T> {
+export interface UseFetchFormProps<T, R = T> {
     actionUrl: string;
     actionMethod: HttpMethodsEnum;
 
@@ -59,13 +60,14 @@ export interface UseFetchFormProps<T> {
     onValidSubmit?: (value: void) => void | PromiseLike<void>;
 
     // this is the signature for catching a promise
-    onSubmitError?: (reason: Error) => void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onSubmitError?: (reason: any) => void;
 
     /**
      * gaurd the data returned after submit
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    guard?: (responseData: any) => responseData is T;
+    guard?: (responseData: any) => responseData is R;
 
     /**
      * if provided, will enforce form validation
@@ -93,7 +95,7 @@ const getFormValues = <T extends {}>(
  * A hook that allows for easily converting any form to an asyncronous fetch operation
  * @param props props needed for fetch overloads
  */
-export const useFetchForm = <T extends {}>({
+export const useFetchForm = <T extends {}, R = T>({
     actionUrl,
     actionMethod,
 
@@ -103,7 +105,7 @@ export const useFetchForm = <T extends {}>({
     onSubmitError: onError,
     validationInstance,
     guard,
-}: UseFetchFormProps<T>): FetchForm<T> => {
+}: UseFetchFormProps<T, R>): FetchForm<T, R> => {
     const { validator, showErrors } = { ...validationInstance };
 
     const initialReducerState: FetchFormReducerState<T> = {
@@ -152,7 +154,7 @@ export const useFetchForm = <T extends {}>({
         return evt;
     };
 
-    const loadingProps = useLoading<T>({ guard });
+    const loadingProps = useLoading<R>({ guard });
     const { isLoading, loadAsync, response } = loadingProps;
 
     // merge in the onChange generator, and disabled property

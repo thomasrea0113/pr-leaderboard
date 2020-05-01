@@ -7,7 +7,7 @@ namespace Leaderboard.Areas.Leaderboards.ViewModels
     {
         public string Id { get; set; }
         public bool IsApproved { get; set; }
-        public string LeaderboardId { get; set; }
+        public string BoardId { get; set; }
         public string UserId { get; set; }
         public decimal Value { get; set; }
 
@@ -15,7 +15,7 @@ namespace Leaderboard.Areas.Leaderboards.ViewModels
         {
             Id = score.Id;
             IsApproved = score.IsApproved;
-            LeaderboardId = score.BoardId;
+            BoardId = score.BoardId;
             UserId = score.UserId;
             Value = score.Value;
         }

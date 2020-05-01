@@ -5,19 +5,20 @@ import React, { useEffect, useRef, useState } from 'react';
 // import $ from 'jquery';
 
 import 'react-dom'; // only needed if this is to be placed directly on the page
+import { isError } from 'util';
 import { ScoreTable } from '../../Components/tables/ScoreTable';
 import { useLoading } from '../../hooks/useLoading';
 import { User, UserView, Score } from '../../types/dotnet-types';
 import {
     SubmitScoreForm,
     SubmitScore,
-    isSubmitScore,
 } from '../../Components/forms/SubmitScoreForm';
 import { useFetchForm } from '../../hooks/useFetchForm';
 import { HttpMethodsEnum } from '../../types/types';
 import { isValidationErrorResponseData } from '../../types/ValidationErrorResponse';
 import { FormFieldProps } from '../../types/react-tag-props';
 import { useValidation } from '../../hooks/useValidation';
+import { isScore } from '../../types/guards/isScore';
 
 interface Props {
     scoresUrl: string;
@@ -81,16 +82,19 @@ const ViewBoardComponent: React.FC<Props> = ({
         fieldAttributes: fieldProps,
         SubmitButton,
         loadingProps: { response: submitResponse },
-    } = useFetchForm<SubmitScore>({
+    } = useFetchForm<SubmitScore, Score>({
         actionUrl: submitScoreUrl,
         actionMethod: HttpMethodsEnum.POST,
         fieldAttributes,
         formRef,
-        guard: isSubmitScore,
+        guard: isScore,
 
         validationInstance,
 
-        onSubmitError: (reason: Error) => setError(reason.message),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        onSubmitError: (reason: any) => {
+            if (isError(reason)) setError(reason.message);
+        },
         onValidSubmit: () => {
             reloadAsync();
             formDispatch({ type: 'RESET_FORM' });
