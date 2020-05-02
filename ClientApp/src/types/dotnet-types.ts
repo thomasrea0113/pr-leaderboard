@@ -76,6 +76,8 @@ export interface User {
     userName: string;
     email?: string;
     isAdmin: boolean;
+    // TODO these should probably be nullable in case we don't
+    // want to always return this data
     interests: Category[];
     leaderboards: Leaderboard[];
 }

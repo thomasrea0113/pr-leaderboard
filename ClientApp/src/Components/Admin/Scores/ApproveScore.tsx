@@ -9,15 +9,15 @@ import {
     useExpanded,
     Column,
 } from 'react-table';
-import { useLoading } from '../../hooks/useLoading';
-import { Score } from '../../types/dotnet-types';
-import { renderHeader, getRowRender } from '../tables/render-utilities';
-import { ScoreColumns } from '../tables/columns/score-columns';
-import { useFetchForm } from '../../hooks/useFetchForm';
-import { HttpMethodsEnum } from '../../types/types';
-import { isValidationErrorResponseData } from '../../types/ValidationErrorResponse';
-import { isArrayOf } from '../../types/guards/isArrayOf';
-import { isScore } from '../../types/guards/isScore';
+import { useLoading } from '../../../hooks/useLoading';
+import { Score } from '../../../types/dotnet-types';
+import { renderHeader, getRowRender } from '../../tables/render-utilities';
+import { ScoreColumns } from '../../tables/columns/score-columns';
+import { useFetchForm } from '../../../hooks/useFetchForm';
+import { HttpMethodsEnum } from '../../../types/types';
+import { isValidationErrorResponseData } from '../../../types/ValidationErrorResponse';
+import { isArrayOf } from '../../../types/guards/isArrayOf';
+import { isScore } from '../../../types/guards/isScore';
 
 interface ApproveScore {
     ids: string[];

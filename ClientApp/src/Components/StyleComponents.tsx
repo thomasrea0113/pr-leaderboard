@@ -165,12 +165,12 @@ export interface TableSortProps {
 export const Sorter: React.FC<TableSortProps> = ({ toggleSortProps, sort }) => (
     <span {...toggleSortProps}>
         <i
-            className={`fa fa-caret-up fa-lg${
+            className={`fa fa-caret-down fa-lg${
                 sort === true ? ` ${activeClass}` : ` ${inactiveClass}`
             }`}
         />
         <i
-            className={`fa fa-caret-down fa-lg${
+            className={`fa fa-caret-up fa-lg${
                 sort === false ? ` ${activeClass}` : ` ${inactiveClass}`
             }`}
         />
