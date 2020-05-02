@@ -6,6 +6,8 @@ namespace Leaderboard
 {
     public class AppConfiguration
     {
+        public NavConfiguration Nav { get; set; } = new NavConfiguration();
+
         public string HomeBackgroundUrl { get; set; }
         public string[] AdminUsers { get; set; } = Array.Empty<string>();
         public MigrationConfiguration AutoMigrate { get; set; } = new MigrationConfiguration();
@@ -16,6 +18,11 @@ namespace Leaderboard
         /// </summary>
         /// <returns></returns>
         public MultipartModelBinderConfig MultipartModelBinder { get; set; } = new MultipartModelBinderConfig();
+    }
+
+    public class NavConfiguration
+    {
+        public string BrandImage { get; set; } = "/images/brand.png";
     }
 
     public class MigrationConfiguration

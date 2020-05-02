@@ -1,4 +1,6 @@
 ﻿@inject Leaderboard.Services.IMessageQueue Messages
+@inject Microsoft.Extensions.Options.IOptionsSnapshot<Leaderboard.AppConfiguration> config
+@inject Microsoft.AspNetCore.Routing.LinkGenerator link
 
 @{
     var modalAction = ViewData["DataModalAction"] ?? "?handler=modal";
@@ -8,6 +10,7 @@
     var modalBackdrop = allowModalClose ? "true" : "static";
     var modalCancelText = ViewData["ModalCancelText"] ?? "Cancel";
     var modalConfirmText = ViewData["ModalConfirmText"] ?? "Confirm";
+    var brandImage = config.Value.Nav.BrandImage;
 }
 
 <!DOCTYPE html>
@@ -24,7 +27,10 @@
 <body>
     <header>
         <nav class="navbar fixed-top navbar-bold navbar-expand-sm navbar-toggleable-sm box-shadow">
-            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Leaderboard</a>
+            
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                <img src="@brandImage" class="row">
+            </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>

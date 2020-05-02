@@ -55,7 +55,7 @@ const HomeComponent: React.FC<ReactProps> = ({ initialUrl }) => {
         : [];
 
     return (
-        <>
+        <div className="navbar-fixed-offset">
             {/* TODO animate welcome text shift after featured load */}
             {isLoading || !delayed ? (
                 <h1 className="animate-fadeinup">Welcome...</h1>
@@ -83,7 +83,7 @@ const HomeComponent: React.FC<ReactProps> = ({ initialUrl }) => {
                     </div>
                 </>
             )}
-        </>
+        </div>
     );
 };
 
