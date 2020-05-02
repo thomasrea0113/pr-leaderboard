@@ -537,7 +537,7 @@ namespace Leaderboard.Migrations
                     b.ToTable("UserLeaderboards");
                 });
 
-            modelBuilder.Entity("SampleApp.Models.AppFile", b =>
+            modelBuilder.Entity("Leaderboard.Areas.Uploads.Models.AppFile", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -682,7 +682,7 @@ namespace Leaderboard.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SampleApp.Models.AppFile", "VideoProof")
+                    b.HasOne("Leaderboard.Areas.Uploads.Models.AppFile", "VideoProof")
                         .WithMany()
                         .HasForeignKey("VideoProofId");
                 });
@@ -713,7 +713,7 @@ namespace Leaderboard.Migrations
                         .HasForeignKey("UserId");
                 });
 
-            modelBuilder.Entity("SampleApp.Models.AppFile", b =>
+            modelBuilder.Entity("Leaderboard.Areas.Uploads.Models.AppFile", b =>
                 {
                     b.HasOne("Leaderboard.Areas.Identity.Models.ApplicationUser", "CreatedBy")
                         .WithMany("UploadedFiles")

@@ -7,7 +7,7 @@ using Leaderboard.Models.Relationships;
 using System.Threading.Tasks;
 using System.Threading;
 using Leaderboard.Areas.Leaderboards.Models;
-using SampleApp.Models;
+using Leaderboard.Areas.Uploads.Models;
 using Leaderboard.Areas.Identity.Models;
 
 namespace Leaderboard.Data

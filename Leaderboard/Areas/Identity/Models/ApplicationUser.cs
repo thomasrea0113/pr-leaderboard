@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Leaderboard.Utilities.Extensions;
-using SampleApp.Models;
+using Leaderboard.Areas.Uploads.Models;
 
 namespace Leaderboard.Areas.Identity.Models
 {

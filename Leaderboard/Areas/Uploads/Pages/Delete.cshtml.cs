@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.FileProviders;
 
-namespace SampleApp.Pages
+namespace Leaderboard.Areas.Uploads.Pages
 {
     public class DeleteModel : PageModel
     {

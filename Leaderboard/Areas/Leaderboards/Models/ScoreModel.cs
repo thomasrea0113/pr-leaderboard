@@ -3,7 +3,7 @@ using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Models.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SampleApp.Models;
+using Leaderboard.Areas.Uploads.Models;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Leaderboard.Areas.Leaderboards.Models

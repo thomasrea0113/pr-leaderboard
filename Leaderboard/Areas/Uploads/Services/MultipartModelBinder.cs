@@ -13,8 +13,8 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Net.Http.Headers;
-using SampleApp.Utilities;
-using static SampleApp.Utilities.FileHelpers;
+using Leaderboard.Areas.Uploads.Utilities;
+using static Leaderboard.Areas.Uploads.Utilities.FileHelpers;
 
 namespace Leaderboard.Areas.Uploads.Utilities
 {

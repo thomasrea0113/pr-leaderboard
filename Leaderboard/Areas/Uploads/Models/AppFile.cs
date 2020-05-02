@@ -5,7 +5,7 @@ using Leaderboard.Data;
 using Leaderboard.Models.Features;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace SampleApp.Models
+namespace Leaderboard.Areas.Uploads.Models
 {
     public class AppFile : IDbEntity<AppFile>
     {

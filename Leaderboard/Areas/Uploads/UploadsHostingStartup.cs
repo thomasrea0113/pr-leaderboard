@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
-using SampleApp.Filters;
+using Leaderboard.Areas.Uploads.Filters;
 
-[assembly: HostingStartup(typeof(SampleApp.UploadsHostingStartup))]
+[assembly: HostingStartup(typeof(Leaderboard.Areas.Uploads.UploadsHostingStartup))]
 
-namespace SampleApp
+namespace Leaderboard.Areas.Uploads
 {
     public class UploadsHostingStartup : IHostingStartup
     {

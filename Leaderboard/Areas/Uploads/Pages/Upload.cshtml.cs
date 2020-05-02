@@ -13,9 +13,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
-using SampleApp.Models;
+using Leaderboard.Areas.Uploads.Models;
 
-namespace SampleApp.Pages
+namespace Leaderboard.Areas.Uploads.Pages
 {
     public class UploadModel : PageModel
     {

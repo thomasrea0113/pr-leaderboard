@@ -16,7 +16,7 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Net.Http.Headers;
 
-namespace SampleApp.Utilities
+namespace Leaderboard.Areas.Uploads.Utilities
 {
     public static class FileHelpers
     {
