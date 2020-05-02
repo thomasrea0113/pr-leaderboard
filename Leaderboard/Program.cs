@@ -3,10 +3,10 @@ using Leaderboard.Areas.Identity.Managers;
 using Leaderboard.Extensions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Leaderboard
 {
@@ -19,17 +19,16 @@ namespace Leaderboard
             using (var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
-                var config = services.GetRequiredService<IConfiguration>();
+                var config = services.GetRequiredService<IOptions<AppConfiguration>>().Value;
                 var env = services.GetRequiredService<IWebHostEnvironment>().EnvironmentName;
 
                 // TODO log seed, catch Migrate exception and notify user that no changes to the database were applied
-                if (config.GetValue("AutoMigrate:Enabled", false))
-                    await services.MigrateAsync(env, config.GetValue("AutoMigrate:AutoSeed", false));
+                if (config.AutoMigrate.Enabled)
+                    await services.MigrateAsync(env, config.AutoMigrate.AutoSeed);
 
                 // make sure the admin users in the appSettings are in the admin role
                 await services.GetRequiredService<AppUserManager>()
-                    .EnsureAdminUsersAsync(config.GetSection("AdminUsers").Get<string[]>());
-
+                    .EnsureAdminUsersAsync(config.AdminUsers);
             }
 
             await host.RunAsync();

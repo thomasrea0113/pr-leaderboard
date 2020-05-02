@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Leaderboard.Services
 {
@@ -23,14 +24,14 @@ namespace Leaderboard.Services
         private readonly SmtpClient _mailer;
         private readonly SmtpEmailSenderConfig _config = new SmtpEmailSenderConfig();
 
-        public SmtpEmailSender(ILogger<SmtpEmailSender> logger, IConfiguration config)
+        public SmtpEmailSender(ILogger<SmtpEmailSender> logger, IOptionsSnapshot<AppConfiguration> config)
         {
             _logger = logger;
 
-            config.Bind("Mail", _config);
-            
+            _config = config.Value.Mail;
+
             if (_config.Password == null)
-                throw new ArgumentNullException("No mail password specified. Did you run 'dotnet user-secrets set \"Mail:Password\" \"<PASSWORD>\"' from the project root?");
+                throw new ArgumentNullException("No mail password specified. Did you run 'dotnet user-secrets set \"AppSettings:Mail:Password\" \"<PASSWORD>\"' from the project root?");
 
             _mailer = new SmtpClient(_config.Host, _config.Port)
             {

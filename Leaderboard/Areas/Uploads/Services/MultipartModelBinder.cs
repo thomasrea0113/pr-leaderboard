@@ -2,18 +2,16 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using Leaderboard.Areas.Uploads.Exceptions;
 using Leaderboard.Areas.Uploads.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
-using Leaderboard.Areas.Uploads.Utilities;
 using static Leaderboard.Areas.Uploads.Utilities.FileHelpers;
 
 namespace Leaderboard.Areas.Uploads.Utilities
@@ -36,10 +34,9 @@ namespace Leaderboard.Areas.Uploads.Utilities
     {
         private readonly MultipartModelBinderConfig _defaultFormOptions;
 
-        public MultipartModelBinder(IConfiguration config)
+        public MultipartModelBinder(IOptions<AppConfiguration> config)
         {
-            _defaultFormOptions = new MultipartModelBinderConfig();
-            config.Bind(nameof(MultipartModelBinder), _defaultFormOptions);
+            _defaultFormOptions = config.Value.MultipartModelBinder;
         }
 
         public async Task<(IFileInfo, FormValueProvider)> ProcessMultipartRequestAsync(

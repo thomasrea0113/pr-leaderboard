@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Leaderboard.ViewModels;
 using Leaderboard.Areas.Leaderboards.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace Leaderboard.Pages
 {
@@ -33,10 +34,10 @@ namespace Leaderboard.Pages
         [BindProperty]
         public ReactProps Props { get; set; }
 
-        public Index(AppUserManager manager, IConfiguration config)
+        public Index(AppUserManager manager, IOptionsSnapshot<AppConfiguration> config)
         {
             _manager = manager;
-            _bgUrl = config.GetValue<string>("HomeBackgroundUrl");
+            _bgUrl = config.Value.HomeBackgroundUrl;
         }
 
         public void Initialize()

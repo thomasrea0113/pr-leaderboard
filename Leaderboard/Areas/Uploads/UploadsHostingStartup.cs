@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Leaderboard.Areas.Uploads.Filters;
+using Microsoft.Extensions.Options;
 
 [assembly: HostingStartup(typeof(Leaderboard.Areas.Uploads.UploadsHostingStartup))]
 
@@ -33,8 +34,7 @@ namespace Leaderboard.Areas.Uploads
 
             services.AddSingleton<ICreatableFileProvider>(p =>
             {
-                var configObject = new MultipartModelBinderConfig();
-                p.GetRequiredService<IConfiguration>().Bind(nameof(MultipartModelBinder), configObject);
+                var configObject = p.GetRequiredService<IOptions<AppConfiguration>>().Value.MultipartModelBinder;
 
                 var path = new Uri(configObject.StoredFilesPath, UriKind.Absolute);
                 Directory.CreateDirectory(path.AbsolutePath);
