@@ -10,6 +10,7 @@ import { isValidationErrorResponseData } from '../types/ValidationErrorResponse'
 
 interface ReactProps {
     initialUrl: string;
+    backgroundImage: string;
 }
 
 interface ServerData {

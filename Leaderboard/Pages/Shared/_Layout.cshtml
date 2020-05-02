@@ -22,18 +22,6 @@
 </head>
 
 <body>
-    @* <div id="sidebar" class="bg-light border-right">
-        <div class="sidebar-heading">Start Bootstrap</div>
-        <div class="list-group list-group-flush">
-            <a href="#" class="list-group-item list-group-item-action bg-light">Dashboard</a>
-            <a href="#" class="list-group-item list-group-item-action bg-light">Shortcuts</a>
-            <a href="#" class="list-group-item list-group-item-action bg-light">Overview</a>
-            <a href="#" class="list-group-item list-group-item-action bg-light">Events</a>
-            <a href="#" class="list-group-item list-group-item-action bg-light">Profile</a>
-            <a href="#" class="list-group-item list-group-item-action bg-light">Status</a>
-        </div>
-        <div class="sidebar-slider" data-toggle-class="expanded" data-toggle-target="#sidebar">Actions</div>
-    </div> *@
     <header>
         <nav class="navbar fixed-top navbar-bold navbar-expand-sm navbar-toggleable-sm box-shadow">
             <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Leaderboard</a>
@@ -50,13 +38,8 @@
                     <li class="nav-item">
                         <a class="nav-link" asp-area="" asp-page="/Contact">Contact</a>
                     </li>
-                    <li class="nav-item dropdown text-danger">
-                        <a class="nav-link dropdown-toggle" asp-area="Admin" asp-page="/Index" id="navbarDropdown" data-toggle="dropdown">
-                        Admin
-                        </a>
-                        <div class="dropdown-menu">
-                        <a class="dropdown-item" asp-area="Admin" asp-page="/Index" asp-route-action="ApproveScore">Approve Scores</a>
-                        </div>
+                    <li class="nav-item">
+                        <a class="nav-link admin-link" asp-area="Admin" asp-page="/Index">Admin</a>
                     </li>
                 </ul>
             </div>

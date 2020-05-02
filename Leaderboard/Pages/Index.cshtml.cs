@@ -7,16 +7,19 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Leaderboard.ViewModels;
 using Leaderboard.Areas.Leaderboards.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace Leaderboard.Pages
 {
     public class Index : PageModel
     {
         private readonly AppUserManager _manager;
+        private readonly string _bgUrl;
 
         public class ReactProps
         {
             public string InitialUrl { get; set; }
+            public string BackgroundImage { get; set; }
         }
 
         /// <summary>
@@ -30,16 +33,18 @@ namespace Leaderboard.Pages
         [BindProperty]
         public ReactProps Props { get; set; }
 
-        public Index(AppUserManager manager)
+        public Index(AppUserManager manager, IConfiguration config)
         {
             _manager = manager;
+            _bgUrl = config.GetValue<string>("HomeBackgroundUrl");
         }
 
         public void Initialize()
         {
             Props ??= new ReactProps
             {
-                InitialUrl = Url.Page(null, "initial")
+                InitialUrl = Url.Page(null, "initial"),
+                BackgroundImage = _bgUrl
             };
         }
 

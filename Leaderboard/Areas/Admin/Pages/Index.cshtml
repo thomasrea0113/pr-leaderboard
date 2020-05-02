@@ -12,5 +12,7 @@ app can handle 404s (see Startup.cs)
     Layout = "/Pages/Shared/_Layout.cshtml";
 }
 
+@section scripts {
 <react-bundle src="js/admin.[hash].js" />
 <react-component component-name="admin" />
+}

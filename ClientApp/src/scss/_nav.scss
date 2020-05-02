@@ -12,8 +12,12 @@
     padding-right: $navbar-brand-padding-y;
     padding-bottom: 0rem;
 
-    * {
+    .nav-link {
         @extend .text-dark;
+
+        &.admin-link {
+            @extend .text-danger;
+        }
     }
 
     .nav-link,
