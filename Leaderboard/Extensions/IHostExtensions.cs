@@ -7,15 +7,23 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace Leaderboard.Extensions
 {
     public static class IHostExtensions
     {
+        /// <summary>
+        /// Migrate the database. It's Important that you don't wrap any services
+        /// in a using clause - the scope will likely be reused throughout the
+        /// startup process. DI will handle the disposing for us
+        /// </summary>
+        /// <param name="provider">Service Collection</param>
+        /// <param name="env">developement/production/etc.</param>
+        /// <param name="seed">whether or not to also run the seed procedure</param>
+        /// <returns></returns>
         public static async Task MigrateAsync(this IServiceProvider provider, string env, bool seed = false)
         {
-            using var ctx = provider.GetRequiredService<ApplicationDbContext>();
+            var ctx = provider.GetRequiredService<ApplicationDbContext>();
 
             var pending = await ctx.Database.GetPendingMigrationsAsync();
             var current = (await ctx.Database.GetAppliedMigrationsAsync()).LastOrDefault();

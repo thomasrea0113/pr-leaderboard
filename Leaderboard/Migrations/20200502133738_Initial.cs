@@ -44,7 +44,7 @@ namespace Leaderboard.Migrations
                     Gender = table.Column<int>(nullable: true),
                     Weight = table.Column<decimal>(type: "decimal(13,3)", nullable: true),
                     BirthDate = table.Column<DateTime>(nullable: true),
-                    IsActive = table.Column<bool>(nullable: true, defaultValue: true)
+                    IsActive = table.Column<bool>(nullable: false, defaultValue: true)
                 },
                 constraints: table =>
                 {
@@ -85,7 +85,7 @@ namespace Leaderboard.Migrations
                 {
                     Id = table.Column<string>(nullable: false),
                     Unit = table.Column<string>(nullable: false),
-                    IsActive = table.Column<bool>(nullable: true, defaultValue: true)
+                    IsActive = table.Column<bool>(nullable: false, defaultValue: true)
                 },
                 constraints: table =>
                 {
@@ -317,7 +317,7 @@ namespace Leaderboard.Migrations
                     Name = table.Column<string>(nullable: false),
                     DivisionId = table.Column<string>(nullable: false),
                     WeightClassId = table.Column<string>(nullable: true),
-                    IsActive = table.Column<bool>(nullable: true, defaultValue: true),
+                    IsActive = table.Column<bool>(nullable: false, defaultValue: true),
                     UOMId = table.Column<string>(nullable: false),
                     Slug = table.Column<string>(nullable: false)
                 },
@@ -349,7 +349,7 @@ namespace Leaderboard.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
-                    IsApproved = table.Column<bool>(nullable: true, defaultValue: false),
+                    IsApproved = table.Column<bool>(nullable: false, defaultValue: false),
                     VideoProofId = table.Column<int>(nullable: true),
                     BoardId = table.Column<string>(nullable: false),
                     UserId = table.Column<string>(nullable: false),

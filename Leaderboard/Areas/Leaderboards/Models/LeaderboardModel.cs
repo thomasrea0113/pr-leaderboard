@@ -34,7 +34,7 @@ namespace Leaderboard.Areas.Leaderboards.Models
         [JsonIgnore]
         public virtual ICollection<UserLeaderboard> UserLeaderboards { get; set; } = new List<UserLeaderboard>();
 
-        public bool? IsActive { get; set; }
+        public bool IsActive { get; set; } = true;
 
         [JsonIgnore]
         public virtual ICollection<ScoreModel> Scores { get; set; }

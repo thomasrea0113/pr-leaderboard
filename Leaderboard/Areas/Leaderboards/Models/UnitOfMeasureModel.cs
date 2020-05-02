@@ -15,7 +15,7 @@ namespace Leaderboard.Areas.Leaderboards.Models
 
         public string Unit { get; set; }
 
-        public bool? IsActive { get; set; }
+        public bool IsActive { get; set; } = true;
 
         public virtual ICollection<LeaderboardModel> Boards { get; set; }
 

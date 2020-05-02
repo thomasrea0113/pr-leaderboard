@@ -14,6 +14,7 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Threading;
+using Leaderboard.Areas.Identity.Managers;
 
 namespace Leaderboard.Tests.TestSetup
 {
@@ -46,8 +47,16 @@ namespace Leaderboard.Tests.TestSetup
             using var scope = server.Services.CreateScope();
             var provider = scope.ServiceProvider;
             var env = provider.GetRequiredService<IWebHostEnvironment>().EnvironmentName;
+            var adminUsers = provider.GetRequiredService<IConfiguration>()
+                .GetSection("AdminUsers").Get<string[]>();
+
             if (!provider.MigrateAsync(env, true).Wait(8000))
                 throw new TimeoutException("seed timeout");
+
+            if (!provider.GetRequiredService<AppUserManager>()
+                .EnsureAdminUsersAsync(adminUsers)
+                .Wait(8000))
+                throw new TimeoutException("Ensure admin users timeout");
             return server;
         }
 

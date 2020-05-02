@@ -41,6 +41,18 @@ namespace Leaderboard.Areas.Identity.Managers
             return default;
         }
 
+        public async Task EnsureAdminUsersAsync(params string[] userNames)
+        {
+            foreach (var username in userNames)
+            {
+                var user = await FindByNameAsync(username);
+                if (!await IsInRoleAsync(user, "admin"))
+                {
+                    await AddToRoleAsync(user, "admin");
+                }
+            }
+        }
+
         private string GetIdClaim(ClaimsPrincipal identity) => identity.FindFirst(ClaimTypes.NameIdentifier).Value;
 
         /// <summary>

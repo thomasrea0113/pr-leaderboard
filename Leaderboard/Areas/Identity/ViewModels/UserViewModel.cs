@@ -11,6 +11,7 @@ namespace Leaderboard.Areas.Identity.ViewModels
     {
         public string UserName { get; private set; }
         public string Email { get; private set; }
+        public bool IsActive { get; private set; }
         public bool IsAdmin { get; private set; }
         public List<CategoryViewModel> Interests { get; private set; }
         public List<LeaderboardViewModel> Leaderboards { get; private set; }
@@ -19,6 +20,7 @@ namespace Leaderboard.Areas.Identity.ViewModels
         {
             UserName = user.UserName;
             Email = user.Email;
+            IsActive = user.IsActive;
             IsAdmin = isAdmin;
 
             // if the passed in user was fully loaded (including all navigation properties)

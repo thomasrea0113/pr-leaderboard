@@ -168,6 +168,9 @@ namespace Leaderboard.Data.SeedExtensions
 
         /// <summary>
         /// Allows for identity user/role seeding using the provided managers.
+        /// It's Important that you don't wrap any services
+        /// in a using clause - the scope will likely be reused throughout the
+        /// startup process. DI will handle the disposing for us
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>

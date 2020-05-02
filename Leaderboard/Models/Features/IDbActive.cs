@@ -9,7 +9,7 @@ namespace Leaderboard.Models.Features
     /// </summary>
     public interface IDbActive
     {
-        bool? IsActive { get; set; }
+        bool IsActive { get; set; }
     }
 
     public static class DbSetExtensions
@@ -18,13 +18,13 @@ namespace Leaderboard.Models.Features
             where TModel : class, IDbActive
         {
             var found = await set.FindAsync(keyValues);
-            if (!found.IsActive.HasValue || !found.IsActive.Value)
+            if (!found.IsActive)
                 return default;
             return found;
         }
 
         public static IQueryable<TModel> WhereActive<TModel>(this DbSet<TModel> set)
             where TModel : class, IDbActive
-            => set.AsQueryable().Where(m => m.IsActive ?? false);
+            => set.AsQueryable().Where(m => m.IsActive);
     }
 }

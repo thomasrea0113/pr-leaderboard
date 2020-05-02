@@ -16,26 +16,21 @@ namespace Leaderboard
         {
             using var host = CreateHostBuilder(args).Build();
 
-            var scope = host.Services.CreateScope();
-            var services = scope.ServiceProvider;
-            var config = services.GetRequiredService<IConfiguration>();
-            var env = services.GetRequiredService<IWebHostEnvironment>().EnvironmentName;
-
-            // TODO log seed, catch Migrate exception and notify user that no changes to the database were applied
-            if (config.GetValue("AutoMigrate:Enabled", false))
+            using (var scope = host.Services.CreateScope())
             {
-                await services.MigrateAsync(env, config.GetValue("AutoMigrate:AutoSeed", false));
+                var services = scope.ServiceProvider;
+                var config = services.GetRequiredService<IConfiguration>();
+                var env = services.GetRequiredService<IWebHostEnvironment>().EnvironmentName;
+
+                // TODO log seed, catch Migrate exception and notify user that no changes to the database were applied
+                if (config.GetValue("AutoMigrate:Enabled", false))
+                    await services.MigrateAsync(env, config.GetValue("AutoMigrate:AutoSeed", false));
+
+                // make sure the admin users in the appSettings are in the admin role
+                await services.GetRequiredService<AppUserManager>()
+                    .EnsureAdminUsersAsync(config.GetSection("AdminUsers").Get<string[]>());
+
             }
-
-            scope.Dispose();
-
-            // migrate may dispose the previous scope, so we create another
-            scope = host.Services.CreateScope();
-            services = scope.ServiceProvider;
-
-            await EnsureAdminUsersAsync(services.GetRequiredService<AppUserManager>(), config.GetSection("AdminUsers").Get<string[]>());
-
-            scope.Dispose();
 
             await host.RunAsync();
         }
@@ -47,17 +42,5 @@ namespace Leaderboard
                 {
                     webBuilder.UseStartup<Startup>();
                 });
-
-        public static async Task EnsureAdminUsersAsync(AppUserManager userManager, params string[] userNames)
-        {
-            foreach (var username in userNames)
-            {
-                var user = await userManager.FindByNameAsync(username);
-                if (!await userManager.IsInRoleAsync(user, "admin"))
-                {
-                    await userManager.AddToRoleAsync(user, "admin");
-                }
-            }
-        }
     }
 }

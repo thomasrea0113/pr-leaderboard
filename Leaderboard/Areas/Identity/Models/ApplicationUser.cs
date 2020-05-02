@@ -35,7 +35,7 @@ namespace Leaderboard.Areas.Identity.Models
 
         public virtual ICollection<UserCategory> UserCategories { get; set; } = new List<UserCategory>();
 
-        public bool? IsActive { get; set; }
+        public bool IsActive { get; set; } = true;
 
         #region identity relationships
 
