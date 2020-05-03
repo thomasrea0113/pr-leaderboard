@@ -8,7 +8,7 @@ namespace Leaderboard
     {
         public NavConfiguration Nav { get; set; } = new NavConfiguration();
 
-        public string HomeBackgroundUrl { get; set; }
+        public string[] HomeBackgroundUrls { get; set; }
         public string[] AdminUsers { get; set; } = Array.Empty<string>();
         public MigrationConfiguration AutoMigrate { get; set; } = new MigrationConfiguration();
         public SmtpEmailSenderConfig Mail { get; set; } = new SmtpEmailSenderConfig();

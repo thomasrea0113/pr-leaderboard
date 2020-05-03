@@ -1,3 +1,5 @@
+@import './animations/parallax.scss';
+
 @include keyframes(fadeInUp) {
     from {
         opacity: 0;
@@ -40,4 +42,23 @@
 
 .anmiate-fadeout {
     @include animate(fadeOut 1s ease);
+}
+
+@include keyframes(ripple) {
+    0% {
+        transform: scale(0.8);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(0.8);
+    }
+}
+
+.animate-oscillate {
+    @include animate(ripple 10s inifite);
+    animation-direction: alternate;
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import 'react-dom';
 import uniqueId from 'lodash/fp/uniqueId';
 import { useLoading } from '../hooks/useLoading';
@@ -10,7 +10,7 @@ import { isValidationErrorResponseData } from '../types/ValidationErrorResponse'
 
 interface ReactProps {
     initialUrl: string;
-    backgroundImage: string;
+    backgroundImages: string[];
 }
 
 interface ServerData {
@@ -21,7 +21,19 @@ interface LocalState {
     delayed: boolean;
 }
 
-const HomeComponent: React.FC<ReactProps> = ({ initialUrl }) => {
+const HomeComponent: React.FC<ReactProps> = ({
+    initialUrl,
+    backgroundImages,
+}) => {
+    const backgroundImage = useMemo(
+        () =>
+            [
+                ...backgroundImages.map(bg => `url(${bg})`),
+                'radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%)',
+            ].join(','),
+        []
+    );
+
     const { isLoading, response, loadAsync } = useLoading<ServerData>();
 
     const [{ delayed }, setState] = useState<LocalState>({
@@ -55,34 +67,26 @@ const HomeComponent: React.FC<ReactProps> = ({ initialUrl }) => {
         : [];
 
     return (
-        <div className="navbar-fixed-offset">
-            {/* TODO animate welcome text shift after featured load */}
-            {isLoading || !delayed ? (
-                <h1 className="animate-fadeinup">Welcome...</h1>
-            ) : (
-                <>
-                    <h1 className="animate-fadeinup">
-                        check out what we&apos;ve got.
-                    </h1>
-                    <div className="card-deck ml-1 mr-1 mr-lg-5 ml-lg-5 hide-sm">
-                        {featured.map((f, i) => (
-                            <FeaturedCard
-                                key={uniqueId('featured')}
-                                {...f}
-                                divProps={{
-                                    className: 'animate-fadein',
-                                    style: {
-                                        opacity: 0,
-                                        ...animationDelay(
-                                            `${(featured.length - i) * 115}ms`
-                                        ),
-                                    },
-                                }}
-                            />
-                        ))}
+        <div
+            className="has-overlay center-background navbar-fixed-background-offset animate-parallax"
+            style={{
+                backgroundImage,
+            }}
+        >
+            <div className="stars-sm" />
+            <div className="stars-md" />
+            <div className="stars-lg" />
+            <div className="navbar-fixed-offset vh-background image-overlay">
+                {/* TODO animate welcome text shift after featured load */}
+                <div className="header">
+                    <div className="title-text animate-fadeinup">
+                        Welcome...
                     </div>
-                </>
-            )}
+                    {isLoading || !delayed ? null : (
+                        <div className="animate-fadeinup">loaded</div>
+                    )}
+                </div>
+            </div>
         </div>
     );
 };

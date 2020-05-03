@@ -7,20 +7,25 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Leaderboard.ViewModels;
 using Leaderboard.Areas.Leaderboards.Models;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using System;
 
 namespace Leaderboard.Pages
 {
     public class Index : PageModel
     {
         private readonly AppUserManager _manager;
-        private readonly string _bgUrl;
+        private readonly string[] _bgUrl;
 
         public class ReactProps
         {
             public string InitialUrl { get; set; }
-            public string BackgroundImage { get; set; }
+
+            /// <summary>
+            /// Any of array of stacked background images, from top to bottom
+            /// </summary>
+            /// <value></value>
+            public string[] BackgroundImages { get; set; }
         }
 
         /// <summary>
@@ -37,7 +42,7 @@ namespace Leaderboard.Pages
         public Index(AppUserManager manager, IOptionsSnapshot<AppConfiguration> config)
         {
             _manager = manager;
-            _bgUrl = config.Value.HomeBackgroundUrl;
+            _bgUrl = config.Value.HomeBackgroundUrls;
         }
 
         public void Initialize()
@@ -45,7 +50,7 @@ namespace Leaderboard.Pages
             Props ??= new ReactProps
             {
                 InitialUrl = Url.Page(null, "initial"),
-                BackgroundImage = _bgUrl
+                BackgroundImages = _bgUrl ?? Array.Empty<string>()
             };
         }
 

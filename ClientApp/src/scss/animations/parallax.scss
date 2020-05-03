@@ -1,0 +1,104 @@
+// n is number of stars required
+@function multiple-box-shadow($n) {
+    $value: '#{random(2000)}px #{random(2000)}px #FFF';
+
+    @for $i from 2 through $n {
+        $value: '#{$value} , #{random(2000)}px #{random(2000)}px #FFF';
+    }
+
+    @return unquote($value);
+}
+
+$shadows-small: multiple-box-shadow(700);
+$shadows-medium: multiple-box-shadow(200);
+$shadows-big: multiple-box-shadow(100);
+
+.animate-parallax {
+    height: 100%;
+    overflow: hidden;
+
+    .header {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        color: #fff;
+        text-align: center;
+        font-family: 'lato', sans-serif;
+        font-weight: 300;
+        font-size: 50px;
+        letter-spacing: 10px;
+        margin-top: -60px;
+        padding-left: 10px;
+
+        .title-text {
+            background: -webkit-linear-gradient(white, #38495a);
+            @include background-clip(text);
+            -webkit-text-fill-color: transparent;
+        }
+    }
+
+    .stars-sm {
+        width: 1px;
+        height: 1px;
+        background: transparent;
+        box-shadow: $shadows-small;
+        @include animate(parallax 50s linear infinite);
+
+        &:after {
+            content: ' ';
+            position: absolute;
+            top: 2000px;
+            width: 1px;
+            height: 1px;
+            background: transparent;
+            box-shadow: $shadows-small;
+        }
+    }
+
+    .stars-md {
+        width: 2px;
+        height: 2px;
+        background: transparent;
+        box-shadow: $shadows-medium;
+        @include animate(parallax 100s linear infinite);
+
+        &:after {
+            content: ' ';
+            position: absolute;
+            top: 2000px;
+            width: 2px;
+            height: 2px;
+            background: transparent;
+            box-shadow: $shadows-medium;
+        }
+    }
+
+    .stars-lg {
+        width: 3px;
+        height: 3px;
+        background: transparent;
+        box-shadow: $shadows-big;
+        @include animate(parallax 150s linear infinite);
+
+        &:after {
+            content: ' ';
+            position: absolute;
+            top: 2000px;
+            width: 3px;
+            height: 3px;
+            background: transparent;
+            box-shadow: $shadows-big;
+        }
+    }
+}
+
+@keyframes parallax {
+    from {
+        transform: translateY(0px);
+    }
+
+    to {
+        transform: translateY(-2000px);
+    }
+}

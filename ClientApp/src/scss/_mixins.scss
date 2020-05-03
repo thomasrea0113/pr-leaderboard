@@ -19,29 +19,10 @@
     transition: $trans;
 }
 
-@mixin center-vertical {
-    // vertical alignment
-    position: absolute;
-    top: 50%;
-    transform: translate(0, -50%);
-    -webkit-transform: translate(0, -50%);
-}
-
-@mixin overlay() {
-    position: absolute;
-    top: 0;
-    left: 0;
-
-    width: 100%;
-    height: 100%;
-
-    overflow: hidden;
-}
-
-@mixin header {
-    @extend .text-success;
-    @extend .font-weight-bolder;
-    text-shadow: 2px 2px rgba($light, 0.75);
+@mixin background-clip($clip) {
+    background-clip: $clip;
+    -moz-background-clip: $clip;
+    -webkit-background-clip: $clip;
 }
 
 @mixin animate($animation) {
@@ -65,4 +46,29 @@
     @keyframes #{$name} {
         @content;
     }
+}
+
+@mixin center-vertical {
+    // vertical alignment
+    position: absolute;
+    top: 50%;
+    transform: translate(0, -50%);
+    -webkit-transform: translate(0, -50%);
+}
+
+@mixin overlay() {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+}
+
+@mixin header {
+    @extend .text-success;
+    @extend .font-weight-bolder;
+    text-shadow: 2px 2px rgba($light, 0.75);
 }
