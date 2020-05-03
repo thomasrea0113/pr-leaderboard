@@ -31,6 +31,10 @@ $shadows-big: multiple-box-shadow(100);
         margin-top: -60px;
         padding-left: 10px;
 
+        * {
+            letter-spacing: 5px;
+        }
+
         .title-text {
             background: -webkit-linear-gradient(white, #38495a);
             @include background-clip(text);

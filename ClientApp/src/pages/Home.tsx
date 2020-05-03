@@ -7,6 +7,7 @@ import { FeaturedCard } from '../Components/FeaturedCard';
 import { ensureDelay } from '../utilities/ensureDelay';
 import { animationDelay } from '../utilities/animation';
 import { isValidationErrorResponseData } from '../types/ValidationErrorResponse';
+import { FontawesomeIconToIcon } from '../Components/StyleComponents';
 
 interface ReactProps {
     initialUrl: string;
@@ -43,10 +44,10 @@ const HomeComponent: React.FC<ReactProps> = ({
     const mergeState = (newState: Partial<LocalState>) =>
         setState(os => ({ ...os, ...newState }));
 
-    // We want to slow down the load for visual affect. If the load takes less than 3
+    // We want to slow down the load for visual affect. If the load takes less than 1.5
     // seconds, we pause
     const reload = () =>
-        ensureDelay(3000, loadAsync({ actionUrl: initialUrl })).then(() =>
+        ensureDelay(1500, loadAsync({ actionUrl: initialUrl })).then(() =>
             mergeState({ delayed: true })
         );
 
@@ -80,10 +81,34 @@ const HomeComponent: React.FC<ReactProps> = ({
                 {/* TODO animate welcome text shift after featured load */}
                 <div className="header">
                     <div className="title-text animate-fadeinup">
-                        Welcome...
+                        PR Leaderboard
                     </div>
                     {isLoading || !delayed ? null : (
-                        <div className="animate-fadeinup">loaded</div>
+                        <div className="animate-fadein">
+                            <div className="row" style={{ margin: '0 1rem' }}>
+                                <a
+                                    href="/"
+                                    className="btn btn-col btn-outline-primary"
+                                >
+                                    {FontawesomeIconToIcon('Go')}
+                                    &nbsp;&nbsp;Recent PRs
+                                </a>
+                                <a
+                                    href="/"
+                                    className="btn btn-col btn-outline-warning"
+                                >
+                                    {FontawesomeIconToIcon('Go')}
+                                    &nbsp;&nbsp;Browse Boards
+                                </a>
+                                <a
+                                    href="/"
+                                    className="btn btn-col btn-outline-danger"
+                                >
+                                    {FontawesomeIconToIcon('Go')}
+                                    &nbsp;&nbsp;About
+                                </a>
+                            </div>
+                        </div>
                     )}
                 </div>
             </div>

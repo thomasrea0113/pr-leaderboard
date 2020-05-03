@@ -1,0 +1,7 @@
+a.btn-col,
+button.btn-col {
+    @extend .btn-lg;
+    @extend .col-md;
+
+    margin: 0 5px 0 5px;
+}
