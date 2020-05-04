@@ -20,15 +20,25 @@ $transition-collapse-width: width 0.35s ease !default;
 
 @import './position';
 
-// Important to prevent transitions from firing on page load
-body.preload * {
-    @include transition(none !important);
+html {
+    height: 100%;
 }
 
-.container:not(.no-shadow) {
-    @extend .bg-white;
-    @extend .shadow;
+body {
+    min-height: 100%;
+    // background-color: #0f141c;
+    background-color: #1b2735;
+
+    // Important to prevent transitions from firing on page load
+    &.preload * {
+        @include transition(none !important);
+    }
 }
+
+// .container:not(.no-shadow) {
+// @extend .bg-light;
+// @extend .shadow;
+// }
 
 html {
     letter-spacing: 0.05rem;

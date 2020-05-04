@@ -53,12 +53,13 @@
     </header>
     @RenderSection("beforeContainer", required: false)
     <partial name="_StatusMessages" model="Messages.GetAllMessages()" />
-    <react-root class="container @if (!IsSectionDefined("beforeContainer")) { <text>navbar-fixed-offset-mt </text> }pb-3">
+    @if (!IsSectionDefined("beforeContainer")) { <div class="navbar-height"></div> }
+    <react-root class="container bg-light shadow-lg pb-3 mt-3">
         @RenderBody()
     </react-root>
 
     <footer class="border-top footer text-muted">
-        <div class="container no-shadow">
+        <div class="container">
             &copy; 2020 - Leaderboard - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>

@@ -1,118 +1,65 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import 'react-dom';
-import uniqueId from 'lodash/fp/uniqueId';
+
+// import flow from 'lodash/fp/flow';
+// import split from 'lodash/fp/split';
+// import drop from 'lodash/fp/drop';
+// import join from 'lodash/fp/join';
+
 import { useLoading } from '../hooks/useLoading';
-import { Featured } from '../types/dotnet-types';
-import { FeaturedCard } from '../Components/FeaturedCard';
 import { ensureDelay } from '../utilities/ensureDelay';
-import { animationDelay } from '../utilities/animation';
-import { isValidationErrorResponseData } from '../types/ValidationErrorResponse';
-import { FontawesomeIconToIcon } from '../Components/StyleComponents';
+import { HomeContext, ServerData } from '../Components/Home/HomeContext';
+import { HomeJumbotronComponent } from '../Components/Home/Jumbotron';
+import { HomeAboutComponent } from '../Components/Home/About';
 
 interface ReactProps {
     initialUrl: string;
     backgroundImages: string[];
 }
 
-interface ServerData {
-    featured: Featured[];
-}
-
-interface LocalState {
-    delayed: boolean;
-}
-
 const HomeComponent: React.FC<ReactProps> = ({
     initialUrl,
     backgroundImages,
 }) => {
-    const backgroundImage = useMemo(
-        () =>
-            [
-                ...backgroundImages.map(bg => `url(${bg})`),
-                'radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%)',
-            ].join(','),
-        []
-    );
+    const { isLoading, isLoaded, response, loadAsync } = useLoading<
+        ServerData
+    >();
 
-    const { isLoading, response, loadAsync } = useLoading<ServerData>();
+    const [delayed, setDelayed] = useState(false);
 
-    const [{ delayed }, setState] = useState<LocalState>({
-        delayed: false,
-    });
-
-    const mergeState = (newState: Partial<LocalState>) =>
-        setState(os => ({ ...os, ...newState }));
+    const isServerReady = isLoaded && !isLoading;
 
     // We want to slow down the load for visual affect. If the load takes less than 1.5
     // seconds, we pause
-    const reload = () =>
+    const refreshData = () =>
         ensureDelay(1500, loadAsync({ actionUrl: initialUrl })).then(() =>
-            mergeState({ delayed: true })
+            setDelayed(true)
         );
 
-    // we want to load some initial data, and don't want to render anything until after
-    // loading has begun
-    const isLoaded = React.useRef(false);
+    // load on start
     useEffect(() => {
-        reload();
-        isLoaded.current = true;
-        return function dismount() {
-            isLoaded.current = false;
-        };
+        refreshData();
     }, []);
-    if (!isLoaded.current) return null;
 
-    const featured = !isValidationErrorResponseData(response?.data)
-        ? response?.data?.featured ?? []
-        : [];
+    // const location = flow(
+    //     split('/'),
+    //     drop(1),
+    //     join('.')
+    // )(window.location.pathname);
 
     return (
-        <div
-            className="has-overlay center-background navbar-fixed-background-offset animate-parallax"
-            style={{
-                backgroundImage,
+        <HomeContext.Provider
+            value={{
+                isReady: isServerReady && delayed,
+                data: response?.data,
+                refreshData,
+                backgroundImages,
             }}
         >
-            <div className="stars-sm" />
-            <div className="stars-md" />
-            <div className="stars-lg" />
-            <div className="navbar-fixed-offset vh-background image-overlay">
-                {/* TODO animate welcome text shift after featured load */}
-                <div className="header">
-                    <div className="title-text animate-fadeinup">
-                        PR Leaderboard
-                    </div>
-                    {isLoading || !delayed ? null : (
-                        <div className="animate-fadein">
-                            <div className="row" style={{ margin: '0 1rem' }}>
-                                <a
-                                    href="/"
-                                    className="btn btn-col btn-outline-primary"
-                                >
-                                    {FontawesomeIconToIcon('Go')}
-                                    &nbsp;&nbsp;Recent PRs
-                                </a>
-                                <a
-                                    href="/"
-                                    className="btn btn-col btn-outline-warning"
-                                >
-                                    {FontawesomeIconToIcon('Go')}
-                                    &nbsp;&nbsp;Browse Boards
-                                </a>
-                                <a
-                                    href="/"
-                                    className="btn btn-col btn-outline-danger"
-                                >
-                                    {FontawesomeIconToIcon('Go')}
-                                    &nbsp;&nbsp;About
-                                </a>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </div>
-        </div>
+            <div className="navbar-height" />
+            <HomeJumbotronComponent />
+            <HomeAboutComponent />
+        </HomeContext.Provider>
     );
 };
 

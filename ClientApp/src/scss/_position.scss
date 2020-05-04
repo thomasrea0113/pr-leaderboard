@@ -18,23 +18,26 @@ div.center-vertical {
     background-position: center;
 }
 
+.navbar-height {
+    height: $navbar-height;
+}
+
 // offset the background image to account for fixed nav
 .navbar-fixed-background-offset {
     background-position-y: $navbar-height !important;
 }
 
-.navbar-fixed-offset {
-    margin-top: $navbar-height;
+a.route-anchor {
+    display: block;
+    position: relative;
+    top: $navbar-height;
+    visibility: hidden;
+}
 
-    &-mt {
-        margin-top: $navbar-height + 0.5rem;
-    }
-
-    // sets the height to that of the background image. Will change if the
-    // background changes
-    &.vh-background {
-        height: calc(418px) !important;
-    }
+// sets the height to that of the background image. Will change if the
+// background changes
+.vh-background {
+    height: 418px !important;
 }
 
 .center-background {
