@@ -14,6 +14,29 @@ import './scss/site.scss';
 // Important to prevent transitions from firing on page load
 $(() => $('body').removeClass('preload'));
 
+$.fn.extend({
+    isInViewport() {
+        const $this = $(this);
+        const elementTop = $this.offset()?.top ?? 0;
+        const elementBottom = elementTop + ($this.outerHeight() ?? 0);
+
+        const viewportTop = $(window).scrollTop() ?? 0;
+        const viewportBottom = viewportTop + ($(window).height() ?? 0);
+
+        return elementBottom > viewportTop && elementTop < viewportBottom;
+    },
+});
+
+const applyVisibleClass = () => {
+    $('[data-visible-class]').each((_, e) => {
+        const $e = $(e);
+        const visibleClass = $e.data('visible-class');
+        if (!$e.hasClass(visibleClass) && $e.isInViewport())
+            $e.addClass(visibleClass);
+    });
+};
+$(applyVisibleClass);
+
 // store the page's scroll-y position as a data attribute on the root html element
 (function trackScroll() {
     const debounce = (fn: () => void) => {
@@ -39,6 +62,7 @@ $(() => $('body').removeClass('preload'));
     // so we can use it in our stylesheets
     const storeScroll = () => {
         document.documentElement.dataset.scroll = window.scrollY.toString();
+        applyVisibleClass();
     };
 
     // Listen for new scroll events, here we debounce our `storeScroll` function

@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import 'react-dom';
 
-// import flow from 'lodash/fp/flow';
-// import split from 'lodash/fp/split';
-// import drop from 'lodash/fp/drop';
-// import join from 'lodash/fp/join';
-
+import { BrowserRouter as Router, useRouteMatch } from 'react-router-dom';
 import { useLoading } from '../hooks/useLoading';
 import { ensureDelay } from '../utilities/ensureDelay';
 import { HomeContext, ServerData } from '../Components/Home/HomeContext';
 import { HomeJumbotronComponent } from '../Components/Home/Jumbotron';
 import { HomeAboutComponent } from '../Components/Home/About';
+import { scrollToSection } from '../Components/Section';
 
 interface ReactProps {
     initialUrl: string;
@@ -41,11 +38,8 @@ const HomeComponent: React.FC<ReactProps> = ({
         refreshData();
     }, []);
 
-    // const location = flow(
-    //     split('/'),
-    //     drop(1),
-    //     join('.')
-    // )(window.location.pathname);
+    if (window.location.pathname !== '')
+        scrollToSection(window.location.pathname);
 
     return (
         <HomeContext.Provider

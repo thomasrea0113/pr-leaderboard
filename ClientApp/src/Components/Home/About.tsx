@@ -1,10 +1,12 @@
 import React from 'react';
+import { useRouteMatch } from 'react-router-dom';
 import { Section } from '../Section';
+import { BootstrapColorClass } from '../../types/dotnet-types';
 
 export const HomeAboutComponent: React.FC<{}> = () => {
     return (
-        <Section name="about">
-            <div className="card mb-3">
+        <Section color={BootstrapColorClass.Danger} name="About">
+            <div className="card mb-3" data-visible-class="animate-fadein">
                 <div className="row">
                     <div className="col-lg-8">
                         <img
@@ -47,7 +49,7 @@ export const HomeAboutComponent: React.FC<{}> = () => {
                 </div>
             </div>
             <div className="card-deck">
-                <div className="card">
+                <div className="card" data-visible-class="animate-fadein">
                     <img
                         className="card-img-top"
                         src="https://scontent-dfw5-1.xx.fbcdn.net/v/t1.0-9/92507963_199397401515960_710265510607978496_n.jpg?_nc_cat=103&_nc_sid=da1649&_nc_ohc=rO58e_67n1kAX-9ZUYr&_nc_ht=scontent-dfw5-1.xx&oh=094996668fa0eeaaf4871cbd03be97bd&oe=5ED44E32"
@@ -66,7 +68,7 @@ export const HomeAboutComponent: React.FC<{}> = () => {
                         </p>
                     </div>
                 </div>
-                <div className="card">
+                <div className="card" data-visible-class="animate-fadein">
                     <img
                         className="card-img-top"
                         src="https://scontent-dfw5-2.xx.fbcdn.net/v/t1.0-9/75015765_10102536624581298_1297348481538588672_o.jpg?_nc_cat=104&_nc_sid=7aed08&_nc_ohc=Slgiw4xU_eQAX8ZviJS&_nc_ht=scontent-dfw5-2.xx&oh=f134ed4cf597d817f4104920f6cf272e&oe=5ED64751"

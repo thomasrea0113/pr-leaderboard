@@ -123,6 +123,15 @@ html {
     @extend .bg-transparent;
 }
 
+// when using anchor hash routing, we need a hidden element that we can go to, which is
+// offset by the height of the fixed navbar
+.anchor {
+    display: block;
+    position: relative;
+    top: -$navbar-height;
+    visibility: hidden;
+}
+
 $sizes: (10, 20, 25, 50, 75);
 @each $prop, $abbrev in (width: vw, height: vh) {
     @each $size in $sizes {

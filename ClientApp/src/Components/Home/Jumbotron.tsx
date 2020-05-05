@@ -1,6 +1,7 @@
 import React, { useMemo, useContext } from 'react';
 import { FontawesomeIconToIcon } from '../StyleComponents';
 import { HomeContext } from './HomeContext';
+import { ScrollToSectionButton } from '../Section';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface HomeJumbotronProps {
@@ -37,27 +38,27 @@ export const HomeJumbotronComponent: React.FC<HomeJumbotronProps> = () => {
                     {isReady ? (
                         <div className="animate-fadein">
                             <div className="row" style={{ margin: '0 1rem' }}>
-                                <a
-                                    href="/"
+                                <ScrollToSectionButton
+                                    to="/"
                                     className="btn btn-col btn-outline-primary spaced-text"
                                 >
                                     {FontawesomeIconToIcon('Go')}
                                     &nbsp;&nbsp;Recent PRs
-                                </a>
-                                <a
-                                    href="/"
+                                </ScrollToSectionButton>
+                                <ScrollToSectionButton
+                                    to="/"
                                     className="btn btn-col btn-outline-warning spaced-text"
                                 >
                                     {FontawesomeIconToIcon('Go')}
                                     &nbsp;&nbsp;Browse Boards
-                                </a>
-                                <a
-                                    href="/"
+                                </ScrollToSectionButton>
+                                <ScrollToSectionButton
+                                    to="/About"
                                     className="btn btn-col btn-outline-danger spaced-text"
                                 >
                                     {FontawesomeIconToIcon('Go')}
                                     &nbsp;&nbsp;About
-                                </a>
+                                </ScrollToSectionButton>
                             </div>
                         </div>
                     ) : null}

@@ -28,14 +28,17 @@
     letter-spacing: 5px;
 }
 
-.section {
-    hr {
+// allows us to style header rows with text classes
+@each $name, $color in $theme-colors {
+    hr.text-#{$name} {
         margin-top: 0;
-        border-top: 2px solid $success;
+        border-top: 2px solid $color;
         border-radius: 1px;
     }
-
-    // div.card {
-    //     @extend .animate-fadeinup;
-    // }
 }
+
+// .section {
+// div.card {
+//     @extend .animate-fadeinup;
+// }
+// }
