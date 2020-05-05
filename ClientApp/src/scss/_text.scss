@@ -1,0 +1,41 @@
+.header {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    text-align: center;
+    margin-top: -60px;
+    padding-left: 10px;
+}
+
+.header-text {
+    @extend .text-light;
+
+    font-family: 'lato', sans-serif;
+    font-weight: 300;
+    font-size: 4rem;
+    letter-spacing: 10px;
+    text-transform: uppercase;
+
+    // span {
+    //     background: -webkit-linear-gradient(white, #38495a);
+    //     @include background-clip(text);
+    //     -webkit-text-fill-color: transparent;
+    // }
+}
+
+.spaced-text {
+    letter-spacing: 5px;
+}
+
+.section {
+    hr {
+        margin-top: 0;
+        border-top: 2px solid $success;
+        border-radius: 1px;
+    }
+
+    // div.card {
+    //     @extend .animate-fadeinup;
+    // }
+}

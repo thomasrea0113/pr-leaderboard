@@ -31,7 +31,7 @@ export const HomeJumbotronComponent: React.FC<HomeJumbotronProps> = () => {
             <div className="stars-lg" />
             <div className="image-overlay">
                 <div className="header">
-                    <div className="title-text animate-fadeinup">
+                    <div className="header-text animate-fadeinup">
                         PR Leaderboard
                     </div>
                     {isReady ? (
@@ -39,21 +39,21 @@ export const HomeJumbotronComponent: React.FC<HomeJumbotronProps> = () => {
                             <div className="row" style={{ margin: '0 1rem' }}>
                                 <a
                                     href="/"
-                                    className="btn btn-col btn-outline-primary"
+                                    className="btn btn-col btn-outline-primary spaced-text"
                                 >
                                     {FontawesomeIconToIcon('Go')}
                                     &nbsp;&nbsp;Recent PRs
                                 </a>
                                 <a
                                     href="/"
-                                    className="btn btn-col btn-outline-warning"
+                                    className="btn btn-col btn-outline-warning spaced-text"
                                 >
                                     {FontawesomeIconToIcon('Go')}
                                     &nbsp;&nbsp;Browse Boards
                                 </a>
                                 <a
                                     href="/"
-                                    className="btn btn-col btn-outline-danger"
+                                    className="btn btn-col btn-outline-danger spaced-text"
                                 >
                                     {FontawesomeIconToIcon('Go')}
                                     &nbsp;&nbsp;About

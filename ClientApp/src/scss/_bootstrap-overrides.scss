@@ -4,7 +4,9 @@ $theme-colors: (
     'dark': #1b2735,
 );
 $primary: theme-color('success');
-$body-bg: $light;
+$body-bg: theme-color('dark');
+$card-bg: rgba($light, 0.8);
+$card-border-color: unset;
 
 $enable-gradients: true;
 $enable-shadows: true;

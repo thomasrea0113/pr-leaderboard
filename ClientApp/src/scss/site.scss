@@ -7,6 +7,8 @@ $font-family-base: 'Signika', sans-serif, monospace !default;
 
 @import './themes/yeti';
 
+@import './text';
+
 @import '../../node_modules/@fortawesome/fontawesome-free/scss/fontawesome';
 @import '../../node_modules/@fortawesome/fontawesome-free/scss/solid';
 @import '../../node_modules/@fortawesome/fontawesome-free/scss/regular';
@@ -27,7 +29,7 @@ html {
 body {
     min-height: 100%;
     // background-color: #0f141c;
-    background-color: #1b2735;
+    // background-color: #1b2735;
 
     // Important to prevent transitions from firing on page load
     &.preload * {
@@ -46,6 +48,16 @@ html {
 
     @include media-breakpoint-up(md) {
         font-size: $font-size-base;
+    }
+}
+
+.quoted {
+    &::before {
+        content: open-quote;
+    }
+
+    &::after {
+        content: close-quote;
     }
 }
 
