@@ -1,6 +1,6 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-bionic
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1
 
-RUN wget -q -O - https://deb.nodesource.com/setup_13.x | bash
+RUN wget -q -O - https://deb.nodesource.com/setup_12.x | bash
 
 RUN apt update && apt upgrade -y && \
     # To preconfigure postfix
