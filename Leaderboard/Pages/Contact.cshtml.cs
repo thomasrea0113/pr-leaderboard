@@ -15,7 +15,7 @@ namespace Leaderboard.Pages
             .Any(c => c.Type == ClaimTypes.Email && c.Value != default);
 
         [ViewData]
-        public string FormIdPrefix => "Contact";
+        public string FormIdPrefix { get; set; } = "Contact";
 
         public string Email => HttpContext.User.FindFirst(ClaimTypes.Email)?.Value;
 

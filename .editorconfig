@@ -19,7 +19,10 @@ dotnet_diagnostic.IDE0003.severity = suggestion
 dotnet_diagnostic.IDE0047.severity = suggestion
 dotnet_diagnostic.IDE0049.severity = suggestion
 
-[obj/**/*.cs]
+[**/Migrations/*.cs]
+dotnet_diagnostic.CA1814.severity = none
+
+[**/obj/**/*.cs]
 dotnet_diagnostic.CS8019.severity = none
 
 [*__virtual.cs]

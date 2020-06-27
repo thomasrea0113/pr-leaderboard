@@ -23,6 +23,37 @@ using Leaderboard.Services;
 
 namespace Leaderboard.Areas.Identity.Pages.Account
 {
+    public class RegisterInputModel
+    {
+        [Required]
+        [Display(Name = "Username")]
+        public string Username { get; set; }
+
+        [EmailAddress]
+        [Display(Name = "Email")]
+        public string Email { get; set; }
+
+        [Required]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [DataType(DataType.Password)]
+        [Display(Name = "Password")]
+        public string Password { get; set; }
+
+        [DataType(DataType.Password)]
+        [Display(Name = "Confirm password")]
+        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        public string ConfirmPassword { get; set; }
+
+        public List<string> Interests { get; set; }
+
+        public GenderValue? Gender { get; set; }
+
+        [DataType(DataType.Date)]
+        public DateTime? Age { get; set; }
+
+        public decimal? Weight { get; set; }
+    }
+
     [AllowAnonymous]
     public class RegisterModel : PageModel
     {
@@ -53,48 +84,17 @@ namespace Leaderboard.Areas.Identity.Pages.Account
         }
 
         [BindProperty]
-        public InputModel Input { get; set; }
+        public RegisterInputModel Input { get; set; }
 
         [FromQuery]
         public string ReturnUrl { get; set; }
 
         [ViewData]
-        public string FormIdPrefix => "Register";
+        public string FormIdPrefix { get; set; } = "Register";
         [ViewData]
-        public string SubmitButtonText => "Register";
+        public string SubmitButtonText { get; set; } = "Register";
 
         public SelectList Categories { get; set; }
-
-        public class InputModel
-        {
-            [Required]
-            [Display(Name = "Username")]
-            public string Username { get; set; }
-
-            [EmailAddress]
-            [Display(Name = "Email")]
-            public string Email { get; set; }
-
-            [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
-            [DataType(DataType.Password)]
-            [Display(Name = "Password")]
-            public string Password { get; set; }
-
-            [DataType(DataType.Password)]
-            [Display(Name = "Confirm password")]
-            [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
-            public string ConfirmPassword { get; set; }
-
-            public List<string> Interests { get; set; }
-
-            public GenderValues? Gender { get; set; }
-
-            [DataType(DataType.Date)]
-            public DateTime? Age { get; set; }
-
-            public decimal? Weight { get; set; }
-        }
 
         /// <summary>
         /// initializes the necessary data from the database for the form

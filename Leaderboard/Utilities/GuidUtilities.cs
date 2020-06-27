@@ -102,8 +102,11 @@ namespace Leaderboard.Utilities
             // compute the hash of the namespace ID concatenated with the name (step 4)
             byte[] data = namespaceBytes.Concat(nameBytes).ToArray();
             byte[] hash;
+
+#pragma warning disable CA5351, CA5350
             using (var algorithm = version == 3 ? (HashAlgorithm)MD5.Create() : SHA1.Create())
                 hash = algorithm.ComputeHash(data);
+#pragma warning restore
 
             // most bytes from the hash are copied straight to the bytes of the new GUID (steps 5-7, 9, 11-12)
             byte[] newGuid = new byte[16];

@@ -27,13 +27,11 @@ namespace Leaderboard.TagHelpers
         public string Name { get; private set; }
         public string Path { get; private set; }
 
-        public ValueTuple<string, string> Deconstruct() => (Name, Path);
-        public static implicit operator Asset(ValueTuple<string, string> tuple)
-            => new Asset
-            {
-                Name = tuple.Item1,
-                Path = tuple.Item2
-            };
+        public Asset(string name, string path)
+        {
+            Name = name;
+            Path = path;
+        }
     }
 
     public class ReactBundleTagHelper : TagHelper
@@ -52,8 +50,8 @@ namespace Leaderboard.TagHelpers
 
             if (!statsFile.Exists)
                 throw new InvalidOperationException("stats.json does not exist at the root of the spa static files directory. Is the webpack-stats-plugin plugin properly configured?");
-
-            var statsFileContents = new StreamReader(statsFile.CreateReadStream()).ReadToEnd();
+            using var reader = new StreamReader(statsFile.CreateReadStream());
+            var statsFileContents = reader.ReadToEnd();
             _webpackStats = (WebpackStats)JsonSerializer.Deserialize(statsFileContents,
                 typeof(WebpackStats),
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
@@ -61,7 +59,7 @@ namespace Leaderboard.TagHelpers
 
             // flatten the chunks to one list of Assets
             _allAssets = _webpackStats.AssetsByChunkName
-                .SelectMany(a => a.Value.Select(a2 => (Asset)(a.Key, a2)))
+                .SelectMany(a => a.Value.Select(a2 => new Asset(a.Key, a2)))
                 .ToList();
         }
 

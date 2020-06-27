@@ -56,7 +56,7 @@ namespace Leaderboard.Areas.Leaderboards.Models
             return Task.CompletedTask;
         }
 
-        private string ToBound(int? bound) => bound != null ? Convert.ToString(bound) : "any";
+        private static string ToBound(int? bound) => bound != null ? Convert.ToString(bound) : "any";
 
         public override string ToString() => $"{ToBound(WeightLowerBound)}-{ToBound(WeightUpperBound)}";
     }

@@ -44,16 +44,32 @@ namespace Leaderboard.Services
 
         public async Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
-            await _mailer.SendMailAsync(new MailMessage(_config.FromAddress, email, subject, htmlMessage)
+            using var message = new MailMessage(_config.FromAddress, email, subject, htmlMessage)
             {
                 IsBodyHtml = true,
-            }).ConfigureAwait(false);
+            };
+            await _mailer.SendMailAsync(message).ConfigureAwait(false);
             _logger.LogInformation("mail send to {email}", email);
         }
 
+        private bool _isDisplosed = false;
+
         public void Dispose()
         {
-            _mailer.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_isDisplosed) return;
+
+            if (disposing)
+            {
+                _mailer.Dispose();
+            }
+
+            _isDisplosed = true;
         }
     }
 }

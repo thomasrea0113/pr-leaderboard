@@ -33,21 +33,6 @@ namespace Leaderboard.Services
         public ClientFormFieldAttribuleMap(IDictionary<string, ClientFormField> dictionary) : base(dictionary)
         {
         }
-
-        // A convenient way to access validators for a dynamic object, by providing a member expression like t => t.Property
-        public ClientFormField this[Expression<Func<TModel, object>> propertyExpression]
-        {
-            get
-            {
-                if (!(propertyExpression.Body is MemberExpression member))
-                    // The property access might be getting converted to object to match the func
-                    // If so, get the operand and see if that's a member expression
-                    member = (propertyExpression.Body as UnaryExpression)?.Operand as MemberExpression;
-                if (member == null)
-                    throw new ArgumentException("Action must be a member expression.");
-                return this[member.Member.Name];
-            }
-        }
     }
 
     public interface IFormFieldAttributeProvider

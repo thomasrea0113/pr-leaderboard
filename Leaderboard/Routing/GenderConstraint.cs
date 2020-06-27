@@ -10,7 +10,7 @@ namespace Leaderboard.Routing.Constraints
         public bool Match(HttpContext httpContext, IRouter route, string routeKey, RouteValueDictionary values, RouteDirection routeDirection)
         {
             var routeVal = values[routeKey]?.ToString();
-            return routeVal == "any" || Enum.TryParse<GenderValues>(values[routeKey]?.ToString(), true, out var _);
+            return routeVal == "any" || Enum.TryParse<GenderValue>(values[routeKey]?.ToString(), true, out var _);
         }
     }
 }
