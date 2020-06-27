@@ -34,9 +34,9 @@ namespace Leaderboard.Areas.Identity.Managers
 
         public async ValueTask<IdentityResult> TryAddToRoleAsync(ApplicationUser user, string role)
         {
-            if (!await IsInRoleAsync(user, role))
+            if (!await IsInRoleAsync(user, role).ConfigureAwait(false))
             {
-                return await AddToRoleAsync(user, role);
+                return await AddToRoleAsync(user, role).ConfigureAwait(false);
             }
             return default;
         }
@@ -45,15 +45,15 @@ namespace Leaderboard.Areas.Identity.Managers
         {
             foreach (var username in userNames)
             {
-                var user = await FindByNameAsync(username);
-                if (!await IsInRoleAsync(user, "admin"))
+                var user = await FindByNameAsync(username).ConfigureAwait(false);
+                if (!await IsInRoleAsync(user, "admin").ConfigureAwait(false))
                 {
-                    await AddToRoleAsync(user, "admin");
+                    await AddToRoleAsync(user, "admin").ConfigureAwait(false);
                 }
             }
         }
 
-        private string GetIdClaim(ClaimsPrincipal identity) => identity.FindFirst(ClaimTypes.NameIdentifier).Value;
+        private static string GetIdClaim(ClaimsPrincipal identity) => identity.FindFirst(ClaimTypes.NameIdentifier).Value;
 
         /// <summary>
         /// Gets the user, but also loads the properties specified by include
@@ -65,19 +65,18 @@ namespace Leaderboard.Areas.Identity.Managers
         /// <returns></returns>
         public async Task<ApplicationUser> GetUserAsync<TProp>(ClaimsPrincipal identity,
             Expression<Func<IQueryable<ApplicationUser>, IIncludableQueryable<ApplicationUser, TProp>>> include)
-            => await GetUserAsync(GetIdClaim(identity), include);
+            => await GetUserAsync(GetIdClaim(identity), include).ConfigureAwait(false);
 
         public async Task<ApplicationUser> GetUserAsync<TProp>(string id,
             Expression<Func<IQueryable<ApplicationUser>, IIncludableQueryable<ApplicationUser, TProp>>> include)
-            => await include.Compile()(Users).FirstOrDefaultAsync(u => u.Id == id);
+            => await include.Compile()(Users).FirstOrDefaultAsync(u => u.Id == id).ConfigureAwait(false);
 
         public async Task<ApplicationUser> GetUserAsync<TProp>(Expression<Func<ApplicationUser, bool>> equality,
             Expression<Func<IQueryable<ApplicationUser>, IIncludableQueryable<ApplicationUser, TProp>>> include)
-            => await include.Compile()(Users).FirstOrDefaultAsync(equality);
+            => await include.Compile()(Users).FirstOrDefaultAsync(equality).ConfigureAwait(false);
 
         private readonly Expression<Func<IQueryable<ApplicationUser>, IIncludableQueryable<ApplicationUser, Category>>> _allNavProps =
             user => user
-                .Include(u => u.UploadedFiles)
                 .Include(u => u.UserLeaderboards)
                 .Include(u => u.UserLeaderboards).ThenInclude(u => u.Leaderboard).ThenInclude(u => u.UOM)
                 .Include(u => u.UserLeaderboards).ThenInclude(u => u.Leaderboard).ThenInclude(u => u.WeightClass)
@@ -92,13 +91,13 @@ namespace Leaderboard.Areas.Identity.Managers
         /// <param name="identity"></param>
         /// <returns></returns>
         public async Task<ApplicationUser> GetCompleteUserAsync(ClaimsPrincipal identity)
-            => await GetCompleteUserAsync(GetIdClaim(identity));
+            => await GetCompleteUserAsync(GetIdClaim(identity)).ConfigureAwait(false);
 
         public async Task<ApplicationUser> GetCompleteUserAsync(string id)
-            => await GetUserAsync(id, _allNavProps);
+            => await GetUserAsync(id, _allNavProps).ConfigureAwait(false);
 
         public async Task<ApplicationUser> GetCompleteUserAsync(Expression<Func<ApplicationUser, bool>> equality)
-            => await GetUserAsync(equality, _allNavProps);
+            => await GetUserAsync(equality, _allNavProps).ConfigureAwait(false);
         /// <summary>
         /// Joins all the divisions on the users categories. This will not filter out
         /// divisions that the user is already a part of
@@ -110,8 +109,9 @@ namespace Leaderboard.Areas.Identity.Managers
 
         public async Task<IdentityResult> CreateOrUpdateByNameAsync(ApplicationUser user, string password)
         {
-            var created = await _store.CreateOrFindByIdAsync(user);
-            await ResetPasswordAsync(user, await GeneratePasswordResetTokenAsync(user), password);
+            var created = await _store.CreateOrFindByIdAsync(user).ConfigureAwait(false);
+            await ResetPasswordAsync(user, await GeneratePasswordResetTokenAsync(user).ConfigureAwait(false), password)
+                .ConfigureAwait(false);
             return created;
         }
 

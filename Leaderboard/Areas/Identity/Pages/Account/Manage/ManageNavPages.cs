@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Leaderboard.Areas.Identity.Pages.Account.Manage
@@ -21,7 +18,7 @@ namespace Leaderboard.Areas.Identity.Pages.Account.Manage
         public static string PersonalData => "PersonalData";
 
         public static string RecommendationsNavClass(ViewContext viewContext) => PageNavClass(viewContext, Recommendations);
-        
+
         public static string IndexNavClass(ViewContext viewContext) => PageNavClass(viewContext, Index);
 
         public static string EmailNavClass(ViewContext viewContext) => PageNavClass(viewContext, Email);

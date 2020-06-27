@@ -1,5 +1,3 @@
-using System;
-using System.Globalization;
 using Microsoft.AspNetCore.Routing;
 
 namespace Leaderboard.Extensions

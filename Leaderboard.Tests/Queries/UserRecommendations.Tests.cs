@@ -1,14 +1,9 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Leaderboard.Areas.Identity.Managers;
-using Leaderboard.Areas.Identity.Models;
-using Leaderboard.Areas.Leaderboards.Models;
 using Leaderboard.Data;
 using Leaderboard.Tests.TestSetup;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -35,13 +30,13 @@ namespace Leaderboard.Tests.Queries
             using var ctx = scope.GetRequiredService<ApplicationDbContext>();
 
             // this user is in the powerlifting divisions, which have a weight and an age
-            var user = await um.FindByNameAsync("LifterDuder");
-            await ctx.Entry(user).Collection(u => u.UserCategories).LoadAsync();
+            var user = await um.FindByNameAsync("LifterDuder").ConfigureAwait(false);
+            await ctx.Entry(user).Collection(u => u.UserCategories).LoadAsync().ConfigureAwait(false);
 
 
             Assert.NotEmpty(user.UserCategories);
 
-            var recommendations = await um.GetRecommendedBoardsQuery(user).ToListAsync();
+            var recommendations = await um.GetRecommendedBoardsQuery(user).ToListAsync().ConfigureAwait(false);
             Assert.NotEmpty(recommendations);
 
             // TODO implement more robust tests.

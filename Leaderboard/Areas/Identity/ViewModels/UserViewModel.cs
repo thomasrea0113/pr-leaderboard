@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Leaderboard.Areas.Identity.Models;
-using Leaderboard.Areas.Leaderboards.Models;
 using Leaderboard.Areas.Leaderboards.ViewModels;
 
 namespace Leaderboard.Areas.Identity.ViewModels

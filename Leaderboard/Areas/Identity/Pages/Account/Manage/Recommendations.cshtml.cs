@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading;
 using System.Threading.Tasks;
 using Leaderboard.Areas.Identity.Managers;
 using Leaderboard.Areas.Identity.ViewModels;
@@ -12,21 +11,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Leaderboard.Areas.Identity.Pages.Account.Manage
 {
+    public class ReactProps
+    {
+        public string InitialUrl { get; set; }
+        public string UserName { get; set; }
+    }
+
+    public class ReactState
+    {
+        public UserViewModel User { get; set; }
+        public IEnumerable<UserLeaderboardViewModel> Recommendations { get; set; }
+    }
     public class RecommendationsModel : PageModel
     {
         private readonly AppUserManager _manager;
-
-        public class ReactProps
-        {
-            public string InitialUrl { get; set; }
-            public string UserName { get; set; }
-        }
-
-        public class ReactState
-        {
-            public UserViewModel User { get; set; }
-            public IEnumerable<UserLeaderboardViewModel> Recommendations { get; set; }
-        }
 
         public ReactProps Props { get; set; } = new ReactProps();
 
@@ -45,12 +43,12 @@ namespace Leaderboard.Areas.Identity.Pages.Account.Manage
 
         public async Task<JsonResult> OnGetInitialAsync()
         {
-            var user = await _manager.GetCompleteUserAsync(User);
+            var user = await _manager.GetCompleteUserAsync(User).ConfigureAwait(false);
             var userBoards = user.UserLeaderboards.Select(ub => ub.Leaderboard);
 
             var recommendations = await _manager.GetRecommendedBoardsQuery(user)
                 .Include(b => b.Division)
-                .ToArrayAsync();
+                .ToArrayAsync().ConfigureAwait(false);
 
             var allUserBoards = UserLeaderboardViewModel
                 .Create(userBoards, true, false, Url)

@@ -18,7 +18,7 @@ namespace Leaderboard.Data.BulkExtensions
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public static async Task BulkInsertOrUpdateAsync<T>(this DbContext context, params T[] entities)
-            where T : class => await context.BulkInsertOrUpdateAsync(t => new { Id = "" }, entities);
+            where T : class => await context.BulkInsertOrUpdateAsync(t => new { Id = "" }, entities).ConfigureAwait(false);
 
         /// <summary>
         /// The second easiest way to bulk insert/update. Useful for entities with a non-standard primary key.
@@ -40,7 +40,7 @@ namespace Leaderboard.Data.BulkExtensions
             var keyProps = typeof(T).GetProperties().Where(p => keyPropNames.Contains(p.Name)).ToList();
 
             if (keyPropNames.Count != keyProps.Count)
-                throw new ArgumentException($"model type {typeof(T).FullName} did not contain all keys: {String.Join(", ", keyPropNames)}");
+                throw new ArgumentException($"model type {typeof(T).FullName} did not contain all keys: {string.Join(", ", keyPropNames)}");
 
             bool equality(List<T> elist, T e) => elist.Any(e2 =>
             {
@@ -50,7 +50,7 @@ namespace Leaderboard.Data.BulkExtensions
                 return true;
             });
 
-            await context.BulkInsertOrUpdateAsync(equality, entities);
+            await context.BulkInsertOrUpdateAsync(equality, entities).ConfigureAwait(false);
         }
 
 
@@ -68,7 +68,7 @@ namespace Leaderboard.Data.BulkExtensions
         {
             var set = context.Set<T>();
 
-            var existing = await set.AsQueryable().Where(e => entities.Contains(e)).ToListAsync();
+            var existing = await set.AsQueryable().Where(e => entities.Contains(e)).ToListAsync().ConfigureAwait(false);
 
             var updatedEntities = entities.Where(e => equality(existing, e)).ToList();
             var newEntitities = entities.Where(e => !equality(existing, e)).ToList();
@@ -83,7 +83,7 @@ namespace Leaderboard.Data.BulkExtensions
             var anyUpdated = updatedEntities.Count > 0;
 
             if (anyNew)
-                await set.AddRangeAsync(newEntitities);
+                await set.AddRangeAsync(newEntitities).ConfigureAwait(false);
             if (anyUpdated)
                 set.UpdateRange(updatedEntities);
         }

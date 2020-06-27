@@ -1,4 +1,3 @@
-using System;
 using Leaderboard.Areas.Leaderboards.Models;
 
 namespace Leaderboard.Areas.Leaderboards.ViewModels

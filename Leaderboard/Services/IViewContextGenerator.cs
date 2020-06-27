@@ -38,14 +38,14 @@ namespace Leaderboard.Services
 
         public ViewContextGenerator(
             IRazorViewEngine viewEngine,
-            IActionContextAccessor _accessor,
+            IActionContextAccessor accessor,
             IModelMetadataProvider metadataProvider,
-            ITempDataDictionaryFactory _factory)
+            ITempDataDictionaryFactory factory)
         {
             _viewEngine = viewEngine;
             _metadataProvider = metadataProvider;
-            _context = _accessor.ActionContext;
-            _tempData = _factory.GetTempData(_context.HttpContext);
+            _context = accessor.ActionContext;
+            _tempData = factory.GetTempData(_context.HttpContext);
         }
 
         public ViewContext GenerateViewContext<TModel>(
@@ -88,7 +88,7 @@ namespace Leaderboard.Services
             if (result.Success)
                 return result.View;
 
-            var searchedLocations = String.Join(Environment.NewLine, result.SearchedLocations.Concat(result.SearchedLocations));
+            var searchedLocations = string.Join(Environment.NewLine, result.SearchedLocations.Concat(result.SearchedLocations));
             throw new InvalidOperationException($"Unable to find partial '{partialName}'. The following locations were searched: {searchedLocations}");
         }
     }

@@ -1,15 +1,9 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Leaderboard.Areas.Identity.Managers;
 using Leaderboard.Areas.Identity.Models;
-using Leaderboard.Areas.Leaderboards.Models;
-using Leaderboard.Data;
-using Leaderboard.Models.Relationships;
 using Leaderboard.Tests.TestSetup;
 using Leaderboard.Tests.TestSetup.Fixtures;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -22,20 +16,20 @@ namespace Leaderboard.Tests.Models
         {
         }
 
-        public async IAsyncEnumerable<ApplicationUser> AddUsersAsync(AppUserManager manager, IEnumerable<ApplicationUser> users)
+        public static async IAsyncEnumerable<ApplicationUser> AddUsersAsync(AppUserManager manager, IEnumerable<ApplicationUser> users)
         {
             foreach (var user in users)
             {
-                yield return await AddUserAsync(manager, user, user.Email);
+                yield return await AddUserAsync(manager, user, user.Email).ConfigureAwait(false);
             }
         }
-        public async Task<ApplicationUser> AddUserAsync(AppUserManager manager, ApplicationUser user)
-            => await AddUserAsync(manager, user, user.Email);
+        public static async Task<ApplicationUser> AddUserAsync(AppUserManager manager, ApplicationUser user)
+            => await AddUserAsync(manager, user, user.Email).ConfigureAwait(false);
 
-        public async Task<ApplicationUser> AddUserAsync(AppUserManager manager, ApplicationUser user, string email)
+        public static async Task<ApplicationUser> AddUserAsync(AppUserManager manager, ApplicationUser user, string email)
         {
             user.Email = email;
-            var result = await manager.CreateAsync(user);
+            var result = await manager.CreateAsync(user).ConfigureAwait(false);
             Assert.Empty(result.Errors);
             return user;
         }

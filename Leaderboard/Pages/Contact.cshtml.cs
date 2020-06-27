@@ -1,7 +1,6 @@
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Leaderboard.Areas.Identity.Managers;
 using Leaderboard.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -37,7 +36,7 @@ namespace Leaderboard.Pages
                 ContactModel.Email = Email ?? ContactModel.Email;
 
                 // TODO implement email
-                await Task.CompletedTask;
+                await Task.CompletedTask.ConfigureAwait(false);
             }
             return Partial("Forms/_ContactFormPartial", ContactModel);
         }

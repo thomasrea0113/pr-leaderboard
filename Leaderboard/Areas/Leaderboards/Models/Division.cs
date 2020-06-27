@@ -2,14 +2,9 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Leaderboard.Models.Features;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using System.Collections.Generic;
-using Leaderboard.Models;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using Leaderboard.Areas.Identity.Models;
 using Newtonsoft.Json;
-using static Leaderboard.Utilities.SlugUtilities;
 
 namespace Leaderboard.Areas.Leaderboards.Models
 {
@@ -19,7 +14,7 @@ namespace Leaderboard.Areas.Leaderboards.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string Id { get; set; }
 
-        public GenderValues? Gender { get; set; }
+        public GenderValue? Gender { get; set; }
         public string Name { get; set; }
 
         // public string IconId { get; set; }

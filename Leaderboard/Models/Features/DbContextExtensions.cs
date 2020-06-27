@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -76,7 +75,7 @@ namespace Leaderboard.Models.Features
                 if (entry.State == EntityState.Added || entry.State == EntityState.Modified)
                 {
                     if (entry.Entity is IOnDbPreSaveAsync onSave)
-                        await onSave.OnPreSaveAsync(entry.Context, entry.CurrentValues);
+                        await onSave.OnPreSaveAsync(entry.Context, entry.CurrentValues).ConfigureAwait(false);
                     if (entry.Entity is ISlugged slugged)
                         slugged.Slug = Slugify(slugged.Name);
                 }
@@ -84,7 +83,7 @@ namespace Leaderboard.Models.Features
                 if (entry.State == EntityState.Added)
                 {
                     if (entry.Entity is IOnDbPreCreateAsync onCreate)
-                        await onCreate.OnPreCreateAsync(entry.Context, entry.CurrentValues);
+                        await onCreate.OnPreCreateAsync(entry.Context, entry.CurrentValues).ConfigureAwait(false);
                 }
                 else if (entry.State == EntityState.Deleted)
                 {
@@ -100,7 +99,7 @@ namespace Leaderboard.Models.Features
                     {
                         // if not active, continue processing actions
                         if (entry.Entity is IOnDbPreDeleteAsync onDelete)
-                            await onDelete.OnDeleteAsync(entry.Context);
+                            await onDelete.OnDeleteAsync(entry.Context).ConfigureAwait(false);
                     }
                 }
             }
@@ -111,7 +110,7 @@ namespace Leaderboard.Models.Features
                 var entity = entry.Entity;
 
                 if (entity is IOnDbPreDeleteAsync onDelete)
-                    await onDelete.OnDeleteAsync(entry.Context);
+                    await onDelete.OnDeleteAsync(entry.Context).ConfigureAwait(false);
 
                 // if this model has an active feature, then we prevent the delete
                 // and set active to false

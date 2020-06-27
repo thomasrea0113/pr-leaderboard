@@ -17,7 +17,7 @@ namespace Leaderboard.Models.Features
         public static async ValueTask<TModel> FindActiveAsync<TModel>(this DbSet<TModel> set, params object[] keyValues)
             where TModel : class, IDbActive
         {
-            var found = await set.FindAsync(keyValues);
+            var found = await set.FindAsync(keyValues).ConfigureAwait(false);
             if (!found.IsActive)
                 return default;
             return found;

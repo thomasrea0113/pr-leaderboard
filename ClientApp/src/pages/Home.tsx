@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import 'react-dom';
 
-import { BrowserRouter as Router, useRouteMatch } from 'react-router-dom';
+import {
+    BrowserRouter as Router,
+    Route,
+    Switch,
+    Redirect,
+} from 'react-router-dom';
+
 import { useLoading } from '../hooks/useLoading';
 import { ensureDelay } from '../utilities/ensureDelay';
 import { HomeContext, ServerData } from '../Components/Home/HomeContext';
 import { HomeJumbotronComponent } from '../Components/Home/Jumbotron';
-import { HomeAboutComponent } from '../Components/Home/About';
-import { scrollToSection } from '../Components/Section';
+import { HomeUpdatesComponent } from '../Components/Home/HomeUpdatesComponent';
 
 interface ReactProps {
     initialUrl: string;
@@ -38,9 +43,6 @@ const HomeComponent: React.FC<ReactProps> = ({
         refreshData();
     }, []);
 
-    if (window.location.pathname !== '')
-        scrollToSection(window.location.pathname);
-
     return (
         <HomeContext.Provider
             value={{
@@ -51,8 +53,13 @@ const HomeComponent: React.FC<ReactProps> = ({
             }}
         >
             <div className="navbar-height" />
-            <HomeJumbotronComponent />
-            <HomeAboutComponent />
+            <Router>
+                <Switch>
+                    <Route path="/Recent" component={HomeUpdatesComponent} />
+                    <Route path="/" exact component={HomeJumbotronComponent} />
+                    <Route render={() => <Redirect to="/Error/404" />} />
+                </Switch>
+            </Router>
         </HomeContext.Provider>
     );
 };

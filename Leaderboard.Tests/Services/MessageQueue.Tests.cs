@@ -1,10 +1,6 @@
 using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Leaderboard.Services;
 using Leaderboard.Tests.TestSetup;
-using Leaderboard.Tests.TestSetup.Fixtures;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 

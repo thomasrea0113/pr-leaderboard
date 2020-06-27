@@ -12,29 +12,29 @@ using System;
 
 namespace Leaderboard.Pages
 {
+    /// <summary>
+    /// data to be sent to the react component on initial load
+    /// </summary>
+    public class ReactData
+    {
+        public IEnumerable<FeaturedViewModel> Featured { get; set; }
+    }
+
+    public class ReactProps
+    {
+        public string InitialUrl { get; set; }
+
+        /// <summary>
+        /// Any of array of stacked background images, from top to bottom
+        /// </summary>
+        /// <value></value>
+        public IList<string> BackgroundImages { get; set; }
+    }
+
     public class Index : PageModel
     {
         private readonly AppUserManager _manager;
-        private readonly string[] _bgUrl;
-
-        public class ReactProps
-        {
-            public string InitialUrl { get; set; }
-
-            /// <summary>
-            /// Any of array of stacked background images, from top to bottom
-            /// </summary>
-            /// <value></value>
-            public string[] BackgroundImages { get; set; }
-        }
-
-        /// <summary>
-        /// data to be sent to the react component on initial load
-        /// </summary>
-        public class ReactData
-        {
-            public IEnumerable<FeaturedViewModel> Featured { get; set; }
-        }
+        private readonly IList<string> _bgUrl;
 
         [BindProperty]
         public ReactProps Props { get; set; }
@@ -89,7 +89,7 @@ namespace Leaderboard.Pages
                 .Include(f => f.Board)
                     .ThenInclude(f => f.WeightClass)
                 .Include(f => f.User)
-                .Take(3).ToArrayAsync();
+                .Take(3).ToArrayAsync().ConfigureAwait(false);
 
             return new JsonResult(new ReactData
             {
@@ -100,11 +100,6 @@ namespace Leaderboard.Pages
         public void OnGet()
         {
             Initialize();
-        }
-
-        public async Task OnPostAsync()
-        {
-            await Task.CompletedTask;
         }
     }
 }

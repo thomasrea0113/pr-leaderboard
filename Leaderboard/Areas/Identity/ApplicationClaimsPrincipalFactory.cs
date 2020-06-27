@@ -17,7 +17,7 @@ namespace Leaderboard.Areas.Identity
 
         protected override async Task<ClaimsIdentity> GenerateClaimsAsync(ApplicationUser user)
         {
-            var identity = await base.GenerateClaimsAsync(user);
+            var identity = await base.GenerateClaimsAsync(user).ConfigureAwait(false);
             if (user.Email != null)
                 identity.AddClaim(new Claim(ClaimTypes.Email, user.Email));
             return identity;

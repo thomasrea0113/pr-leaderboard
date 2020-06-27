@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using static Leaderboard.Utilities.SlugUtilities;

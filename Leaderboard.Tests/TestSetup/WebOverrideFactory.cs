@@ -11,9 +11,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.TestHost;
 using Leaderboard.Extensions;
 using System;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System.Threading;
 using Leaderboard.Areas.Identity.Managers;
 using Microsoft.Extensions.Options;
 
@@ -54,7 +51,7 @@ namespace Leaderboard.Tests.TestSetup
                 throw new TimeoutException("seed timeout");
 
             if (!provider.GetRequiredService<AppUserManager>()
-                .EnsureAdminUsersAsync(adminUsers)
+                .EnsureAdminUsersAsync(adminUsers.ToArray())
                 .Wait(8000))
                 throw new TimeoutException("Ensure admin users timeout");
             return server;

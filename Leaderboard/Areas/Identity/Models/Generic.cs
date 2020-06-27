@@ -1,4 +1,3 @@
-using Leaderboard.Areas.Identity.Models;
 using Microsoft.AspNetCore.Identity;
 
 namespace Leaderboard.Areas.Identity.Models

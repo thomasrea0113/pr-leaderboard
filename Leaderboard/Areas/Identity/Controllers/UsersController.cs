@@ -25,8 +25,8 @@ namespace Leaderboard.Areas.Identity
         [Route("[action]")]
         public async Task<UserViewModel> Me()
         {
-            var user = await _userManager.GetUserAsync(User);
-            var userViewModel = new UserViewModel(user, await _userManager.IsInRoleAsync(user, "admin"));
+            var user = await _userManager.GetUserAsync(User).ConfigureAwait(false);
+            var userViewModel = new UserViewModel(user, await _userManager.IsInRoleAsync(user, "admin").ConfigureAwait(false));
             return userViewModel;
         }
 
@@ -45,7 +45,7 @@ namespace Leaderboard.Areas.Identity
                 users = users.Where(u => u.IsAdmin == isAdmin);
 
 
-            var userViewModels = (await users.ToArrayAsync())
+            var userViewModels = (await users.ToArrayAsync().ConfigureAwait(false))
                 // if isAdmin is defined, we know we're only returning users with that flag
                 // otherwise, return the user's admin state
                 .Select(u => new UserViewModel(u.u, isAdmin ?? u.IsAdmin));

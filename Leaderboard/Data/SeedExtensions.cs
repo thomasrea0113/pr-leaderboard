@@ -41,7 +41,11 @@ namespace Leaderboard.Data.SeedExtensions
             List<TEntity> objects = new List<TEntity>();
             foreach (var seedFile in seedFilePath)
                 if (File.Exists(seedFile))
-                    objects.AddRange(await JsonSerializer.DeserializeAsync<IEnumerable<TEntity>>(File.OpenRead(seedFile)));
+                {
+                    using var reader = File.OpenRead(seedFile);
+                    objects.AddRange(await JsonSerializer.DeserializeAsync<IEnumerable<TEntity>>(reader)
+                    .ConfigureAwait(false));
+                }
 
             return objects;
         }
@@ -96,12 +100,12 @@ namespace Leaderboard.Data.SeedExtensions
                 {
                     Id = GuidUtilities.Create($"role_{roleName}").ToString()
                 };
-                await manager.TryCreateByNameAsync(role);
+                await manager.TryCreateByNameAsync(role).ConfigureAwait(false);
                 yield return role;
             }
         }
 
-        private static async IAsyncEnumerable<ApplicationUser> GetOrCreateUsers(this AppUserManager manager, GenderValues? gender, params string[] userNames)
+        private static async IAsyncEnumerable<ApplicationUser> GetOrCreateUsers(this AppUserManager manager, GenderValue? gender, params string[] userNames)
         {
             foreach (var userName in userNames)
             {
@@ -111,7 +115,7 @@ namespace Leaderboard.Data.SeedExtensions
                     Gender = gender,
                     IsActive = true
                 };
-                await manager.CreateOrUpdateByNameAsync(user, "Password123");
+                await manager.CreateOrUpdateByNameAsync(user, "Password123").ConfigureAwait(false);
                 yield return user;
             }
         }
@@ -183,43 +187,43 @@ namespace Leaderboard.Data.SeedExtensions
             var roleManager = services.GetRequiredService<AppRoleManager>();
 
             // wait for the database to be created
-            await context.Database.EnsureCreatedAsync();
+            await context.Database.EnsureCreatedAsync().ConfigureAwait(false);
 
             // see below for an example of how to use the different bulk insert overloads
-            var weightClasses = await GetSeedDataFromFile<WeightClass>(environmentName);
-            await context.BulkInsertOrUpdateAsync(t => new { t.Id }, weightClasses.ToArray());
+            var weightClasses = await GetSeedDataFromFile<WeightClass>(environmentName).ConfigureAwait(false);
+            await context.BulkInsertOrUpdateAsync(t => new { t.Id }, weightClasses.ToArray()).ConfigureAwait(false);
 
-            var divisions = await GetSeedDataFromFile<Division>(environmentName);
-            await context.BulkInsertOrUpdateAsync((elist, e) => elist.Any(e2 => e2.Id == e.Id), divisions.ToArray());
+            var divisions = await GetSeedDataFromFile<Division>(environmentName).ConfigureAwait(false);
+            await context.BulkInsertOrUpdateAsync((elist, e) => elist.Any(e2 => e2.Id == e.Id), divisions.ToArray()).ConfigureAwait(false);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync().ConfigureAwait(false);
 
             // categoryId from Category.cs call to HasData()
             var divisionCategories = GenerateDivisionCategories(
                 divisions.Where(d => d.Id != "61a38bd5-49f1-4717-bd65-ab795da6fe26").ToList(),
                 "642313a2-1f0c-4329-a676-7a9cdac045bd");
-            await context.BulkInsertOrUpdateAsync(divisionCategories.ToArray());
+            await context.BulkInsertOrUpdateAsync(divisionCategories.ToArray()).ConfigureAwait(false);
 
             // adding the one running division to the running category
             var runningDivisions = divisions.Where(d => d.Id == "61a38bd5-49f1-4717-bd65-ab795da6fe26" ||
             d.Id == "47a6f903-e450-45a3-8793-15856c9bc88f").ToList();
             divisionCategories = GenerateDivisionCategories(runningDivisions, "6772a358-e5b7-49dd-a49b-9d855ed46c5e");
-            await context.BulkInsertOrUpdateAsync(divisionCategories.ToArray());
+            await context.BulkInsertOrUpdateAsync(divisionCategories.ToArray()).ConfigureAwait(false);
 
-            var divisionWeightClasses = await GetSeedDataFromFile<DivisionWeightClass>(environmentName);
-            await context.BulkInsertOrUpdateAsync(divisionWeightClasses.ToArray());
+            var divisionWeightClasses = await GetSeedDataFromFile<DivisionWeightClass>(environmentName).ConfigureAwait(false);
+            await context.BulkInsertOrUpdateAsync(divisionWeightClasses.ToArray()).ConfigureAwait(false);
 
             // adding bench/squat/deadlift to all divisions/weightclasses
             var boards = GenerateLeaderboards("e362dd90-d6fe-459b-ba26-09db002bfff6", divisions, weightClasses, "Bench", "Squat", "Deadlift");
-            await context.BulkInsertOrUpdateAsync(boards.ToArray());
+            await context.BulkInsertOrUpdateAsync(boards.ToArray()).ConfigureAwait(false);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync().ConfigureAwait(false);
 
-            var roles = await roleManager.GetOrCreateRoles("admin").ToListAsync();
-            var users = await userManager.GetOrCreateUsers(null, "Admin").ToListAsync();
-            await userManager.TryAddToRoleAsync(users.First(), "Admin");
+            var roles = await roleManager.GetOrCreateRoles("admin").ToListAsync().ConfigureAwait(false);
+            var users = await userManager.GetOrCreateUsers(null, "Admin").ToListAsync().ConfigureAwait(false);
+            await userManager.TryAddToRoleAsync(users.First(), "Admin").ConfigureAwait(false);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync().ConfigureAwait(false);
 
             // if not in productions, we want some dummy users and scores
             if (environmentName != "Production")
@@ -228,21 +232,22 @@ namespace Leaderboard.Data.SeedExtensions
                 // adding some null data for division/weight class. Important for testing.
                 // TODO determine real age/weight groups for sprinting and add more races
                 var sprintBoards = GenerateLeaderboards("12c7c15a-db13-4912-a7c8-fc86db54849b", runningDivisions, null, "100-Metre Dash", "40-Yard Dash");
-                await context.BulkInsertOrUpdateAsync(sprintBoards.ToArray());
+                await context.BulkInsertOrUpdateAsync(sprintBoards.ToArray()).ConfigureAwait(false);
 
-                await context.SaveChangesAsync();
+                await context.SaveChangesAsync().ConfigureAwait(false);
 
-                users = await userManager.GetOrCreateUsers(GenderValues.Male, "LifterDuder", "LiftLife", "Lifter22").ToListAsync();
+                users = await userManager.GetOrCreateUsers(GenderValue.Male, "LifterDuder", "LiftLife", "Lifter22")
+                    .ToListAsync().ConfigureAwait(false);
 
                 var ld = users.First();
                 ld.Weight = 75;
-                await userManager.UpdateAsync(ld);
+                await userManager.UpdateAsync(ld).ConfigureAwait(false);
 
                 var llUser = users.Single(u => u.UserName == "LiftLife");
                 var email = $"thomasrea0113@gmail.com";
                 llUser.Email = email;
                 llUser.NormalizedEmail = email.ToUpper();
-                await userManager.UpdateAsync(llUser);
+                await userManager.UpdateAsync(llUser).ConfigureAwait(false);
 
                 // setting some birthdates
                 users[0].BirthDate = DateTime.Parse("05/11/1993");
@@ -251,32 +256,35 @@ namespace Leaderboard.Data.SeedExtensions
 
                 var userCats = GenerateUserCategories("642313a2-1f0c-4329-a676-7a9cdac045bd", users.SkipLast(1).ToArray());
                 userCats = userCats.Concat(GenerateUserCategories("6772a358-e5b7-49dd-a49b-9d855ed46c5e", users.TakeLast(1).ToArray()));
-                await context.BulkInsertOrUpdateAsync(userCats.ToArray());
+                await context.BulkInsertOrUpdateAsync(userCats.ToArray()).ConfigureAwait(false);
 
                 boards = GenerateLeaderboards("e362dd90-d6fe-459b-ba26-09db002bfff6", divisions, null, "Null board weight 1", "Null weight board 2");
-                await context.BulkInsertOrUpdateAsync(boards.ToArray());
+                await context.BulkInsertOrUpdateAsync(boards.ToArray()).ConfigureAwait(false);
 
-                await context.SaveChangesAsync();
+                await context.SaveChangesAsync().ConfigureAwait(false);
 
                 // only add the user to half of there recommendations
                 var recommendations = users.ToAsyncEnumerable()
                     .SelectAwait(async u =>
                     {
-                        var recommendations = await userManager.GetRecommendedBoardsQuery(u).ToListAsync();
+                        var recommendations = await userManager.GetRecommendedBoardsQuery(u)
+                            .ToListAsync().ConfigureAwait(false);
                         if (recommendations.Any())
                             return (u, recommendations.Skip(recommendations.Count / 2).ToList());
                         return default;
                     })
                     .Where(ub => ub != default);
 
-                var userBoards = await GenerateUserLeaderboards(recommendations).ToArrayAsync();
-                await context.BulkInsertOrUpdateAsync(e => new { e.UserId, e.LeaderboardId }, userBoards);
+                var userBoards = await GenerateUserLeaderboards(recommendations)
+                    .ToArrayAsync().ConfigureAwait(false);
+                await context.BulkInsertOrUpdateAsync(e => new { e.UserId, e.LeaderboardId }, userBoards)
+                    .ConfigureAwait(false);
 
                 var scores = GenerateScores(userBoards.ToList());
-                await context.BulkInsertOrUpdateAsync(scores.ToArray());
+                await context.BulkInsertOrUpdateAsync(scores.ToArray()).ConfigureAwait(false);
             }
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync().ConfigureAwait(false);
         }
     }
 }

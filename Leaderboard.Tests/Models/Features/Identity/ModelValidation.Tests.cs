@@ -27,7 +27,7 @@ namespace Leaderboard.Tests.Models.Identity.Validators
             user.Email = "EHREHRHEdsdsdf92848****020394923949~!!";
 
             // first create the user
-            var result = await manager.CreateAsync(user);
+            var result = await manager.CreateAsync(user).ConfigureAwait(false);
 
             Assert.Contains(result.Errors, e => e.Description == describer.InvalidEmail(user.Email).Description);
         }
@@ -40,7 +40,7 @@ namespace Leaderboard.Tests.Models.Identity.Validators
             user.Email = default;
 
             var manager = scope.GetRequiredService<AppUserManager>();
-            var result = await manager.CreateAsync(user);
+            var result = await manager.CreateAsync(user).ConfigureAwait(false);
             Assert.True(result.Succeeded);
         }
 
@@ -58,10 +58,10 @@ namespace Leaderboard.Tests.Models.Identity.Validators
             users[1].Email = users[0].Email;
 
             // can create the first user with email;
-            var result = await manager.CreateAsync(users[0]);
+            var result = await manager.CreateAsync(users[0]).ConfigureAwait(false);
             Assert.Empty(result.Errors);
 
-            result = await manager.CreateAsync(users[1]);
+            result = await manager.CreateAsync(users[1]).ConfigureAwait(false);
 
             // email is a duplicate, so should contain the duplicate email identity error
             Assert.Contains(result.Errors, e => e.Description == describer.DuplicateEmail(users[1].Email).Description);

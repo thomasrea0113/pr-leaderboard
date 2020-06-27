@@ -118,7 +118,8 @@ namespace Leaderboard
                 //     a.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder()
                 //         .RequireRole("Admin")
                 //         .Build())));
-            }).AddNewtonsoftJson(o =>
+            })
+            .AddNewtonsoftJson(o =>
             {
                 o.UseCamelCasing(true);
                 o.SerializerSettings.Converters.Add(new StringEnumConverter());
@@ -142,7 +143,7 @@ namespace Leaderboard
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -156,6 +157,7 @@ namespace Leaderboard
                 app.UseHsts();
                 app.UseHttpsRedirection();
             }
+            app.UseStatusCodePagesWithReExecute("/Error/{0}");
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
 

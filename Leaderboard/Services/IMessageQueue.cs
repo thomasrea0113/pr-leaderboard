@@ -12,14 +12,14 @@ namespace Leaderboard.Services
         IEnumerable<T> GetAllMessages(bool peek = false);
     }
 
-    public interface IMessageQueue : IMessageIEnumerable<string> {}
+    public interface IMessageQueue : IMessageIEnumerable<string> { }
 
     public class TempDataMessageQueue : IMessageQueue
     {
         private readonly ITempDataDictionary _tempData;
-        public const string MESSAGE_QUEUE_KEY = "QueuedMessages";
-        private InvalidOperationException InvalidType(object type)
-            => new InvalidOperationException($"TempData key {MESSAGE_QUEUE_KEY} was of type {type.GetType()}, not {typeof(IEnumerable<string>)}");
+        public const string MessageQueryKey = "QueuedMessages";
+        private static InvalidOperationException InvalidType(object type)
+            => new InvalidOperationException($"TempData key {MessageQueryKey} was of type {type.GetType()}, not {typeof(IEnumerable<string>)}");
 
         public TempDataMessageQueue(ITempDataDictionaryFactory tempFactory, IHttpContextAccessor accessor)
         {
@@ -31,12 +31,12 @@ namespace Leaderboard.Services
             object messages;
 
             if (!peek)
-                if (_tempData.ContainsKey(MESSAGE_QUEUE_KEY))
-                    messages = _tempData[MESSAGE_QUEUE_KEY];
+                if (_tempData.ContainsKey(MessageQueryKey))
+                    messages = _tempData[MessageQueryKey];
                 else
                     return Enumerable.Empty<string>();
             else
-                messages = _tempData.Peek(MESSAGE_QUEUE_KEY);
+                messages = _tempData.Peek(MessageQueryKey);
 
             if (messages == default)
                 return Enumerable.Empty<string>();
@@ -49,16 +49,16 @@ namespace Leaderboard.Services
 
         public void PushMessage(string message)
         {
-            var exists = _tempData.TryGetValue(MESSAGE_QUEUE_KEY, out var messagesObject);
+            var exists = _tempData.TryGetValue(MessageQueryKey, out var messagesObject);
 
             if (!exists)
             {
-                _tempData[MESSAGE_QUEUE_KEY] = new string[] { message };
+                _tempData[MessageQueryKey] = new string[] { message };
             }
             else if (messagesObject is IEnumerable<string> messages)
             {
                 // Need to evaluate the appended enumerable so that it can be serialized
-                _tempData[MESSAGE_QUEUE_KEY] = messages.Append(message).ToArray();
+                _tempData[MessageQueryKey] = messages.Append(message).ToArray();
             }
             else
             {

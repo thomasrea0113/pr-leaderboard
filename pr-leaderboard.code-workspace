@@ -51,6 +51,7 @@
 		"omnisharp.defaultLaunchSolution": "Solution/pr-leaderboard.sln",
 		"dotnet-test-explorer.testProjectPath": "**/*.Tests.csproj",
 		"jest.autoEnable": false,
+		"omnisharp.enableEditorConfigSupport": true,
 	},
 	"extensions": {
 		"recommendations": [

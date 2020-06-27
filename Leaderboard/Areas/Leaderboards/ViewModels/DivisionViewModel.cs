@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Leaderboard.Areas.Identity.Models;
@@ -11,7 +10,7 @@ namespace Leaderboard.Areas.Leaderboards.ViewModels
         public string Id { get; private set; }
         public string Name { get; private set; }
         public List<CategoryViewModel> Categories { get; private set; }
-        public GenderValues? Gender { get; private set; }
+        public GenderValue? Gender { get; private set; }
         public int? AgeLowerBound { get; private set; }
         public int? AgeUpperBound { get; private set; }
 

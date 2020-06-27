@@ -1,5 +1,5 @@
 using System;
-using Leaderboard.Areas.Uploads.Utilities;
+using System.Collections.Generic;
 using Leaderboard.Services;
 
 namespace Leaderboard
@@ -8,16 +8,10 @@ namespace Leaderboard
     {
         public NavConfiguration Nav { get; set; } = new NavConfiguration();
 
-        public string[] HomeBackgroundUrls { get; set; }
-        public string[] AdminUsers { get; set; } = Array.Empty<string>();
+        public IList<string> HomeBackgroundUrls { get; set; }
+        public IList<string> AdminUsers { get; set; } = Array.Empty<string>();
         public MigrationConfiguration AutoMigrate { get; set; } = new MigrationConfiguration();
         public SmtpEmailSenderConfig Mail { get; set; } = new SmtpEmailSenderConfig();
-
-        /// <summary>
-        /// For large file uploads
-        /// </summary>
-        /// <returns></returns>
-        public MultipartModelBinderConfig MultipartModelBinder { get; set; } = new MultipartModelBinderConfig();
     }
 
     public class NavConfiguration

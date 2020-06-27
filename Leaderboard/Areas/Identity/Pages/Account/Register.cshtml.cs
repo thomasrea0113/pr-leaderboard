@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
-using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Areas.Identity.Managers;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -106,16 +104,12 @@ namespace Leaderboard.Areas.Identity.Pages.Account
         {
             Categories = new SelectList(await _ctx.Categories
                 .AsQueryable()
-                .ToArrayAsync(), nameof(Category.Name), nameof(Category.Name));
-        }
-
-        public void OnGet()
-        {
+                .ToArrayAsync().ConfigureAwait(false), nameof(Category.Name), nameof(Category.Name));
         }
 
         public async Task<IActionResult> OnGetFormAsync()
         {
-            await InitModelAsync();
+            await InitModelAsync().ConfigureAwait(false);
             return Partial("Forms/_RegisterFormPartial", this);
         }
 
@@ -135,7 +129,7 @@ namespace Leaderboard.Areas.Identity.Pages.Account
 
                 };
 
-                var result = await _userManager.CreateAsync(user, Input.Password);
+                var result = await _userManager.CreateAsync(user, Input.Password).ConfigureAwait(false);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
@@ -144,7 +138,7 @@ namespace Leaderboard.Areas.Identity.Pages.Account
                     {
                         var categories = await _ctx.Categories.AsQueryable()
                             .Where(c => Input.Interests.Contains(c.Name))
-                            .ToListAsync();
+                            .ToListAsync().ConfigureAwait(false);
 
                         if (categories.Any())
                         {
@@ -152,14 +146,14 @@ namespace Leaderboard.Areas.Identity.Pages.Account
                             {
                                 UserId = user.Id,
                                 CategoryId = c.Id
-                            }));
-                            await _ctx.SaveChangesAsync();
+                            })).ConfigureAwait(false);
+                            await _ctx.SaveChangesAsync().ConfigureAwait(false);
                         }
                     }
 
                     if (Input.Email != default)
                     {
-                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user).ConfigureAwait(false);
                         code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
                         var callbackUrl = Url.Page(
@@ -169,7 +163,8 @@ namespace Leaderboard.Areas.Identity.Pages.Account
                             protocol: Request.Scheme);
 
                         await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                            await _renderer.RenderPartialToStringAsync("_EmailConfirmationPartial", user, new { callbackUrl }));
+                            await _renderer.RenderPartialToStringAsync("_EmailConfirmationPartial", user, new { callbackUrl })
+                            .ConfigureAwait(false)).ConfigureAwait(false);
 
                         if (_userManager.Options.SignIn.RequireConfirmedAccount)
                         {
@@ -178,8 +173,9 @@ namespace Leaderboard.Areas.Identity.Pages.Account
                         }
                     }
 
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    _messages.PushMessage(await _renderer.RenderPartialToStringAsync("_RegisterSuccessPartial", user));
+                    await _signInManager.SignInAsync(user, isPersistent: false).ConfigureAwait(false);
+                    _messages.PushMessage(await _renderer.RenderPartialToStringAsync("_RegisterSuccessPartial", user)
+                        .ConfigureAwait(false));
                     return this.JavascriptRedirect(ReturnUrl);
                 }
                 foreach (var error in result.Errors)
@@ -189,7 +185,7 @@ namespace Leaderboard.Areas.Identity.Pages.Account
             }
 
             // If we got this far, something failed, redisplay form
-            await InitModelAsync();
+            await InitModelAsync().ConfigureAwait(false);
             return Partial("Forms/_RegisterFormPartial", this);
         }
     }

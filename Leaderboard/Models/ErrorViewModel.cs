@@ -1,5 +1,3 @@
-using System;
-
 namespace Leaderboard.Models
 {
     public class ErrorViewModel

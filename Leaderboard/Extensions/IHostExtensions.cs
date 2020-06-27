@@ -25,21 +25,21 @@ namespace Leaderboard.Extensions
         {
             var ctx = provider.GetRequiredService<ApplicationDbContext>();
 
-            var pending = await ctx.Database.GetPendingMigrationsAsync();
-            var current = (await ctx.Database.GetAppliedMigrationsAsync()).LastOrDefault();
+            var pending = await ctx.Database.GetPendingMigrationsAsync().ConfigureAwait(false);
+            var current = (await ctx.Database.GetAppliedMigrationsAsync().ConfigureAwait(false)).LastOrDefault();
             if (pending.Any())
             {
                 var migrator = ctx.Database.GetService<IMigrator>();
-                await ctx.Database.MigrateAsync();
+                await ctx.Database.MigrateAsync().ConfigureAwait(false);
                 if (seed)
                     try
                     {
-                        await provider.SeedDataAsync(env);
+                        await provider.SeedDataAsync(env).ConfigureAwait(false);
                     }
                     catch
                     {
                         // if the seed failed, then we want to remove the migration(s) we just added
-                        await migrator.MigrateAsync(current ?? "0");
+                        await migrator.MigrateAsync(current ?? "0").ConfigureAwait(false);
                         throw;
                     }
             }

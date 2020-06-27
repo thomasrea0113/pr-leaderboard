@@ -1,5 +1,3 @@
-using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using Leaderboard.Tests.TestSetup;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -26,7 +24,8 @@ namespace Leaderboard.Tests.Services
 
             // send the email. If no exception is throw, then all is well
             var to = $"thomasrea0113@gmail.com";
-            await mailer.SendEmailAsync(to, "PR Leaderboard Unit Test", "This email was generated as part of the Leaderboard Unit Tests. You can ignore this message.");
+            await mailer.SendEmailAsync(to, "PR Leaderboard Unit Test", "This email was generated as part of the Leaderboard Unit Tests. You can ignore this message.")
+                .ConfigureAwait(false);
         }
     }
 }

@@ -3,7 +3,6 @@ using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -48,7 +47,7 @@ namespace Leaderboard.Services
             await _mailer.SendMailAsync(new MailMessage(_config.FromAddress, email, subject, htmlMessage)
             {
                 IsBodyHtml = true,
-            });
+            }).ConfigureAwait(false);
             _logger.LogInformation("mail send to {email}", email);
         }
 

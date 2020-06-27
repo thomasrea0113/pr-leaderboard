@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Data;
@@ -24,8 +23,8 @@ namespace Leaderboard.Areas.Identity.Managers
 
             // need to first normalize the name
             role.NormalizedName = role.Name.Normalize().ToUpper();
-            var existing = await FindByNameAsync(role.NormalizedName);
-            if(existing != null)
+            var existing = await FindByNameAsync(role.NormalizedName).ConfigureAwait(false);
+            if (existing != null)
             {
                 // if the user exists, return it and overwrite passed values. 
                 var dbEntry = Context.Entry(existing);
@@ -42,7 +41,7 @@ namespace Leaderboard.Areas.Identity.Managers
                 return null;
             }
             else
-                return await CreateAsync(role);
+                return await CreateAsync(role).ConfigureAwait(false);
         }
     }
 }

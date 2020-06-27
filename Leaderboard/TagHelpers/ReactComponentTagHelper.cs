@@ -1,14 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.Json;
-using System.Text.RegularExpressions;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Razor.TagHelpers;
-using Microsoft.AspNetCore.SpaServices.StaticFiles;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 

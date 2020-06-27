@@ -3,7 +3,6 @@ using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Models.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Leaderboard.Areas.Uploads.Models;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Leaderboard.Areas.Leaderboards.Models
@@ -14,9 +13,6 @@ namespace Leaderboard.Areas.Leaderboards.Models
         public string Id { get; set; }
 
         public bool IsApproved { get; set; }
-
-        [JsonIgnore]
-        public virtual AppFile VideoProof { get; set; }
 
         public string BoardId { get; set; }
 
@@ -35,12 +31,6 @@ namespace Leaderboard.Areas.Leaderboards.Models
             builder.HasOne(e => e.Board)
                 .WithMany(e => e.Scores)
                 .HasForeignKey(e => e.BoardId);
-
-            // we don't need to access the score from the file directly,
-            // so we call WithMany with no argument and let it create a 
-            // shadow property
-            builder.HasOne(b => b.VideoProof)
-                .WithMany();
 
             builder.HasOne(e => e.User)
                 .WithMany(e => e.Scores)

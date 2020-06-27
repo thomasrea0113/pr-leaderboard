@@ -1,13 +1,11 @@
 ﻿using System;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using Leaderboard.Models.Features;
 using Leaderboard.Models.Relationships;
 using System.Threading.Tasks;
 using System.Threading;
 using Leaderboard.Areas.Leaderboards.Models;
-using Leaderboard.Areas.Uploads.Models;
 using Leaderboard.Areas.Identity.Models;
 
 namespace Leaderboard.Data
@@ -23,7 +21,6 @@ namespace Leaderboard.Data
         public DbSet<WeightClass> WeightClasses { get; set; }
         public DbSet<ScoreModel> Scores { get; set; }
         public DbSet<UnitOfMeasureModel> UnitsOfMeasure { get; set; }
-        public DbSet<AppFile> UploadedFiles { get; set; }
         public DbSet<Category> Categories { get; set; }
 
         #region relationship tables
@@ -51,12 +48,12 @@ namespace Leaderboard.Data
 
         public override async Task<int> SaveChangesAsync(CancellationToken ct = default)
         {
-            this.ChangeTracker.DetectChanges();
-            var allEntries = this.ChangeTracker.Entries();
-            await allEntries.ProcessPreSaveFeaturesAsync();
-            this.ChangeTracker.DetectChanges();
-            var count = await base.SaveChangesAsync();
-            await allEntries.ProcessPostSaveFeaturesAsync();
+            ChangeTracker.DetectChanges();
+            var allEntries = ChangeTracker.Entries();
+            await allEntries.ProcessPreSaveFeaturesAsync().ConfigureAwait(false);
+            ChangeTracker.DetectChanges();
+            var count = await base.SaveChangesAsync().ConfigureAwait(false);
+            await allEntries.ProcessPostSaveFeaturesAsync().ConfigureAwait(false);
             return count;
         }
     }

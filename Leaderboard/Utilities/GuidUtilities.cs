@@ -18,17 +18,17 @@ namespace Leaderboard.Utilities
         /// Tries to parse the specified string as a <see cref="Guid"/>.  A return value indicates whether the operation succeeded.
         /// </summary>
         /// <param name="value">The GUID string to attempt to parse.</param>
-        /// <param name="guid">When this method returns, contains the <see cref="Guid"/> equivalent to the GUID
+        /// <param name="guidValue">When this method returns, contains the <see cref="Guid"/> equivalent to the GUID
         /// contained in <paramref name="value"/>, if the conversion succeeded, or Guid.Empty if the conversion failed.</param>
         /// <returns><c>true</c> if a GUID was successfully parsed; <c>false</c> otherwise.</returns>
-        public static bool TryParse(string? value, out Guid guid) => Guid.TryParse(value, out guid);
+        public static bool TryParse(string? value, out Guid guidValue) => Guid.TryParse(value, out guidValue);
 
         /// <summary>
         /// Converts a GUID to a lowercase string with no dashes.
         /// </summary>
-        /// <param name="guid">The GUID.</param>
+        /// <param name="guidValue">The GUID.</param>
         /// <returns>The GUID as a lowercase string with no dashes.</returns>
-        public static string ToLowerNoDashString(this Guid guid) => guid.ToString("N");
+        public static string ToLowerNoDashString(this Guid guidValue) => guidValue.ToString("N");
 
         /// <summary>
         /// Converts a lowercase, no dashes string to a GUID.

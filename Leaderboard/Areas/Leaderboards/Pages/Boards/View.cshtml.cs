@@ -12,7 +12,6 @@ using Leaderboard.Areas.Leaderboards.ViewModels;
 using Leaderboard.Data;
 using Leaderboard.Extensions;
 using Leaderboard.Services;
-using Leaderboard.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Routing;
@@ -28,6 +27,20 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
         public string Slug { get; set; }
     }
 
+    public class ReactProps
+    {
+        public string ScoresUrl { get; set; }
+        public string SubmitScoreUrl { get; set; }
+        public ClientFormFieldAttribuleMap<SubmitScoreViewModel> FieldAttributes { get; set; }
+    }
+
+    public class ReactState
+    {
+        public UserViewModel User { get; set; }
+        public LeaderboardViewModel Board { get; set; }
+        public IEnumerable<ScoreViewModel> Scores { get; set; }
+    }
+
     public class ViewModel : PageModel
     {
         private readonly ApplicationDbContext _ctx;
@@ -36,10 +49,9 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
         private readonly IFormFieldAttributeProvider _formFieldAttributeProvider;
         private readonly ScoresController _scoresController;
 
+        public ReactProps Props { get; private set; }
         public LeaderboardModel Board { get; private set; }
-
         private BoardRouteArgs RouteArgs { get; set; }
-
         private IQueryable<LeaderboardModel> BoardQuery { get; set; }
 
         [ViewData]
@@ -50,21 +62,6 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
 
         [ViewData]
         public bool DataModalShow { get; private set; }
-
-        public class ReactProps
-        {
-            public string ScoresUrl { get; set; }
-            public string SubmitScoreUrl { get; set; }
-            public ClientFormFieldAttribuleMap<SubmitScoreViewModel> FieldAttributes { get; set; }
-        }
-        public ReactProps Props { get; private set; }
-
-        public class ReactState
-        {
-            public UserViewModel User { get; set; }
-            public LeaderboardViewModel Board { get; set; }
-            public IEnumerable<ScoreViewModel> Scores { get; set; }
-        }
 
         public ViewModel(
             ApplicationDbContext ctx,
@@ -85,7 +82,7 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
             RouteArgs = RouteData.ToObject<BoardRouteArgs>();
 
             var tinfo = CultureInfo.CurrentCulture.TextInfo;
-            var genderValue = Enum.Parse<GenderValues>(tinfo.ToTitleCase(RouteArgs.Gender));
+            var genderValue = Enum.Parse<GenderValue>(tinfo.ToTitleCase(RouteArgs.Gender));
 
             BoardQuery = _ctx.Leaderboards.AsQueryable().Where(b =>
                 b.Division.Slug == RouteArgs.Division && b.Slug == RouteArgs.Slug &&
@@ -118,18 +115,18 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
         {
             Init();
 
-            var board = await BoardQuery.SingleAsync();
+            var board = await BoardQuery.SingleAsync().ConfigureAwait(false);
 
-            var scores = await _scoresController.All();
+            var scores = await _scoresController.All().ConfigureAwait(false);
 
             if (User.Identity.IsAuthenticated)
             {
-                var user = await _userManager.GetCompleteUserAsync(User);
+                var user = await _userManager.GetCompleteUserAsync(User).ConfigureAwait(false);
 
                 var isMember = await _ctx.Entry(user).Collection(b => b.UserLeaderboards).Query()
-                    .AnyAsync(ub => ub.LeaderboardId == board.Id);
+                    .AnyAsync(ub => ub.LeaderboardId == board.Id).ConfigureAwait(false);
                 var isRecommended = await _userManager.GetRecommendedBoardsQuery(user)
-                    .AnyAsync(b => b.Id == board.Id);
+                    .AnyAsync(b => b.Id == board.Id).ConfigureAwait(false);
 
                 return new JsonResult(new ReactState
                 {
@@ -146,25 +143,23 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
             });
         }
 
-        public async Task OnGetJoinAsync()
+        public Task OnGetJoin()
         {
             Init();
 
             // TODO confirm user is not already in this board
-            await Task.CompletedTask;
 
             ModalTitle = "Join Board";
             ModalBody = "Would you like to join this board?";
             DataModalShow = true;
+            return Task.CompletedTask;
         }
 
-        public async Task<RedirectToPageResult> OnPostModalAsync()
+        public Task<RedirectToPageResult> OnPostModalAsync()
         {
-            // TODO implement join
-            await Task.CompletedTask;
 
             _messages.PushMessage("You've joined this board!");
-            return RedirectToPage();
+            return Task.FromResult(RedirectToPage());
         }
     }
 }

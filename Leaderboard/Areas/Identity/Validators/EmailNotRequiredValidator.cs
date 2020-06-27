@@ -1,4 +1,3 @@
-using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Leaderboard.Areas.Identity.Models;
@@ -27,14 +26,14 @@ namespace Leaderboard.Areas.Identity.Validators
             if (user.Email != default)
             {
                 // username is just whitespace
-                if (String.IsNullOrWhiteSpace(user.Email))
+                if (string.IsNullOrWhiteSpace(user.Email))
                     return invalid;
 
                 // not a valid email
                 if (!Regex.IsMatch(user.Email, EmailRegexString))
                     return invalid;
 
-                var emailExists = await manager.Users.AnyAsync(u => u.Email == user.Email);
+                var emailExists = await manager.Users.AnyAsync(u => u.Email == user.Email).ConfigureAwait(false);
 
                 if (emailExists)
                     return IdentityResult.Failed(_describer.DuplicateEmail(user.Email));

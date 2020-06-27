@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,7 +15,7 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
 {
     public class ApproveModel
     {
-        public string[] Ids { get; set; }
+        public IList<string> Ids { get; set; }
     }
 
     [ApiController]
@@ -41,12 +40,12 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
             var scores = await _ctx.Scores.AsQueryable()
                 .Where(s => !s.IsApproved)
                 .Where(s => ids.Contains(s.Id))
-                .ToArrayAsync();
+                .ToArrayAsync().ConfigureAwait(false);
 
             foreach (var score in scores)
                 score.IsApproved = true;
 
-            await _ctx.SaveChangesAsync();
+            await _ctx.SaveChangesAsync().ConfigureAwait(false);
 
             return scores;
         }
@@ -66,7 +65,7 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
             if (isApproved != null)
                 query = query.Where(s => s.IsApproved == isApproved);
 
-            return (await query.ToArrayAsync()).Select(s => new ScoreViewModel(s));
+            return (await query.ToArrayAsync().ConfigureAwait(false)).Select(s => new ScoreViewModel(s));
         }
 
         [Authorize]
@@ -81,10 +80,11 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
                 .Where(b => b.Id == model.BoardId)
                 .Include(b => b.Division)
                 .Include(b => b.WeightClass)
-                .SingleAsync();
+                .SingleAsync().ConfigureAwait(false);
 
             var isMember = (await _ctx.Set<UserLeaderboard>().AsQueryable()
                 .CountAsync(ub => ub.UserId == _um.GetUserId(User) && ub.LeaderboardId == board.Id)
+                .ConfigureAwait(false)
             ) == 1;
 
             if (!isMember)
@@ -101,7 +101,7 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
                 Value = model.Score
             }).Entity;
 
-            await _ctx.SaveChangesAsync();
+            await _ctx.SaveChangesAsync().ConfigureAwait(false);
 
             var page = Url.Page("/Boards/View", null, board.GetViewArgs(), null, null, $"score={score.Id}");
 

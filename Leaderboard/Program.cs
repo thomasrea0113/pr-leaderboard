@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using Leaderboard.Areas.Identity.Managers;
 using Leaderboard.Extensions;
@@ -10,7 +11,7 @@ using Microsoft.Extensions.Options;
 
 namespace Leaderboard
 {
-    public class Program
+    public static class Program
     {
         public static async Task Main(string[] args)
         {
@@ -24,14 +25,14 @@ namespace Leaderboard
 
                 // TODO log seed, catch Migrate exception and notify user that no changes to the database were applied
                 if (config.AutoMigrate.Enabled)
-                    await services.MigrateAsync(env, config.AutoMigrate.AutoSeed);
+                    await services.MigrateAsync(env, config.AutoMigrate.AutoSeed).ConfigureAwait(false);
 
                 // make sure the admin users in the appSettings are in the admin role
                 await services.GetRequiredService<AppUserManager>()
-                    .EnsureAdminUsersAsync(config.AdminUsers);
+                    .EnsureAdminUsersAsync(config.AdminUsers.ToArray()).ConfigureAwait(false);
             }
 
-            await host.RunAsync();
+            await host.RunAsync().ConfigureAwait(false);
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

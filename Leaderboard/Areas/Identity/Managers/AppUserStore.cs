@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Areas.Leaderboards.Models;
 using Leaderboard.Data;
-using Leaderboard.Extensions;
-using Leaderboard.Models.Relationships;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -79,7 +77,7 @@ namespace Leaderboard.Areas.Identity.Managers
             if (newEntry.State != EntityState.Detached)
                 throw new InvalidOperationException($"This method should only be called on an entity that is in state '{EntityState.Detached}'");
 
-            var existing = await FindByIdAsync(user.Id);
+            var existing = await FindByIdAsync(user.Id).ConfigureAwait(false);
             if (existing != null)
             {
                 // if the user exists, return it and overwrite passed values. 
@@ -97,7 +95,7 @@ namespace Leaderboard.Areas.Identity.Managers
                 return null;
             }
             else
-                return await CreateAsync(user);
+                return await CreateAsync(user).ConfigureAwait(false);
         }
 
         public IQueryable<ScoreModel> GetFeaturedQuery()

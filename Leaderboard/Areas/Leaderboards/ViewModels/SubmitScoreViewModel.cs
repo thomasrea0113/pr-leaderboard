@@ -1,7 +1,4 @@
-using System;
 using System.ComponentModel.DataAnnotations;
-using Leaderboard.Areas.Leaderboards.Models;
-using Leaderboard.Areas.Leaderboards.Validators;
 
 namespace Leaderboard.Areas.Leaderboards.ViewModels
 {

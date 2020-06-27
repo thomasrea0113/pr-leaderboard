@@ -1,15 +1,11 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Leaderboard.Areas.Identity;
 using Leaderboard.Areas.Identity.Managers;
 using Leaderboard.Areas.Identity.ViewModels;
-using Leaderboard.Data;
 using Leaderboard.Tests.TestSetup;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -51,13 +47,13 @@ namespace Leaderboard.Tests.Api
             var users = scope.GetRequiredService<UsersController>();
 
             var activeAdminUsers = (await scope.GetRequiredService<AppUserManager>()
-                .GetUsersInRoleAsync("admin"))
+                .GetUsersInRoleAsync("admin").ConfigureAwait(false))
                 .Where(u => u.IsActive)
                 .Select(u => new UserViewModel(u, true))
                 .OrderBy(u => u.UserName)
                 .ToList();
 
-            var allActiveUsers = (await users.All(isActive: true))
+            var allActiveUsers = (await users.All(isActive: true).ConfigureAwait(false))
                 .OrderBy(u => u.UserName)
                 .ToList();
 

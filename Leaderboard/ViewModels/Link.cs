@@ -1,5 +1,3 @@
-using System;
-
 namespace Leaderboard.ViewModels
 {
     // An enum of bootstrap 4 button classes, for customizing buttons server-side

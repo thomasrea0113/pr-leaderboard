@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 
 namespace Leaderboard.Extensions
@@ -11,7 +10,7 @@ namespace Leaderboard.Extensions
         /// <param name="obj"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static T ToObject<T>(this object obj) 
+        public static T ToObject<T>(this object obj)
             where T : class, new()
         {
             var objProps = obj.GetType().GetProperties();

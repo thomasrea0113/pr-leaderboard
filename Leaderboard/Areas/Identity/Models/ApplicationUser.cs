@@ -8,11 +8,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Leaderboard.Utilities.Extensions;
-using Leaderboard.Areas.Uploads.Models;
 
 namespace Leaderboard.Areas.Identity.Models
 {
-    public enum GenderValues
+    public enum GenderValue
     {
         Male,
         Female,
@@ -21,7 +20,7 @@ namespace Leaderboard.Areas.Identity.Models
 
     public class ApplicationUser : IdentityUser, IDbEntity<ApplicationUser>, IDbActive
     {
-        public GenderValues? Gender { get; set; }
+        public GenderValue? Gender { get; set; }
         public decimal? Weight { get; set; }
 
         public DateTime? BirthDate { get; set; }
@@ -31,7 +30,6 @@ namespace Leaderboard.Areas.Identity.Models
 
         public virtual ICollection<UserLeaderboard> UserLeaderboards { get; set; } = new List<UserLeaderboard>();
         public virtual ICollection<ScoreModel> Scores { get; set; } = new List<ScoreModel>();
-        public virtual ICollection<AppFile> UploadedFiles { get; set; } = new List<AppFile>();
 
         public virtual ICollection<UserCategory> UserCategories { get; set; } = new List<UserCategory>();
 

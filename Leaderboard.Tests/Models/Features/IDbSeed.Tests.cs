@@ -1,9 +1,7 @@
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Leaderboard.Areas.Identity.Managers;
-using Leaderboard.Areas.Leaderboards.Models;
 using Leaderboard.Data;
 using Leaderboard.Data.SeedExtensions;
 using Leaderboard.Tests.TestSetup;
@@ -29,18 +27,18 @@ namespace Leaderboard.Tests.Models.Features
         {
             using var _ = CreateScope(out var scope);
 
-            await scope.GetRequiredService<IServiceProvider>().SeedDataAsync("development");
+            await scope.GetRequiredService<IServiceProvider>().SeedDataAsync("development").ConfigureAwait(false);
 
             var ctx = scope.GetRequiredService<ApplicationDbContext>();
             var um = scope.GetRequiredService<AppUserManager>();
 
-            var admin = await um.FindByNameAsync("Admin");
+            var admin = await um.FindByNameAsync("Admin").ConfigureAwait(false);
             Assert.NotNull(admin);
-            Assert.True(await um.IsInRoleAsync(admin, "Admin"));
+            Assert.True(await um.IsInRoleAsync(admin, "Admin").ConfigureAwait(false));
             Assert.Empty(admin.UserLeaderboards);
 
             var userName = "LifterDuder".Normalize().ToUpper();
-            var user = await um.GetCompleteUserAsync(u => u.NormalizedUserName == userName);
+            var user = await um.GetCompleteUserAsync(u => u.NormalizedUserName == userName).ConfigureAwait(false);
 
             Assert.NotNull(user);
             Assert.NotEmpty(user.UserLeaderboards);
@@ -61,7 +59,7 @@ namespace Leaderboard.Tests.Models.Features
             {
                 u.UserName,
                 u.Age
-            }).ToListAsync();
+            }).ToListAsync().ConfigureAwait(false);
         }
     }
 }
