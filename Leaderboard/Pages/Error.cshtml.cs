@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
-namespace Leaderboard.Areas.Error.Pages
+namespace Leaderboard.Pages
 {
     public class ErrorModel
     {
@@ -35,6 +35,10 @@ namespace Leaderboard.Areas.Error.Pages
             var exceptionHandlerPathFeature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
             var statusCodeReExecuteFeature = HttpContext.Features.Get<IStatusCodeReExecuteFeature>();
 
+            // in cases where the user routes directly to the error page
+            if (Response.StatusCode > 199 && Response.StatusCode < 300)
+                Response.StatusCode = 404;
+
             var statusCode = Response.StatusCode;
 
             if (exceptionHandlerPathFeature?.Error is Exception exception)
@@ -45,10 +49,11 @@ namespace Leaderboard.Areas.Error.Pages
                     exceptionHandlerPathFeature.Path);
             }
 
-            _logger.LogWarning(
-                "client got status code '{statusCode}' for address '{path}'",
-                statusCode,
-                statusCodeReExecuteFeature.OriginalPath);
+            if (statusCodeReExecuteFeature != null)
+                _logger.LogWarning(
+                    "client got status code '{statusCode}' for address '{path}'",
+                    statusCode,
+                    statusCodeReExecuteFeature.OriginalPath);
 
             PageError = new ErrorModel
             {

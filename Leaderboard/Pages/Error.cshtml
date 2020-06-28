@@ -1,5 +1,5 @@
-@page "/{code:int}"
-@using Leaderboard.Areas.Error.Pages
+@page "/Error/{code:int}"
+@using Leaderboard.Pages
 @model ErrorPageModel
 
 <h3>@Model.PageError.StatusCode - @Model.PageError.Message</h3>

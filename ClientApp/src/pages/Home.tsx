@@ -1,66 +1,63 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import 'react-dom';
 
-import {
-    BrowserRouter as Router,
-    Route,
-    Switch,
-    Redirect,
-} from 'react-router-dom';
-
-import { useLoading } from '../hooks/useLoading';
-import { ensureDelay } from '../utilities/ensureDelay';
-import { HomeContext, ServerData } from '../Components/Home/HomeContext';
-import { HomeJumbotronComponent } from '../Components/Home/Jumbotron';
-import { HomeUpdatesComponent } from '../Components/Home/HomeUpdatesComponent';
+import { Link } from 'react-router-dom';
+import { FontawesomeIconToIcon } from '../Components/StyleComponents';
 
 interface ReactProps {
     initialUrl: string;
     backgroundImages: string[];
 }
 
-const HomeComponent: React.FC<ReactProps> = ({
-    initialUrl,
-    backgroundImages,
-}) => {
-    const { isLoading, isLoaded, response, loadAsync } = useLoading<
-        ServerData
-    >();
-
-    const [delayed, setDelayed] = useState(false);
-
-    const isServerReady = isLoaded && !isLoading;
-
-    // We want to slow down the load for visual affect. If the load takes less than 1.5
-    // seconds, we pause
-    const refreshData = () =>
-        ensureDelay(1500, loadAsync({ actionUrl: initialUrl })).then(() =>
-            setDelayed(true)
-        );
-
-    // load on start
-    useEffect(() => {
-        refreshData();
-    }, []);
+const HomeComponent: React.FC<ReactProps> = ({ backgroundImages }) => {
+    const backgroundImage = useMemo(
+        () =>
+            [
+                ...backgroundImages.map(bg => `url(${bg})`),
+                'linear-gradient(180deg, rgba(9,10,15,1) 5%, rgba(27,39,53,1) 93%)',
+            ].join(','),
+        []
+    );
 
     return (
-        <HomeContext.Provider
-            value={{
-                isReady: isServerReady && delayed,
-                data: response?.data,
-                refreshData,
-                backgroundImages,
-            }}
-        >
+        <>
             <div className="navbar-height" />
-            <Router>
-                <Switch>
-                    <Route path="/Recent" component={HomeUpdatesComponent} />
-                    <Route path="/" exact component={HomeJumbotronComponent} />
-                    <Route render={() => <Redirect to="/Error/404" />} />
-                </Switch>
-            </Router>
-        </HomeContext.Provider>
+            <div
+                className="has-overlay vh-75 center-background animate-parallax"
+                style={{
+                    backgroundImage,
+                }}
+            >
+                <div className="stars-sm" />
+                <div className="stars-md" />
+                <div className="stars-lg" />
+                <div className="image-overlay">
+                    <div className="header">
+                        <div className="header-text animate-fadeinup">
+                            PR Leaderboard
+                        </div>
+                        <div className="animate-fadein">
+                            <div className="row" style={{ margin: '0 1rem' }}>
+                                <a
+                                    href="/Recent"
+                                    className="btn btn-col btn-outline-primary spaced-text"
+                                >
+                                    {FontawesomeIconToIcon('Go')}
+                                    &nbsp;&nbsp;Recent PRs
+                                </a>
+                                <a
+                                    href="/"
+                                    className="btn btn-col btn-outline-warning spaced-text"
+                                >
+                                    {FontawesomeIconToIcon('Go')}
+                                    &nbsp;&nbsp;Browse Boards
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
     );
 };
 

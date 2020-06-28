@@ -114,10 +114,6 @@ namespace Leaderboard
             services.AddRazorPages(o =>
             {
                 o.Conventions.AuthorizeAreaFolder("Admin", "/", "AppAdmin");
-                // o.Conventions.AddAreaFolderApplicationModelConvention("Admin", "/", a =>
-                //     a.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder()
-                //         .RequireRole("Admin")
-                //         .Build())));
             })
             .AddNewtonsoftJson(o =>
             {
@@ -174,7 +170,7 @@ namespace Leaderboard
                 // The Admin area is a react component that uses ReactRouter to
                 // handle routing inside the component, so all pages
                 // should route to the Index page
-                endpoints.MapFallbackToAreaPage("/Index", "Admin");
+                // endpoints.MapFallbackToAreaPage("/Index", "Admin");
             });
         }
     }
