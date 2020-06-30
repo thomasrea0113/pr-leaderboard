@@ -15,6 +15,7 @@ module.exports = () => {
             site: ['./src/Site.ts'],
             'board/view': ['./src/pages/Board/View.tsx'],
             admin: ['./src/pages/Admin.tsx'],
+            'board/recent': ['./src/pages/Board/Recent.tsx'],
         },
         output: {
             path: outDir,

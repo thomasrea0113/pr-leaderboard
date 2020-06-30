@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
+import 'react-dom';
+
 import { useLoading } from '../../hooks/useLoading';
 import { Score } from '../../types/dotnet-types';
-import { isArrayOf } from '../../types/guards/isArrayOf';
 import { isScore } from '../../types/guards/isScore';
-import { isFeatured } from '../../types/guards/isFeatured';
+import { isIndexOf, isArrayOf } from '../../types/guards/higherOrderGuards';
 
 interface Props {
     initialUrl: string;
@@ -13,10 +14,13 @@ type ServerData = Score[];
 
 const RecentComponent: React.FC<Props> = ({ initialUrl }) => {
     const { loadAsync, isLoaded, isLoading, response } = useLoading({
-        guard: isArrayOf(isFeatured(isScore)),
+        guard: isIndexOf(isArrayOf(isScore)),
     });
 
-    const reloadAsync = () => loadAsync({ actionUrl: initialUrl });
+    const reloadAsync = () =>
+        loadAsync({
+            actionUrl: initialUrl,
+        });
 
     useEffect(() => {
         reloadAsync();

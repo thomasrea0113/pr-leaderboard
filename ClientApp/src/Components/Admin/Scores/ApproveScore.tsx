@@ -16,7 +16,7 @@ import { ScoreColumns } from '../../tables/columns/score-columns';
 import { useFetchForm } from '../../../hooks/useFetchForm';
 import { HttpMethodsEnum } from '../../../types/types';
 import { isValidationErrorResponseData } from '../../../types/ValidationErrorResponse';
-import { isArrayOf } from '../../../types/guards/isArrayOf';
+import { isArrayOf } from '../../../types/guards/higherOrderGuards';
 import { isScore } from '../../../types/guards/isScore';
 
 interface ApproveScore {
@@ -30,7 +30,7 @@ export const ApproveScoreComponent: React.FC<{}> = () => {
     const { response, loadAsync, isLoaded, isLoading } = useLoading<Score[]>();
 
     const reloadAsync = () =>
-        loadAsync({ actionUrl: '/api/Scores/All?isApproved=false' });
+        loadAsync({ actionUrl: '/api/Scores?isApproved=false' });
 
     useEffect(() => {
         reloadAsync();

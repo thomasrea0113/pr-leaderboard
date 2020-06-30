@@ -1,4 +1,7 @@
+using Leaderboard.Areas.Leaderboards.Controllers;
+using Leaderboard.Extensions;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Routing;
 
 namespace Leaderboard.Areas.Leaderboards.Pages
 {
@@ -9,17 +12,28 @@ namespace Leaderboard.Areas.Leaderboards.Pages
 
     public class RecentsPageModel : PageModel
     {
-        public RecentsReactProps Props { get; set; }
+        private readonly LinkGenerator _link;
 
-        public RecentsPageModel()
+        public RecentsPageModel(LinkGenerator link)
         {
+            _link = link;
         }
+
+        public RecentsReactProps Props { get; set; }
 
         private void Init()
         {
             Props ??= new RecentsReactProps
             {
-                InitialUrl = Url.Link(null, new { handler = "initial" })
+                InitialUrl = _link.GetUriByAction(HttpContext,
+                    nameof(ScoresController.ByBoard),
+                    ControllerExtensions.GetControllerName<ScoresController>(),
+                    new ByBoardScoresQuery
+                    {
+                        IsApproved = true,
+                        Top = 5,
+                        TopBoards = 5,
+                    })
             };
         }
 

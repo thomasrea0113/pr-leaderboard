@@ -75,7 +75,7 @@ namespace Leaderboard.Tests.Controllers
             var context = scope.ServiceProvider.GetRequiredService<IHttpContextAccessor>().HttpContext;
 
             var uri = url.GetPathByAction(
-                context, nameof(ScoresController.All),
+                context, nameof(ScoresController.Get),
                 ControllerExtensions.GetControllerName<ScoresController>(),
                 new
                 {

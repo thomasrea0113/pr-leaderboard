@@ -117,7 +117,7 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
 
             var board = await BoardQuery.SingleAsync().ConfigureAwait(false);
 
-            var scores = await _scoresController.All().ConfigureAwait(false);
+            var scores = _scoresController.Get();
 
             if (User.Identity.IsAuthenticated)
             {

@@ -16,6 +16,9 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Leaderboard.Routing.Constraints;
 using Newtonsoft.Json.Converters;
+using AutoMapper;
+using AutoMapper.EquivalencyExpression;
+using Leaderboard.Models;
 
 namespace Leaderboard
 {
@@ -50,6 +53,13 @@ namespace Leaderboard
             });
 
             services.AddScoped<DbContext>(services => services.GetRequiredService<ApplicationDbContext>());
+
+            services.AddAutoMapper((provider, mapper) =>
+            {
+                mapper.AddCollectionMappers();
+                mapper.UseEntityFrameworkCoreModel<ApplicationDbContext>(provider);
+                mapper.AddProfile<AutoMapperProfile>();
+            }, typeof(ApplicationDbContext).Assembly);
 
             // adding the default user models
             services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
