@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using Leaderboard.Areas.Leaderboards.Models;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Leaderboard.Areas.Leaderboards.ViewModels
 {
@@ -9,38 +7,8 @@ namespace Leaderboard.Areas.Leaderboards.ViewModels
     /// </summary>
     public class UserLeaderboardViewModel : LeaderboardViewModel
     {
-        public bool IsMember { get; private set; }
-        public bool IsRecommended { get; private set; }
-        public string ViewUrl { get; set; }
-        public string JoinUrl { get; set; }
-
-        public UserLeaderboardViewModel(
-            LeaderboardModel model,
-            bool isMember,
-            bool isRecommended,
-            IUrlHelper url = default) : base(model)
-        {
-            IsMember = isMember;
-            IsRecommended = isRecommended;
-
-            if (url != default)
-            {
-                var args = model.GetViewArgs();
-                // NOTE - page will return null if it does not resolve to a valid url (including any route constraints)
-                ViewUrl = url.Page("/Boards/View", args);
-                JoinUrl = url.Page("/Boards/View", "join", args);
-            }
-        }
-
-        public static IEnumerable<UserLeaderboardViewModel> Create(
-            IEnumerable<LeaderboardModel> models,
-            bool isMember,
-            bool isRecommended,
-            IUrlHelper url = default)
-        {
-            foreach (var model in models)
-                yield return new UserLeaderboardViewModel(model, isMember, isRecommended, url);
-        }
+        public bool IsMember { get; set; }
+        public bool IsRecommended { get; set; }
 
         #region equality
 

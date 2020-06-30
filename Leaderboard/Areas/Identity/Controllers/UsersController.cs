@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Leaderboard.Areas.Identity.Managers;
 using Leaderboard.Areas.Identity.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Leaderboard.Areas.Identity
 {
@@ -15,10 +15,12 @@ namespace Leaderboard.Areas.Identity
     public class UsersController : ControllerBase
     {
         private readonly AppUserManager _userManager;
+        private readonly IMapper _mapper;
 
-        public UsersController(AppUserManager userManager)
+        public UsersController(AppUserManager userManager, IMapper mapper)
         {
             _userManager = userManager;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -26,31 +28,42 @@ namespace Leaderboard.Areas.Identity
         public async Task<UserViewModel> Me()
         {
             var user = await _userManager.GetUserAsync(User).ConfigureAwait(false);
-            var userViewModel = new UserViewModel(user, await _userManager.IsInRoleAsync(user, "admin").ConfigureAwait(false));
+            var userViewModel = _mapper.Map<UserViewModel>(user);
+            userViewModel.IsAdmin = await _userManager.IsInRoleAsync(user, "admin").ConfigureAwait(false);
             return userViewModel;
         }
 
         [HttpGet]
-        [Route("[action]")]
-        [Authorize(Roles = "admin")]
-        public async Task<IEnumerable<UserViewModel>> All(bool? isAdmin = null, bool? isActive = null)
+        [Route("")]
+        [Authorize(Policy = "AppAdmin")]
+        public IEnumerable<UserViewModel> Get(bool? isAdmin = null, bool? isActive = null)
         {
-            var users = _userManager.Users
-                .Select(u => new { IsAdmin = u.UserRoles.Any(u2 => u2.Role.NormalizedName == "ADMIN"), u });
+            var adminUserIds = _userManager.Users.Where(u =>
+                u.UserRoles.Any(ur => ur.Role.NormalizedName == "ADMIN"))
+                .Select(u => u.Id)
+                .ToArray();
+
+            var users = _mapper.ProjectTo<UserViewModel>(_userManager.Users);
 
             if (isActive != null)
-                users = users.Where(u => u.u.IsActive == isActive);
+                users = users.Where(u => u.IsActive == isActive);
+            // TODO test
+            foreach (var user in users)
+            {
+                // setting admin on this user
+                if (adminUserIds.Any(auid => auid == user.Id))
+                    user.IsAdmin = true;
 
-            if (isAdmin != null)
-                users = users.Where(u => u.IsAdmin == isAdmin);
-
-
-            var userViewModels = (await users.ToArrayAsync().ConfigureAwait(false))
-                // if isAdmin is defined, we know we're only returning users with that flag
-                // otherwise, return the user's admin state
-                .Select(u => new UserViewModel(u.u, isAdmin ?? u.IsAdmin));
-
-            return userViewModels;
+                // we are only pulling non-admin users, and this user is not an admin
+                if (isAdmin == false && !user.IsAdmin)
+                    yield return user;
+                // we are only pulling admin users, and this user is an admin
+                else if (isAdmin == true && user.IsAdmin)
+                    yield return user;
+                // isAdmin is null, so we are returning all users, whether or not they are an admin
+                else if (isAdmin == null)
+                    yield return user;
+            }
         }
     }
 }

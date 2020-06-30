@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Leaderboard.Areas.Identity;
 using Leaderboard.Areas.Identity.Managers;
 using Leaderboard.Areas.Identity.ViewModels;
@@ -45,15 +47,17 @@ namespace Leaderboard.Tests.Api
             using var _ = CreateScope(out var scope);
 
             var users = scope.GetRequiredService<UsersController>();
+            var mapper = scope.GetRequiredService<IMapper>();
 
             var activeAdminUsers = (await scope.GetRequiredService<AppUserManager>()
                 .GetUsersInRoleAsync("admin").ConfigureAwait(false))
                 .Where(u => u.IsActive)
-                .Select(u => new UserViewModel(u, true))
                 .OrderBy(u => u.UserName)
+                .AsQueryable()
+                .ProjectTo<UserViewModel>(mapper.ConfigurationProvider, new { IsAdmin = true })
                 .ToList();
 
-            var allActiveUsers = (await users.All(isActive: true).ConfigureAwait(false))
+            var allActiveUsers = users.Get(isActive: true)
                 .OrderBy(u => u.UserName)
                 .ToList();
 

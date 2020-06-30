@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Leaderboard.Areas.Identity.Managers;
 using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Areas.Identity.ViewModels;
@@ -48,6 +49,7 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
         private readonly AppUserManager _userManager;
         private readonly IFormFieldAttributeProvider _formFieldAttributeProvider;
         private readonly ScoresController _scoresController;
+        private readonly IMapper _mapper;
 
         public ReactProps Props { get; private set; }
         public LeaderboardModel Board { get; private set; }
@@ -68,13 +70,15 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
             IMessageQueue messages,
             AppUserManager userManager,
             IFormFieldAttributeProvider formFieldAttributeProvider,
-            ScoresController scoresController)
+            ScoresController scoresController,
+            IMapper mapper)
         {
             _ctx = ctx;
             _messages = messages;
             _userManager = userManager;
             _formFieldAttributeProvider = formFieldAttributeProvider;
             _scoresController = scoresController;
+            _mapper = mapper;
         }
 
         private void Init()
@@ -116,29 +120,37 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
             Init();
 
             var board = await BoardQuery.SingleAsync().ConfigureAwait(false);
+            var userBoardViewModel = _mapper.Map<UserLeaderboardViewModel>(board);
+            userBoardViewModel.IsMember = false;
+            userBoardViewModel.IsRecommended = false;
+
+            var args = board.GetViewArgs();
+            userBoardViewModel.ViewUrl = Url.Page("/Boards/View", args);
+            userBoardViewModel.JoinUrl = Url.Page("/Boards/View", "join", args);
 
             var scores = _scoresController.Get();
 
             if (User.Identity.IsAuthenticated)
             {
                 var user = await _userManager.GetCompleteUserAsync(User).ConfigureAwait(false);
+                var userViewModel = _mapper.Map<UserViewModel>(user);
 
-                var isMember = await _ctx.Entry(user).Collection(b => b.UserLeaderboards).Query()
+                userBoardViewModel.IsMember = await _ctx.Entry(user).Collection(b => b.UserLeaderboards).Query()
                     .AnyAsync(ub => ub.LeaderboardId == board.Id).ConfigureAwait(false);
-                var isRecommended = await _userManager.GetRecommendedBoardsQuery(user)
+                userBoardViewModel.IsRecommended = await _userManager.GetRecommendedBoardsQuery(user)
                     .AnyAsync(b => b.Id == board.Id).ConfigureAwait(false);
 
                 return new JsonResult(new ReactState
                 {
-                    User = new UserViewModel(user),
-                    Board = new UserLeaderboardViewModel(board, isMember, isRecommended),
+                    User = userViewModel,
+                    Board = userBoardViewModel,
                     Scores = scores,
                 });
             }
 
             return new JsonResult(new ReactState
             {
-                Board = new UserLeaderboardViewModel(board, false, false),
+                Board = userBoardViewModel,
                 Scores = scores,
             });
         }

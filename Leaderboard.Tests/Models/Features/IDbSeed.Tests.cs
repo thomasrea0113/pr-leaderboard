@@ -33,7 +33,7 @@ namespace Leaderboard.Tests.Models.Features
 
             var admin = await um.FindByNameAsync("Admin").ConfigureAwait(false);
             Assert.NotNull(admin);
-            Assert.True(await um.IsInRoleAsync(admin, "Admin").ConfigureAwait(false));
+            Assert.True(await um.IsInRoleAsync(admin, "admin").ConfigureAwait(false));
             Assert.Empty(admin.UserLeaderboards);
 
             var userName = "LifterDuder".Normalize().ToUpper();
@@ -42,6 +42,7 @@ namespace Leaderboard.Tests.Models.Features
             Assert.NotNull(user);
             Assert.NotEmpty(user.UserLeaderboards);
             Assert.All(user.UserLeaderboards, lb => Assert.NotEmpty(lb.Leaderboard.Division.DivisionCategories));
+            Assert.True(await um.IsInRoleAsync(user, "admin").ConfigureAwait(false));
 
             // TODO investigate... user.UserCategories is not empty, but the related properties on the object are not
             // lazy loaded (just return null instead of the proxy). We can get around this my querying the context

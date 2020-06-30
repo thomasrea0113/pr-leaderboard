@@ -1,3 +1,5 @@
+using Leaderboard.Areas.Identity.ViewModels;
+
 namespace Leaderboard.Areas.Leaderboards.ViewModels
 {
     public class ScoreViewModel
@@ -5,7 +7,8 @@ namespace Leaderboard.Areas.Leaderboards.ViewModels
         public string Id { get; set; }
         public bool IsApproved { get; set; }
         public string BoardId { get; set; }
-        public string UserId { get; set; }
+        public UserViewModel User { get; set; }
+
         public decimal Value { get; set; }
     }
 }

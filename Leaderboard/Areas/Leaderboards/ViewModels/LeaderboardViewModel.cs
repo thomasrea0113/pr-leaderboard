@@ -1,7 +1,4 @@
-using System.Collections.Generic;
-using System.Linq;
 using Leaderboard.Areas.Leaderboards.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace Leaderboard.Areas.Leaderboards.ViewModels
 {
@@ -20,33 +17,8 @@ namespace Leaderboard.Areas.Leaderboards.ViewModels
         public WeightClassViewModel WeightClass { get; private set; }
         public string Slug { get; private set; }
 
-        public LeaderboardViewModel(LeaderboardModel model)
-        {
-            Id = model.Id;
-            Name = model.Name;
-            Division = new DivisionViewModel(model.Division);
-            Slug = model.Slug;
-            UOM = new UnitOfMeasureViewModel(model.UOM);
-            if (model.WeightClass != null)
-                WeightClass = new WeightClassViewModel(model.WeightClass);
-        }
-
-        public static IEnumerable<LeaderboardViewModel> Create(IEnumerable<LeaderboardModel> models)
-        {
-            foreach (var model in models)
-                yield return new LeaderboardViewModel(model);
-        }
-
-        public static async IAsyncEnumerable<LeaderboardViewModel> FromQueryAsync(IQueryable<LeaderboardModel> query)
-        {
-            await foreach (var lb in query
-                .Include(b => b.Division)
-                .Include(b => b.WeightClass)
-                .Include(b => b.UOM).ToAsyncEnumerable())
-            {
-                yield return new LeaderboardViewModel(lb);
-            }
-        }
+        public string ViewUrl { get; set; }
+        public string JoinUrl { get; set; }
 
         #region equality
 

@@ -220,7 +220,7 @@ namespace Leaderboard.Data
 
             var roles = await roleManager.GetOrCreateRoles("admin").ToListAsync().ConfigureAwait(false);
             var users = await userManager.GetOrCreateUsers(null, "Admin").ToListAsync().ConfigureAwait(false);
-            await userManager.TryAddToRoleAsync(users.First(), "Admin").ConfigureAwait(false);
+            await userManager.TryAddToRoleAsync(users.First(), "admin").ConfigureAwait(false);
 
             await context.SaveChangesAsync().ConfigureAwait(false);
 
@@ -240,6 +240,7 @@ namespace Leaderboard.Data
 
                 var ld = users.First();
                 ld.Weight = 75;
+                await userManager.TryAddToRoleAsync(ld, "Admin").ConfigureAwait(false);
                 await userManager.UpdateAsync(ld).ConfigureAwait(false);
 
                 var llUser = users.Single(u => u.UserName == "LiftLife");

@@ -81,7 +81,7 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
 
             var query = _ctx.Scores.AsQueryable();
 
-            if (isApproved != true && !User.IsInRole("Admin"))
+            if (isApproved != true && !User.IsInRole("admin"))
             {
                 Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                 return null;
@@ -124,7 +124,8 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
 
 
 
-            return scoresQuery.ToDictionary(g => g.Key, g => g.AsEnumerable());
+            var scoresByBoard = scoresQuery.ToDictionary(g => g.Key, g => g.AsEnumerable());
+            return scoresByBoard;
         }
 
         [Authorize]

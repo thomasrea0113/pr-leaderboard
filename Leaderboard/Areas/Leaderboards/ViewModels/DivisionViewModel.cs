@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using System.Linq;
 using Leaderboard.Areas.Identity.Models;
-using Leaderboard.Areas.Leaderboards.Models;
 
 namespace Leaderboard.Areas.Leaderboards.ViewModels
 {
@@ -13,24 +11,5 @@ namespace Leaderboard.Areas.Leaderboards.ViewModels
         public GenderValue? Gender { get; private set; }
         public int? AgeLowerBound { get; private set; }
         public int? AgeUpperBound { get; private set; }
-
-        public DivisionViewModel(Division division)
-        {
-            Id = division.Id;
-            Name = division.Name;
-
-            if (division.DivisionCategories?.Any() == true)
-                Categories = CategoryViewModel.Create(division.DivisionCategories.Select(dc => dc.Category)).ToList();
-
-            Gender = division.Gender;
-            AgeLowerBound = division.AgeLowerBound;
-            AgeUpperBound = division.AgeUpperBound;
-        }
-
-        public static IEnumerable<DivisionViewModel> Create(params Division[] divisions)
-        {
-            foreach (var division in divisions)
-                yield return new DivisionViewModel(division);
-        }
     }
 }
