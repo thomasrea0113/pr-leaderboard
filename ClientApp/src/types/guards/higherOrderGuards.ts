@@ -24,8 +24,7 @@ export const isArrayOf = <T>(
 
 /**
  * a higher-order function that returns a type guard capable
- * checking that the guarded object is an array the type specified
- * by the passed in type guard
+ * checking that the guarded object is a dictionay of strings to the given guard
  * @param itemGuard the guard for the elements in the array
  */
 export const isIndexOf = <TValue>(
