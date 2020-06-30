@@ -213,28 +213,6 @@ namespace Leaderboard.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UploadedFiles",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Size = table.Column<long>(nullable: false),
-                    Path = table.Column<string>(nullable: false),
-                    UploadDate = table.Column<DateTime>(nullable: false),
-                    CreatedById = table.Column<string>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UploadedFiles", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_UploadedFiles_AspNetUsers_CreatedById",
-                        column: x => x.CreatedById,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "UserCategories",
                 columns: table => new
                 {
@@ -350,10 +328,10 @@ namespace Leaderboard.Migrations
                 {
                     Id = table.Column<string>(nullable: false),
                     IsApproved = table.Column<bool>(nullable: false, defaultValue: false),
-                    VideoProofId = table.Column<int>(nullable: true),
                     BoardId = table.Column<string>(nullable: false),
                     UserId = table.Column<string>(nullable: false),
-                    Value = table.Column<decimal>(type: "decimal(12,4)", nullable: false)
+                    Value = table.Column<decimal>(type: "decimal(12,4)", nullable: false),
+                    CreatedDate = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -370,12 +348,6 @@ namespace Leaderboard.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Scores_UploadedFiles_VideoProofId",
-                        column: x => x.VideoProofId,
-                        principalTable: "UploadedFiles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -521,25 +493,9 @@ namespace Leaderboard.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Scores_VideoProofId",
-                table: "Scores",
-                column: "VideoProofId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_UnitsOfMeasure_Unit",
                 table: "UnitsOfMeasure",
                 column: "Unit",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UploadedFiles_CreatedById",
-                table: "UploadedFiles",
-                column: "CreatedById");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UploadedFiles_Path",
-                table: "UploadedFiles",
-                column: "Path",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -611,9 +567,6 @@ namespace Leaderboard.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
-
-            migrationBuilder.DropTable(
-                name: "UploadedFiles");
 
             migrationBuilder.DropTable(
                 name: "Categories");

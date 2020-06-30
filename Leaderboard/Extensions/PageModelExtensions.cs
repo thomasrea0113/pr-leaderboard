@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Leaderboard.Extensions.PageModelExtensions
+namespace Leaderboard.Extensions
 {
     public static class PageModelExtensions
     {

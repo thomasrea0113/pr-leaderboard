@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Leaderboard.Areas.Identity.Managers;
 using Leaderboard.Areas.Leaderboards.Models;
@@ -31,23 +32,24 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
             _um = userManager;
         }
 
-        [Authorize(Roles = "admin")]
+        [Authorize(Policy = "AppAdmin")]
         [HttpPatch]
         [Route("[action]")]
-        public async Task<IEnumerable<ScoreModel>> Approve(ApproveModel m)
+        public async IAsyncEnumerable<ScoreModel> Approve(ApproveModel m)
         {
             var ids = m.Ids;
-            var scores = await _ctx.Scores.AsQueryable()
+            var scores = _ctx.Scores.AsQueryable()
                 .Where(s => !s.IsApproved)
                 .Where(s => ids.Contains(s.Id))
-                .ToArrayAsync().ConfigureAwait(false);
+                .AsAsyncEnumerable();
 
-            foreach (var score in scores)
+            await foreach (var score in scores)
+            {
                 score.IsApproved = true;
+                yield return score;
+            }
 
             await _ctx.SaveChangesAsync().ConfigureAwait(false);
-
-            return scores;
         }
 
         /// <summary>
@@ -55,15 +57,24 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
         /// </summary>
         /// <param name="isApproved">indicates whether to return scores that are only approved/not approved. Null indicates all scores</param>
         /// <returns></returns>
-        [Authorize]
         [HttpGet]
         [Route("[action]")]
-        public async Task<IEnumerable<ScoreViewModel>> All(bool? isApproved = null)
+        public async Task<IEnumerable<ScoreViewModel>> All(bool? isApproved = null, int? top = null)
         {
             var query = _ctx.Scores.AsQueryable();
 
-            if (isApproved != null)
-                query = query.Where(s => s.IsApproved == isApproved);
+            isApproved ??= true;
+
+            if (isApproved == false && User.IsInRole("Admin"))
+            {
+                Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                return null;
+            }
+
+            query = query.Where(s => s.IsApproved == isApproved);
+
+            if (top != null)
+                query = query.OrderByDescending(s => s.CreatedDate).Take((int)top);
 
             return (await query.ToArrayAsync().ConfigureAwait(false)).Select(s => new ScoreViewModel(s));
         }

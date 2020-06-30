@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Leaderboard.Areas.Identity.Managers;
 using Leaderboard.Data;
-using Leaderboard.Data.SeedExtensions;
 using Leaderboard.Tests.TestSetup;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

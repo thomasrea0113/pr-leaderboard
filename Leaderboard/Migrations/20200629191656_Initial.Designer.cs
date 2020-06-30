@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Leaderboard.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200502133738_Initial")]
+    [Migration("20200629191656_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -394,6 +394,9 @@ namespace Leaderboard.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<bool>("IsApproved")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
@@ -406,16 +409,11 @@ namespace Leaderboard.Migrations
                     b.Property<decimal>("Value")
                         .HasColumnType("decimal(12,4)");
 
-                    b.Property<int?>("VideoProofId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.HasIndex("BoardId");
 
                     b.HasIndex("UserId");
-
-                    b.HasIndex("VideoProofId");
 
                     b.ToTable("Scores");
                 });
@@ -536,37 +534,6 @@ namespace Leaderboard.Migrations
                     b.ToTable("UserLeaderboards");
                 });
 
-            modelBuilder.Entity("Leaderboard.Areas.Uploads.Models.AppFile", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<string>("CreatedById")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Path")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<long>("Size")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("UploadDate")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("Path")
-                        .IsUnique();
-
-                    b.ToTable("UploadedFiles");
-                });
-
             modelBuilder.Entity("Leaderboard.Areas.Identity.Models.ApplicationRoleClaim", b =>
                 {
                     b.HasOne("Leaderboard.Areas.Identity.Models.ApplicationRole", "Role")
@@ -680,10 +647,6 @@ namespace Leaderboard.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Leaderboard.Areas.Uploads.Models.AppFile", "VideoProof")
-                        .WithMany()
-                        .HasForeignKey("VideoProofId");
                 });
 
             modelBuilder.Entity("Leaderboard.Models.Relationships.UserCategory", b =>
@@ -710,15 +673,6 @@ namespace Leaderboard.Migrations
                     b.HasOne("Leaderboard.Areas.Identity.Models.ApplicationUser", "User")
                         .WithMany("UserLeaderboards")
                         .HasForeignKey("UserId");
-                });
-
-            modelBuilder.Entity("Leaderboard.Areas.Uploads.Models.AppFile", b =>
-                {
-                    b.HasOne("Leaderboard.Areas.Identity.Models.ApplicationUser", "CreatedBy")
-                        .WithMany("UploadedFiles")
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

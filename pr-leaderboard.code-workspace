@@ -57,7 +57,8 @@
 		"recommendations": [
 			"gruntfuggly.todo-tree",
 			"fernandoescolar.vscode-solution-explorer",
-			"eamodio.gitlens"
+			"eamodio.gitlens",
+			"editorconfig.editorconfig"
 		]
 	}
 }

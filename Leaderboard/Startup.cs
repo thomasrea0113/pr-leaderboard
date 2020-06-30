@@ -136,6 +136,11 @@ namespace Leaderboard
             });
 
             services.AddScoped<IFormFieldAttributeProvider, FormFieldAttributeProvider>();
+
+
+            // for generating urls outside of a controller
+            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+            services.AddHttpContextAccessor();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -166,11 +171,6 @@ namespace Leaderboard
             {
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
-
-                // The Admin area is a react component that uses ReactRouter to
-                // handle routing inside the component, so all pages
-                // should route to the Index page
-                // endpoints.MapFallbackToAreaPage("/Index", "Admin");
             });
         }
     }

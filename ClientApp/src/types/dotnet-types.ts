@@ -102,10 +102,3 @@ export interface Link {
     className?: keyof typeof BootstrapColorClass;
     url: string;
 }
-
-export interface Featured {
-    title: string;
-    description: string;
-    image: string;
-    links: Link[];
-}

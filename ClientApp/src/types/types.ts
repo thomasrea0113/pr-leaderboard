@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
+export type Featured<T> = T & { isFeatured: boolean };
+
 /**
  * Make all nested properties optional
  */

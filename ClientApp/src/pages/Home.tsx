@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import 'react-dom';
 
-import { Link } from 'react-router-dom';
 import { FontawesomeIconToIcon } from '../Components/StyleComponents';
 
 interface ReactProps {

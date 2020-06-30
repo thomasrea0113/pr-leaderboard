@@ -14,5 +14,9 @@ namespace Leaderboard.Extensions
             controller.BadRequest(
                 controller.ProblemDetailsFactory.CreateValidationProblemDetails(
                     controller.HttpContext, controller.ModelState));
+
+        public static string GetControllerName<T>()
+            where T : ControllerBase
+            => typeof(T).Name.Replace("Controller", "");
     }
 }

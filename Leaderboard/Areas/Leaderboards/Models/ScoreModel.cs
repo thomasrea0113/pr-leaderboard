@@ -4,10 +4,14 @@ using Leaderboard.Models.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.ComponentModel.DataAnnotations.Schema;
+using System;
+using Leaderboard.Data;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Leaderboard.Areas.Leaderboards.Models
 {
-    public class ScoreModel : IDbEntity<ScoreModel>
+    public class ScoreModel : IDbEntity<ScoreModel>, IOnDbPreCreateAsync
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string Id { get; set; }
@@ -26,6 +30,8 @@ namespace Leaderboard.Areas.Leaderboards.Models
 
         public decimal Value { get; set; }
 
+        public DateTime CreatedDate { get; set; }
+
         public void OnModelCreating(EntityTypeBuilder<ScoreModel> builder)
         {
             builder.HasOne(e => e.Board)
@@ -35,6 +41,9 @@ namespace Leaderboard.Areas.Leaderboards.Models
             builder.HasOne(e => e.User)
                 .WithMany(e => e.Scores)
                 .HasForeignKey(e => e.UserId);
+
+            builder.Property(b => b.CreatedDate)
+                .HasConversion(Conversions.LocalToUtcDateTime);
 
             // scores must be approved before they can be submitted
             builder.Property(b => b.IsApproved).HasDefaultValue(false);
@@ -46,6 +55,13 @@ namespace Leaderboard.Areas.Leaderboards.Models
             builder.Property(e => e.UserId).ValueGeneratedNever().IsRequired();
 
             builder.HasKey(e => e.Id);
+        }
+
+        public Task OnPreCreateAsync(DbContext ctx, PropertyValues values)
+        {
+            if (CreatedDate == default)
+                CreatedDate = DateTime.UtcNow;
+            return Task.CompletedTask;
         }
     }
 }

@@ -8,13 +8,12 @@ using System.Threading.Tasks;
 using Leaderboard.Areas.Identity.Managers;
 using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Areas.Leaderboards.Models;
-using Leaderboard.Data.BulkExtensions;
 using Leaderboard.Models.Relationships;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Leaderboard.Utilities;
 
-namespace Leaderboard.Data.SeedExtensions
+namespace Leaderboard.Data
 {
     public static class SeedExtensions
     {

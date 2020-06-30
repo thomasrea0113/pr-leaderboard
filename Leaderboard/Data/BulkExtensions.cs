@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
-namespace Leaderboard.Data.BulkExtensions
+namespace Leaderboard.Data
 {
     public static class BulkExtensions
     {

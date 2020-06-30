@@ -1,0 +1,8 @@
+@page
+@using Leaderboard.Areas.Leaderboards.Pages
+@model RecentsPageModel
+
+@section scripts {
+    <react-bundle src="js/board/recent.[hash].js" />
+    <react-component component-name="board/recent" props="Model.Props" />
+}

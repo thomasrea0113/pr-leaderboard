@@ -18,8 +18,8 @@ using Leaderboard.Data;
 using Leaderboard.Areas.Leaderboards.Models;
 using Microsoft.EntityFrameworkCore;
 using Leaderboard.Models.Relationships;
-using Leaderboard.Extensions.PageModelExtensions;
 using Leaderboard.Services;
+using Leaderboard.Extensions;
 
 namespace Leaderboard.Areas.Identity.Pages.Account
 {

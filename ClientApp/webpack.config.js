@@ -6,7 +6,7 @@ const { StatsWriterPlugin } = require('webpack-stats-plugin');
 
 const outDir = path.resolve(__dirname, 'dist');
 
-module.exports = env => {
+module.exports = () => {
     const config = {
         mode: 'development',
         entry: {
@@ -137,7 +137,7 @@ module.exports = env => {
         ],
     };
 
-    if (env && env.production) config.mode = 'production';
+    config.mode = process.env.NODE_ENV || 'development';
 
     if (config.mode === 'development') {
         config.devServer = {
