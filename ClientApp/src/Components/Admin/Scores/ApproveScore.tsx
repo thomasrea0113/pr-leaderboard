@@ -67,9 +67,14 @@ export const ApproveScoreComponent: React.FC<{}> = () => {
     const approveColumns: Column<Score>[] = [
         ...ScoreColumns,
         {
+            Header: 'Division',
+            id: 'Division',
+            accessor: s => s.board.division.name,
+        },
+        {
             Header: 'Leaderboard',
             id: 'leaderboard',
-            accessor: s => s.boardId,
+            accessor: s => s.board.name,
         },
         {
             Header: 'Approve',

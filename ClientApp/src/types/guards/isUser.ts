@@ -5,8 +5,8 @@ export const isUser = (obj: any): obj is User => {
     const user = obj as User;
     if (
         user != null &&
-        typeof user.userName === 'string' &&
-        typeof user.isAdmin === 'boolean'
+        typeof user.id === 'string' &&
+        typeof user.userName === 'string'
     )
         return true;
     return false;

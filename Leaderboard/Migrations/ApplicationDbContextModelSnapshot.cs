@@ -350,6 +350,9 @@ namespace Leaderboard.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("IconUrl")
+                        .HasColumnType("text");
+
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")

@@ -6,9 +6,19 @@ using Leaderboard.Models.Features;
 using Leaderboard.Models.Relationships;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Leaderboard.Areas.Leaderboards.Models
 {
+    public static class LeaderboardModelExtensions
+    {
+        public static string GetViewUrl(this LeaderboardModel b, IUrlHelper Url)
+            => Url.Page("/Boards/View", b.ViewArgs);
+
+        public static string GetJoinUrl(this LeaderboardModel b, IUrlHelper Url)
+            => Url.Page("/Boards/View", "join", b.ViewArgs);
+    }
+
     // TODO implement sluggy on save
     public class LeaderboardModel : IDbEntity<LeaderboardModel>, IDbActive, ISlugged
     {
@@ -18,6 +28,8 @@ namespace Leaderboard.Areas.Leaderboards.Models
         public string Id { get; set; }
 
         public string Name { get; set; }
+
+        public string IconUrl { get; set; }
 
         public string DivisionId { get; set; }
 
@@ -44,6 +56,19 @@ namespace Leaderboard.Areas.Leaderboards.Models
         public virtual UnitOfMeasureModel UOM { get; set; }
 
         public string Slug { get; set; }
+
+        /// <summary>
+        /// The 'View Board' page uses a friendly url, which means this information is needed to route currectly with Url.Page()
+        /// </summary>
+        /// <returns></returns>
+        public object ViewArgs => new
+        {
+            area = "Leaderboards",
+            division = Division.Slug,
+            gender = Division.Gender?.ToString().ToLower() ?? "any",
+            weightClass = WeightClass?.Range ?? "any",
+            slug = Slug
+        };
 
         public void OnModelCreating(EntityTypeBuilder<LeaderboardModel> builder)
         {
@@ -82,19 +107,6 @@ namespace Leaderboard.Areas.Leaderboards.Models
         }
 
         #region Helper Methods
-
-        /// <summary>
-        /// The 'View Board' page uses a friendly url, which means this information is needed to route currectly with Url.Page()
-        /// </summary>
-        /// <returns></returns>
-        public object GetViewArgs() => new
-        {
-            area = "Leaderboards",
-            division = Division.Slug,
-            gender = Division.Gender?.ToString().ToLower() ?? "any",
-            weightClass = WeightClass?.Range ?? "any",
-            slug = Slug
-        };
 
         #endregion
 

@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Leaderboard.Areas.Identity.Managers;
+using Leaderboard.Areas.Identity.Models;
 using Leaderboard.Areas.Identity.ViewModels;
+using Leaderboard.Areas.Leaderboards.Models;
 using Leaderboard.Areas.Leaderboards.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -45,35 +47,40 @@ namespace Leaderboard.Areas.Identity.Pages.Account.Manage
             Props.UserName = User.FindFirst(ClaimTypes.Name).Value;
         }
 
-        public async Task<JsonResult> OnGetInitialAsync()
+        private async IAsyncEnumerable<UserLeaderboardViewModel> GetRecommendations(ApplicationUser user)
         {
-            var user = await _manager.GetCompleteUserAsync(User).ConfigureAwait(false);
-            var userViewModel = _mapper.Map<UserViewModel>(user);
-
             var userBoards = _mapper.ProjectTo<UserLeaderboardViewModel>(
                 user.UserLeaderboards.Select(ub => ub.Leaderboard).AsQueryable(), new
                 {
-                    isMember = true,
-                    isRecommended = false
+                    IsMember = true,
+                    IsRecommended = false
                 });
 
-            // TODO Test
-
             var recommendations = await _manager.GetRecommendedBoardsQuery(user)
-                .Include(b => b.Division)
                 .ProjectTo<UserLeaderboardViewModel>(_mapper.ConfigurationProvider, new
                 {
-                    isMember = false,
-                    isRecommended = true,
+                    IsMember = false,
+                    IsRecommended = true,
                 })
                 .ToArrayAsync().ConfigureAwait(false);
 
-            var allUserBoards = userBoards.Concat(recommendations).Distinct();
+            foreach (var board in userBoards.Concat(recommendations).Distinct())
+            {
+                var model = _mapper.Map<LeaderboardModel>(board);
+                board.JoinUrl = model.GetJoinUrl(Url);
+                board.ViewUrl = model.GetViewUrl(Url);
+                yield return board;
+            }
+        }
+
+        public async Task<JsonResult> OnGetInitialAsync()
+        {
+            var user = await _manager.GetCompleteUserAsync(User).ConfigureAwait(false);
 
             return new JsonResult(new ReactState
             {
-                User = userViewModel,
-                Recommendations = allUserBoards
+                User = _mapper.Map<UserViewModel>(user),
+                Recommendations = await GetRecommendations(user).ToArrayAsync().ConfigureAwait(false)
             });
         }
     }

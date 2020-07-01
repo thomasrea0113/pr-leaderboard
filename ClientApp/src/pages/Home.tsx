@@ -4,7 +4,6 @@ import 'react-dom';
 import { FontawesomeIconToIcon } from '../Components/StyleComponents';
 
 interface ReactProps {
-    initialUrl: string;
     backgroundImages: string[];
 }
 
@@ -38,7 +37,7 @@ const HomeComponent: React.FC<ReactProps> = ({ backgroundImages }) => {
                         <div className="animate-fadein">
                             <div className="row" style={{ margin: '0 1rem' }}>
                                 <a
-                                    href="/Recent"
+                                    href="/Leaderboards/Recents"
                                     className="btn btn-col btn-outline-primary spaced-text"
                                 >
                                     {FontawesomeIconToIcon('Go')}

@@ -1,5 +1,5 @@
 import React, { DetailedHTMLProps, ButtonHTMLAttributes } from 'react';
-import { BootstrapColorClass } from '../types/dotnet-types';
+import { BootstrapColorClass } from '../types/types';
 
 export interface SectionProps {
     name: string;

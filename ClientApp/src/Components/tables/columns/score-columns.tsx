@@ -5,7 +5,7 @@ export const ScoreColumns: Column<Score>[] = [
     {
         Header: 'User',
         id: 'user',
-        accessor: s => s.userId,
+        accessor: s => s.user.userName,
     },
     {
         Header: 'Score',

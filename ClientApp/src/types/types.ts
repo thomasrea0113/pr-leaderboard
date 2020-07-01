@@ -2,6 +2,23 @@
 
 export type Featured<T> = T & { isFeatured: boolean };
 
+export enum BootstrapColorClass {
+    Primary,
+    Secondary,
+    Success,
+    Danger,
+    Warning,
+    Info,
+    Light,
+    Dark,
+    Link,
+}
+
+export enum FontawesomeIcon {
+    Go = 'fas fa-chevron-right',
+    User = 'fas fa-user',
+}
+
 /**
  * Make all nested properties optional
  */

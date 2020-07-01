@@ -10,13 +10,12 @@ import React, {
 import omit from 'lodash/fp/omit';
 import merge from 'lodash/fp/merge';
 import { TableSortByToggleProps, TableGroupByToggleProps } from 'react-table';
+import { GenderValues, Unit } from '../types/dotnet-types';
 import {
-    GenderValues,
+    NumberRange,
     BootstrapColorClass,
     FontawesomeIcon,
-    Unit,
-} from '../types/dotnet-types';
-import { NumberRange } from '../types/types';
+} from '../types/types';
 
 /**
  * the color to use when a give icon is active

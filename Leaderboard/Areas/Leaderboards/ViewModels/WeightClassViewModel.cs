@@ -4,5 +4,6 @@ namespace Leaderboard.Areas.Leaderboards.ViewModels
     {
         public int? WeightLowerBound { get; set; }
         public int? WeightUpperBound { get; set; }
+        public string Range { get; set; }
     }
 }

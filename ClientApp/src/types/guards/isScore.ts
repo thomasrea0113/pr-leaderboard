@@ -1,4 +1,6 @@
 import { Score } from '../dotnet-types';
+import { isUser } from './isUser';
+import { isBoard } from './isBoard';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const isScore = (obj: any): obj is Score => {
@@ -6,8 +8,8 @@ export const isScore = (obj: any): obj is Score => {
     if (
         score != null &&
         typeof score.id === 'string' &&
-        typeof score.boardId === 'string' &&
-        typeof score.userId === 'string' &&
+        isBoard(score.board) &&
+        isUser(score.user) &&
         typeof score.value === 'number' &&
         typeof score.isApproved === 'boolean'
     )

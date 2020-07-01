@@ -120,13 +120,12 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
             Init();
 
             var board = await BoardQuery.SingleAsync().ConfigureAwait(false);
+
             var userBoardViewModel = _mapper.Map<UserLeaderboardViewModel>(board);
             userBoardViewModel.IsMember = false;
             userBoardViewModel.IsRecommended = false;
-
-            var args = board.GetViewArgs();
-            userBoardViewModel.ViewUrl = Url.Page("/Boards/View", args);
-            userBoardViewModel.JoinUrl = Url.Page("/Boards/View", "join", args);
+            userBoardViewModel.ViewUrl = Url.Page("/Boards/View", board.ViewArgs);
+            userBoardViewModel.JoinUrl = Url.Page("/Boards/View", "join", board.ViewArgs);
 
             var scores = _scoresController.Get();
 

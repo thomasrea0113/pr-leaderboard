@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using Leaderboard.Areas.Identity.Managers;
@@ -23,8 +22,13 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
     public class ScoresQuery
     {
         public bool? IsApproved { get; set; }
-
         public int? Top { get; set; }
+
+        /// <summary>
+        /// The field to order results by
+        /// </summary>
+        /// <value></value>
+        public string OrderBy { get; set; }
     }
 
     public class ByBoardScoresQuery : ScoresQuery
@@ -78,25 +82,35 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
         {
             var isApproved = filter?.IsApproved;
             var top = filter?.Top;
+            var orderBy = filter?.OrderBy;
 
             var query = _ctx.Scores.AsQueryable();
 
-            if (isApproved != true && !User.IsInRole("admin"))
+            if (orderBy != null)
             {
-                Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                return null;
+                var order = orderBy.First();
+                var noOrder = string.Concat(orderBy.Skip(1));
+
+                if (order == '-')
+                    query = query.OrderByDescending(noOrder);
+                else if (order == '+')
+                    query = query.OrderBy(noOrder);
+                // if a direction was not provided, simply order by ascending
+                else
+                    query = query.OrderBy(orderBy);
             }
+            // no order by provided, order by most recent first
             else
-            {
+                query = query.OrderByDescending(s => s.CreatedDate);
 
-                if (isApproved != null)
-                    query = query.Where(s => s.IsApproved == isApproved);
 
-                if (top != null)
-                    query = query.Take((int)top);
+            if (isApproved != null)
+                query = query.Where(s => s.IsApproved == isApproved);
 
-                return _mapper.ProjectTo<ScoreViewModel>(query);
-            }
+            if (top != null)
+                query = query.Take((int)top);
+
+            return _mapper.ProjectTo<ScoreViewModel>(query);
         }
 
         [HttpGet]
@@ -114,13 +128,13 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
             // EF Core doesn't support groupby, so we have to evaluate the query and do it in memory
             var scores = await Get(filter).ToArrayAsync().ConfigureAwait(false);
 
-            var scoresQuery = scores.GroupBy(s => s.BoardId);
+            var scoresQuery = scores.GroupBy(s => s.Board.Id);
 
             if (topBoards != null)
                 scoresQuery = scoresQuery.Take((int)filter.TopBoards);
 
             if (top != null)
-                scoresQuery = scoresQuery.SelectMany(g => g.Take((int)top).GroupBy(s => s.BoardId));
+                scoresQuery = scoresQuery.SelectMany(g => g.Take((int)top).GroupBy(s => s.Board.Id));
 
 
 
@@ -163,7 +177,7 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
 
             await _ctx.SaveChangesAsync().ConfigureAwait(false);
 
-            var page = Url.Page("/Boards/View", null, board.GetViewArgs(), null, null, $"score={score.Id}");
+            var page = Url.Page("/Boards/View", null, board.ViewArgs, null, null, $"score={score.Id}");
 
             // TODO generate board slug
             return Created(page, score);

@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Leaderboard.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200629191656_Initial")]
+    [Migration("20200701153543_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -350,6 +350,9 @@ namespace Leaderboard.Migrations
 
                     b.Property<string>("DivisionId")
                         .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("IconUrl")
                         .HasColumnType("text");
 
                     b.Property<bool>("IsActive")

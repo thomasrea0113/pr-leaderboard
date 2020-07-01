@@ -293,6 +293,7 @@ namespace Leaderboard.Migrations
                 {
                     Id = table.Column<string>(nullable: false),
                     Name = table.Column<string>(nullable: false),
+                    IconUrl = table.Column<string>(nullable: true),
                     DivisionId = table.Column<string>(nullable: false),
                     WeightClassId = table.Column<string>(nullable: true),
                     IsActive = table.Column<bool>(nullable: false, defaultValue: true),

@@ -6,7 +6,7 @@ namespace Leaderboard.Areas.Leaderboards.ViewModels
     {
         public string Id { get; set; }
         public bool IsApproved { get; set; }
-        public string BoardId { get; set; }
+        public LeaderboardViewModel Board { get; set; }
         public UserViewModel User { get; set; }
 
         public decimal Value { get; set; }
