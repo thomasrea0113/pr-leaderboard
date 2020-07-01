@@ -15,7 +15,6 @@ using Leaderboard.Areas.Identity.Managers;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
-using System.Net.Http;
 
 namespace Leaderboard.Tests.TestSetup
 {

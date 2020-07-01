@@ -11,7 +11,7 @@ export const ViewUsersComponent: React.FC<{}> = () => {
     });
 
     const getUsersAsync = () => {
-        loadAsync({ actionUrl: '/api/Users/All' });
+        loadAsync({ actionUrl: '/api/Users' });
     };
 
     useEffect(getUsersAsync, []);

@@ -28,10 +28,9 @@ namespace Leaderboard.Models
             bool IsRecommended = false;
             CreateMap<LeaderboardModel, UserLeaderboardViewModel>()
                 .IncludeBase<LeaderboardModel, LeaderboardViewModel>()
-            .ForMember(m => m.IsMember, m => m.MapFrom(_ => IsMember))
-            .ForMember(m => m.IsRecommended, m => m.MapFrom(_ => IsRecommended));
+                .ForMember(m => m.IsMember, m => m.MapFrom(_ => IsMember))
+                .ForMember(m => m.IsRecommended, m => m.MapFrom(_ => IsRecommended));
 
-            // static bool setAdmin() => false;
             bool IsAdmin = false;
             CreateMap<ApplicationUser, UserViewModel>()
                 .ForMember(m => m.Interests, m => m.MapFrom(p => p.UserCategories.Select(uc => uc.Category)))

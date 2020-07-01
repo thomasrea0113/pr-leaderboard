@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import 'react-dom';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { HashRouter as Router, Route, Switch } from 'react-router-dom';
 
 import { User } from '../types/dotnet-types';
 import { AppContext, AppState, DefaultAppState } from '../AppContext';
@@ -42,7 +42,7 @@ const AdminComponent: React.FC<{}> = () => {
                 admin functions
                 {/* The app is deployed to and Admin area of the MVC app, so all
             routes should be under the Admin area */}
-                <Router basename="/Admin">
+                <Router hashType="hashbang">
                     <ul className="nav nav-tabs">
                         <ScoresNav path={scoresPath} />
                         <BoardsNav path={boardsPath} />

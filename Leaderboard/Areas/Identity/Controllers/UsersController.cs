@@ -47,7 +47,7 @@ namespace Leaderboard.Areas.Identity
 
             if (isActive != null)
                 users = users.Where(u => u.IsActive == isActive);
-            // TODO test
+
             foreach (var user in users)
             {
                 // setting admin on this user
