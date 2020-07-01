@@ -127,7 +127,11 @@ namespace Leaderboard.Areas.Leaderboards.Pages.Boards
             userBoardViewModel.ViewUrl = Url.Page("/Boards/View", board.ViewArgs);
             userBoardViewModel.JoinUrl = Url.Page("/Boards/View", "join", board.ViewArgs);
 
-            var scores = _scoresController.Get();
+            var scores = _scoresController.GetScores(new ScoresQuery
+            {
+                IsApproved = true,
+                BoardId = board.Id,
+            });
 
             if (User.Identity.IsAuthenticated)
             {

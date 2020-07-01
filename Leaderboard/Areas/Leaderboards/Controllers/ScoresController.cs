@@ -8,6 +8,7 @@ using Leaderboard.Areas.Leaderboards.ViewModels;
 using Leaderboard.Data;
 using Leaderboard.Extensions;
 using Leaderboard.Models.Relationships;
+using Leaderboard.Routing;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +23,7 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
     public class ScoresQuery
     {
         public bool? IsApproved { get; set; }
+        public string BoardId { get; set; }
         public int? Top { get; set; }
 
         /// <summary>
@@ -43,12 +45,15 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
         private readonly ApplicationDbContext _ctx;
         private readonly AppUserManager _um;
         private readonly IMapper _mapper;
+        private readonly IAuthorizationService _auth;
 
-        public ScoresController(ApplicationDbContext ctx, AppUserManager userManager, IMapper mapper)
+        public ScoresController(ApplicationDbContext ctx, AppUserManager userManager, IMapper mapper,
+            IAuthorizationService auth)
         {
             _ctx = ctx;
             _um = userManager;
             _mapper = mapper;
+            _auth = auth;
         }
 
         [Authorize(Policy = "AppAdmin")]
@@ -78,11 +83,27 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("")]
-        public IQueryable<ScoreViewModel> Get([FromQuery] ScoresQuery filter = null)
+        public async Task<IActionResult> Get([FromQuery] ScoresQuery filter = null)
+        {
+
+            if (filter?.IsApproved != true)
+            {
+                var isAdmin = await _auth.AuthorizeAsync(User, "AppAdmin").ConfigureAwait(false);
+
+                // if the user is requesting unapproved scores, they must be an admin
+                if (!isAdmin.Succeeded)
+                    return Unauthorized();
+            }
+
+            return Ok(GetScores(filter));
+        }
+
+        public IQueryable<ScoreViewModel> GetScores(ScoresQuery filter = null)
         {
             var isApproved = filter?.IsApproved;
             var top = filter?.Top;
             var orderBy = filter?.OrderBy;
+            var boardId = filter?.BoardId;
 
             var query = _ctx.Scores.AsQueryable();
 
@@ -107,6 +128,9 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
             if (isApproved != null)
                 query = query.Where(s => s.IsApproved == isApproved);
 
+            if (boardId != null)
+                query = query.Where(s => s.BoardId == boardId);
+
             if (top != null)
                 query = query.Take((int)top);
 
@@ -126,7 +150,7 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
                 filter.Top = null;
 
             // EF Core doesn't support groupby, so we have to evaluate the query and do it in memory
-            var scores = await Get(filter).ToArrayAsync().ConfigureAwait(false);
+            var scores = await GetScores(filter).ToArrayAsync().ConfigureAwait(false);
 
             var scoresQuery = scores.GroupBy(s => s.Board.Id);
 

@@ -16,11 +16,13 @@ namespace Leaderboard.Areas.Identity
     {
         private readonly AppUserManager _userManager;
         private readonly IMapper _mapper;
+        private readonly IAuthorizationService _auth;
 
-        public UsersController(AppUserManager userManager, IMapper mapper)
+        public UsersController(AppUserManager userManager, IMapper mapper, IAuthorizationService auth)
         {
             _userManager = userManager;
             _mapper = mapper;
+            _auth = auth;
         }
 
         [HttpGet]
@@ -29,7 +31,7 @@ namespace Leaderboard.Areas.Identity
         {
             var user = await _userManager.GetUserAsync(User).ConfigureAwait(false);
             var userViewModel = _mapper.Map<UserViewModel>(user);
-            userViewModel.IsAdmin = await _userManager.IsInRoleAsync(user, "admin").ConfigureAwait(false);
+            userViewModel.IsAdmin = (await _auth.AuthorizeAsync(User, "AppAdmin").ConfigureAwait(false)).Succeeded;
             return userViewModel;
         }
 
