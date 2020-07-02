@@ -19,6 +19,7 @@ export interface Score {
     isApproved: boolean;
     board: Leaderboard;
     user: User;
+    createdDate: Date;
     value: number;
 }
 
@@ -41,8 +42,8 @@ export interface Leaderboard {
     division: Division;
     weightClass?: WeightClass;
     slug: string;
-    viewUrl: string;
-    joinUrl: string;
+    viewUrl?: string;
+    joinUrl?: string;
 }
 
 export interface Division {

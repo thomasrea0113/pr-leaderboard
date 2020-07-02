@@ -56,6 +56,7 @@ const ViewBoardComponent: React.FC<Props> = ({
     const initial = {
         board: {
             id: undefined,
+            iconUrl: undefined,
             uom: {
                 unit: undefined,
             },
@@ -67,6 +68,7 @@ const ViewBoardComponent: React.FC<Props> = ({
     const {
         board: {
             id,
+            iconUrl,
             uom: { unit },
         },
         user,
@@ -151,6 +153,10 @@ const ViewBoardComponent: React.FC<Props> = ({
             <ScoreTable
                 reloadAsync={reloadAsync}
                 scores={scores ?? []}
+                icon={
+                    iconUrl ??
+                    'https://www.mensjournal.com/wp-content/uploads/mf/rookie-mistakes-bench-press.jpg?w=800&h=450&crop=1'
+                }
                 unit={unit ?? 'Kilograms'}
             />
         </>

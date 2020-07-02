@@ -19,6 +19,7 @@ using Newtonsoft.Json.Converters;
 using AutoMapper;
 using AutoMapper.EquivalencyExpression;
 using Leaderboard.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Leaderboard
 {
@@ -35,6 +36,12 @@ namespace Leaderboard
         private readonly string _envName;
 
         private readonly ILoggerFactory Factory = LoggerFactory.Create(builder => builder.AddDebug());
+
+        private void ConfigureJson(MvcNewtonsoftJsonOptions options)
+        {
+            options.UseCamelCasing(true);
+            options.SerializerSettings.Converters.Add(new StringEnumConverter());
+        }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -125,11 +132,7 @@ namespace Leaderboard
             {
                 o.Conventions.AuthorizeAreaFolder("Admin", "/", "AppAdmin");
             })
-            .AddNewtonsoftJson(o =>
-            {
-                o.UseCamelCasing(true);
-                o.SerializerSettings.Converters.Add(new StringEnumConverter());
-            });
+                .AddNewtonsoftJson(ConfigureJson);
 
             services.AddAuthorization(o =>
             {
@@ -138,7 +141,9 @@ namespace Leaderboard
             });
 
             // controllers will be used for api CRUD actions
-            services.AddControllers().AddControllersAsServices();
+            services.AddControllers()
+                .AddControllersAsServices()
+                .AddNewtonsoftJson(ConfigureJson);
 
             services.AddSpaStaticFiles(cnf =>
             {

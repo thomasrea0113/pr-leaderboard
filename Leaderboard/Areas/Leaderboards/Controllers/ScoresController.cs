@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,7 +9,6 @@ using Leaderboard.Areas.Leaderboards.ViewModels;
 using Leaderboard.Data;
 using Leaderboard.Extensions;
 using Leaderboard.Models.Relationships;
-using Leaderboard.Routing;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -31,6 +31,7 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
         /// </summary>
         /// <value></value>
         public string OrderBy { get; set; }
+        public DateTimeOffset? CreatedSince { get; set; }
     }
 
     public class ByBoardScoresQuery : ScoresQuery
@@ -104,6 +105,7 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
             var top = filter?.Top;
             var orderBy = filter?.OrderBy;
             var boardId = filter?.BoardId;
+            var createdSince = filter?.CreatedSince;
 
             var query = _ctx.Scores.AsQueryable();
 
@@ -131,6 +133,9 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
             if (boardId != null)
                 query = query.Where(s => s.BoardId == boardId);
 
+            if (createdSince != null)
+                query = query.Where(s => s.CreatedDate > createdSince);
+
             if (top != null)
                 query = query.Take((int)top);
 
@@ -139,7 +144,22 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
 
         [HttpGet]
         [Route("[action]")]
-        public async Task<IDictionary<string, IEnumerable<ScoreViewModel>>> ByBoard([FromQuery] ByBoardScoresQuery filter = null)
+        public async Task<IActionResult> ByBoard([FromQuery] ByBoardScoresQuery filter = null)
+        {
+
+            if (filter?.IsApproved != true)
+            {
+                var isAdmin = await _auth.AuthorizeAsync(User, "AppAdmin").ConfigureAwait(false);
+
+                // if the user is requesting unapproved scores, they must be an admin
+                if (!isAdmin.Succeeded)
+                    return Unauthorized();
+            }
+
+            return Ok(GetScoresByBoard(filter));
+        }
+
+        public async Task<IDictionary<string, IEnumerable<ScoreViewModel>>> GetScoresByBoard(ByBoardScoresQuery filter = null)
         {
             var top = filter?.Top;
             var topBoards = filter?.TopBoards;

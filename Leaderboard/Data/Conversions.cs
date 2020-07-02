@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Leaderboard.Data
 {
-    
+
     public static class Conversions
     {
         /// <summary>

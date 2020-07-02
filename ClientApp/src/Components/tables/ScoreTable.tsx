@@ -15,11 +15,12 @@ import { renderCell, renderHeader } from './render-utilities';
 
 interface LocalProps {
     reloadAsync?: () => Promise<void>;
+    icon: string;
     scores: Score[];
     unit: string;
 }
 
-export const ScoreTable: React.FC<LocalProps> = ({ scores }) => {
+export const ScoreTable: React.FC<LocalProps> = ({ scores, icon }) => {
     const initialState: Partial<TableState<Score>> = useMemo(
         () => ({
             sortBy: [{ id: 'score', desc: true }],

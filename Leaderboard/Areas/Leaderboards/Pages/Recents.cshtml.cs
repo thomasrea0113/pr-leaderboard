@@ -26,13 +26,12 @@ namespace Leaderboard.Areas.Leaderboards.Pages
             Props ??= new RecentsReactProps
             {
                 InitialUrl = _link.GetUriByAction(HttpContext,
-                    nameof(ScoresController.ByBoard),
+                    nameof(ScoresController.Get),
                     ControllerExtensions.GetControllerName<ScoresController>(),
                     new ByBoardScoresQuery
                     {
                         IsApproved = true,
-                        Top = 5,
-                        TopBoards = 5,
+                        Top = 100
                     })
             };
         }

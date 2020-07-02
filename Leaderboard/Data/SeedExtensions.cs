@@ -136,17 +136,21 @@ namespace Leaderboard.Data
         {
             // sudo random number generation. Always seed with 1, so the calls to Next are predictable
             var rand = new Random(1);
+            var now = DateTime.UtcNow;
 
             foreach (var board in userBoards)
             {
                 for (var i = 0; i < 10; i++)
                 {
+                    var createdDaysSeed = rand.Next(1, 500);
+                    var createdMillisecondsSeed = rand.Next(1, 1439999);
                     yield return new ScoreModel
                     {
                         Id = GuidUtilities.Create($"score_{board.UserId}{board.LeaderboardId}{i}").ToString(),
                         IsApproved = i % 2 == 0, // if i is even, then true. All odd indexes will be false,
                         UserId = board.UserId,
                         BoardId = board.LeaderboardId,
+                        CreatedDate = now.AddDays(-createdDaysSeed).AddMilliseconds(-createdMillisecondsSeed),
                         Value = Convert.ToDecimal(rand.NextDouble() * rand.Next(200, 1500))
                     };
                 }

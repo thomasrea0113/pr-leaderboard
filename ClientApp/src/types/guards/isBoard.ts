@@ -8,8 +8,6 @@ export const isBoard = (obj: any): obj is Leaderboard => {
         typeof board.id === 'string' &&
         typeof board.name === 'string' &&
         typeof board.slug === 'string' &&
-        typeof board.joinUrl === 'string' &&
-        typeof board.viewUrl === 'string' &&
         typeof board.uom?.unit === 'string' &&
         typeof board.division?.name === 'string'
     )

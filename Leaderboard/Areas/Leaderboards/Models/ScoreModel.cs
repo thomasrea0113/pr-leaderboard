@@ -59,6 +59,8 @@ namespace Leaderboard.Areas.Leaderboards.Models
 
         public Task OnPreCreateAsync(DbContext ctx, PropertyValues values)
         {
+            if (CreatedDate > DateTime.UtcNow)
+                throw new InvalidOperationException($"{nameof(CreatedDate)} must be earlier than the current time");
             if (CreatedDate == default)
                 CreatedDate = DateTime.UtcNow;
             return Task.CompletedTask;
