@@ -328,7 +328,7 @@ namespace Leaderboard.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
-                    IsApproved = table.Column<bool>(nullable: false, defaultValue: false),
+                    ApprovedDate = table.Column<DateTime>(nullable: true),
                     BoardId = table.Column<string>(nullable: false),
                     UserId = table.Column<string>(nullable: false),
                     Value = table.Column<decimal>(type: "decimal(12,4)", nullable: false),

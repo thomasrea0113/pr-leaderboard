@@ -6,7 +6,7 @@ namespace Leaderboard.Areas.Leaderboards.ViewModels
     public class ScoreViewModel
     {
         public string Id { get; set; }
-        public bool IsApproved { get; set; }
+        public DateTime? ApprovedDate { get; set; }
         public LeaderboardViewModel Board { get; set; }
         public UserViewModel User { get; set; }
         public DateTime CreatedDate { get; set; }

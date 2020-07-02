@@ -16,7 +16,8 @@ namespace Leaderboard.Areas.Leaderboards.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string Id { get; set; }
 
-        public bool IsApproved { get; set; }
+        public DateTime? ApprovedDate { get; set; }
+        public bool IsApproved => ApprovedDate != null;
 
         public string BoardId { get; set; }
 
@@ -43,10 +44,11 @@ namespace Leaderboard.Areas.Leaderboards.Models
                 .HasForeignKey(e => e.UserId);
 
             builder.Property(b => b.CreatedDate)
-                .HasConversion(Conversions.LocalToUtcDateTime);
+                .HasConversion(Conversions.LocalToUtcDateTime)
+                .IsRequired();
 
-            // scores must be approved before they can be submitted
-            builder.Property(b => b.IsApproved).HasDefaultValue(false);
+            builder.Property(b => b.ApprovedDate)
+                .HasConversion(Conversions.LocalToUtcDateTime);
 
             // ensuring the value is always accurate to 4 decimal places
             builder.Property(e => e.Value).HasColumnType("decimal(12,4)");
@@ -63,6 +65,10 @@ namespace Leaderboard.Areas.Leaderboards.Models
                 throw new InvalidOperationException($"{nameof(CreatedDate)} must be earlier than the current time");
             if (CreatedDate == default)
                 CreatedDate = DateTime.UtcNow;
+
+            if (ApprovedDate <= CreatedDate)
+                throw new InvalidOperationException($"{nameof(CreatedDate)} must be earlier than {nameof(ApprovedDate)}");
+
             return Task.CompletedTask;
         }
     }

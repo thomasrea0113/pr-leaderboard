@@ -32,6 +32,7 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
         /// <value></value>
         public string OrderBy { get; set; }
         public DateTimeOffset? CreatedSince { get; set; }
+        public DateTimeOffset? ApprovedSince { get; set; }
     }
 
     public class ByBoardScoresQuery : ScoresQuery
@@ -64,13 +65,15 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
         {
             var ids = m.Ids;
             var scores = _ctx.Scores.AsQueryable()
-                .Where(s => !s.IsApproved)
+                .Where(s => s.ApprovedDate == null)
                 .Where(s => ids.Contains(s.Id))
                 .AsAsyncEnumerable();
 
+            var now = DateTime.UtcNow;
+
             await foreach (var score in scores)
             {
-                score.IsApproved = true;
+                score.ApprovedDate = now;
                 yield return score;
             }
 
@@ -102,6 +105,7 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
         public IQueryable<ScoreViewModel> GetScores(ScoresQuery filter = null)
         {
             var isApproved = filter?.IsApproved;
+            var approvedSince = filter?.ApprovedSince;
             var top = filter?.Top;
             var orderBy = filter?.OrderBy;
             var boardId = filter?.BoardId;
@@ -109,10 +113,10 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
 
             var query = _ctx.Scores.AsQueryable();
 
-            if (orderBy != null)
+            if (orderBy is string orderString)
             {
-                var order = orderBy.First();
-                var noOrder = string.Concat(orderBy.Skip(1));
+                var order = orderString.First();
+                var noOrder = string.Concat(orderString.Skip(1));
 
                 if (order == '-')
                     query = query.OrderByDescending(noOrder);
@@ -120,24 +124,32 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
                     query = query.OrderBy(noOrder);
                 // if a direction was not provided, simply order by ascending
                 else
-                    query = query.OrderBy(orderBy);
+                    query = query.OrderBy(orderString);
             }
             // no order by provided, order by most recent first
             else
                 query = query.OrderByDescending(s => s.CreatedDate);
 
 
-            if (isApproved != null)
-                query = query.Where(s => s.IsApproved == isApproved);
+            if (isApproved is bool approved)
+            {
+                if (approved)
+                    query = query.Where(s => s.ApprovedDate != null);
+                else
+                    query = query.Where(s => s.ApprovedDate == null);
+            }
 
-            if (boardId != null)
-                query = query.Where(s => s.BoardId == boardId);
+            if (boardId is string bid)
+                query = query.Where(s => s.BoardId == bid);
 
-            if (createdSince != null)
-                query = query.Where(s => s.CreatedDate > createdSince);
+            if (createdSince is DateTimeOffset createdDate)
+                query = query.Where(s => s.CreatedDate > createdDate);
 
-            if (top != null)
-                query = query.Take((int)top);
+            if (approvedSince is DateTimeOffset approvedDate)
+                query = query.Where(s => s.ApprovedDate > approvedSince);
+
+            if (top is int t)
+                query = query.Take(t);
 
             return _mapper.ProjectTo<ScoreViewModel>(query);
         }
@@ -213,7 +225,6 @@ namespace Leaderboard.Areas.Leaderboards.Controllers
 
             var score = _ctx.Set<ScoreModel>().Add(new ScoreModel
             {
-                IsApproved = false,
                 BoardId = board.Id,
                 UserId = _um.GetUserId(User),
                 Value = model.Score

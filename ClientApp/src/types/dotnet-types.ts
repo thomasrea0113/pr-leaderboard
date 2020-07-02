@@ -16,7 +16,7 @@ export enum Unit {
 
 export interface Score {
     id: string;
-    isApproved: boolean;
+    ApprovedDate?: Date;
     board: Leaderboard;
     user: User;
     createdDate: Date;

@@ -10,8 +10,7 @@ export const isScore = (obj: any): obj is Score => {
         typeof score.id === 'string' &&
         isBoard(score.board) &&
         isUser(score.user) &&
-        typeof score.value === 'number' &&
-        typeof score.isApproved === 'boolean'
+        typeof score.value === 'number'
     )
         return true;
     return false;

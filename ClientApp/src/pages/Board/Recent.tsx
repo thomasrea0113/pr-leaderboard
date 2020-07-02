@@ -1,10 +1,10 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect } from 'react';
 import 'react-dom';
 
 import { useLoading } from '../../hooks/useLoading';
 import { Score } from '../../types/dotnet-types';
 import { isScore } from '../../types/guards/isScore';
-import { isIndexOf, isArrayOf } from '../../types/guards/higherOrderGuards';
+import { isArrayOf } from '../../types/guards/higherOrderGuards';
 
 interface Props {
     initialUrl: string;
@@ -19,18 +19,29 @@ const RecentComponent: React.FC<Props> = ({ initialUrl }) => {
         guard,
     });
 
-    const reloadAsync = () =>
+    let lastQuery = '';
+
+    const loadScoresAsync = () =>
         loadAsync({
-            actionUrl: initialUrl,
+            actionUrl: `${initialUrl}&ApprovedSince=${lastQuery}`,
         });
 
+    const reloadAsync = () => {
+        const now = new Date().toJSON();
+        const promise = loadScoresAsync().then(() => {
+            lastQuery = now;
+        });
+        return promise;
+    };
+
     useEffect(() => {
-        reloadAsync();
+        loadScoresAsync();
         const interval = setInterval(() => reloadAsync(), 5000);
         return () => clearInterval(interval);
     }, []);
 
-    const data = (guard(response?.data) ? response?.data : []) ?? [];
+    const newData =
+        response?.data != null && guard(response.data) ? response.data : [];
 
     return (
         <div>

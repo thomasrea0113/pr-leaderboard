@@ -144,13 +144,15 @@ namespace Leaderboard.Data
                 {
                     var createdDaysSeed = rand.Next(1, 500);
                     var createdMillisecondsSeed = rand.Next(1, 1439999);
+                    var created = now.AddDays(-createdDaysSeed).AddMilliseconds(-createdMillisecondsSeed);
+                    var approvedDate = i % 2 == 0 ? (DateTime?)created.AddDays(1) : null;
                     yield return new ScoreModel
                     {
                         Id = GuidUtilities.Create($"score_{board.UserId}{board.LeaderboardId}{i}").ToString(),
-                        IsApproved = i % 2 == 0, // if i is even, then true. All odd indexes will be false,
+                        ApprovedDate = approvedDate,
                         UserId = board.UserId,
                         BoardId = board.LeaderboardId,
-                        CreatedDate = now.AddDays(-createdDaysSeed).AddMilliseconds(-createdMillisecondsSeed),
+                        CreatedDate = created,
                         Value = Convert.ToDecimal(rand.NextDouble() * rand.Next(200, 1500))
                     };
                 }
