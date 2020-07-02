@@ -22,6 +22,7 @@ dotnet_diagnostic.IDE0049.severity = suggestion
 
 [**/Migrations/**.cs]
 dotnet_diagnostic.CA1814.severity = none
+dotnet_diagnostic.CS8019.severity = none
 
 [**/obj/**.cs]
 dotnet_diagnostic.CS8019.severity = none

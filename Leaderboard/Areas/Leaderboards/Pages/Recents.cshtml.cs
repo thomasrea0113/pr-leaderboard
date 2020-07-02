@@ -8,6 +8,16 @@ namespace Leaderboard.Areas.Leaderboards.Pages
     public class RecentsReactProps
     {
         public string InitialUrl { get; set; }
+        /// <summary>
+        /// only retain this number of scores in the recents view
+        /// </summary>
+        /// <value></value>
+        public int Top { get; set; }
+        /// <summary>
+        /// refresh interval in milliseconds
+        /// </summary>
+        /// <value></value>
+        public int RefreshEvery { get; set; }
     }
 
     public class RecentsPageModel : PageModel
@@ -23,6 +33,7 @@ namespace Leaderboard.Areas.Leaderboards.Pages
 
         private void Init()
         {
+            var top = 100;
             Props ??= new RecentsReactProps
             {
                 InitialUrl = _link.GetUriByAction(HttpContext,
@@ -31,8 +42,10 @@ namespace Leaderboard.Areas.Leaderboards.Pages
                     new ByBoardScoresQuery
                     {
                         IsApproved = true,
-                        Top = 100
-                    })
+                        Top = top
+                    }),
+                Top = top,
+                RefreshEvery = 5000
             };
         }
 
