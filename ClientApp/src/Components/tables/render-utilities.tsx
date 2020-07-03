@@ -135,3 +135,18 @@ export const getRowRender = <T extends {}>(prepareRow: (row: Row<T>) => void) =>
             </Fragment>
         );
     };
+
+export const defaultDateOptions: Intl.DateTimeFormatOptions = {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+};
+
+export const renderDate = (
+    date: string | Date,
+    options?: Intl.DateTimeFormatOptions
+) => {
+    const dateValue = typeof date === 'string' ? new Date(date) : date;
+    return dateValue.toLocaleDateString('en-US', options ?? defaultDateOptions);
+};

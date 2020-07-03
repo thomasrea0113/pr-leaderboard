@@ -7,12 +7,18 @@ import {
     useStatelessLoading,
 } from './useStatelessLoading';
 
+export interface LoadingState {
+    isLoading: boolean;
+    /**
+     * indiciates that the component has performed the initial load. Will be set after the first call to laodAsync
+     */
+    isLoaded: boolean;
+}
+
 /**
  * props for internal loading state
  */
-export interface UseLoadingState<D> {
-    isLoading: boolean;
-    isLoaded: boolean;
+export interface UseLoadingState<D> extends LoadingState {
     response?: TypedResponse<D>;
 }
 

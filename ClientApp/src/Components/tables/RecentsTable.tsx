@@ -1,26 +1,33 @@
-import React, { Fragment, useMemo } from 'react';
+import React, { useMemo, Fragment } from 'react';
 import {
-    useGlobalFilter,
+    Column,
     useTable,
+    useGlobalFilter,
     useGroupBy,
-    useExpanded,
-    Row,
     useSortBy,
+    useExpanded,
     TableState,
+    Row,
 } from 'react-table';
 import omit from 'lodash/fp/omit';
-import { ScoreColumns } from './columns/score-columns';
 import { Score } from '../../types/dotnet-types';
-import { renderCell, renderHeader } from './render-utilities';
+import { ScoreColumns } from './columns/score-columns';
+import { renderHeader, renderCell } from './render-utilities';
 
-interface LocalProps {
-    reloadAsync?: () => Promise<void>;
-    icon: string;
-    scores: Score[];
-    unit: string;
+export interface RecentsTableProps {
+    data: Score[];
 }
 
-export const ScoreTable: React.FC<LocalProps> = ({ scores }) => {
+const columns: Column<Score>[] = [
+    ...ScoreColumns,
+    {
+        Header: 'Board',
+        id: 'board',
+        accessor: s => `${s.board.division.name} / ${s.board.name}`,
+    },
+];
+
+export const RecentsTable: React.FC<RecentsTableProps> = ({ data }) => {
     const initialState: Partial<TableState<Score>> = useMemo(
         () => ({
             sortBy: [{ id: 'score', desc: true }],
@@ -36,10 +43,10 @@ export const ScoreTable: React.FC<LocalProps> = ({ scores }) => {
         prepareRow,
     } = useTable(
         {
-            data: scores,
-            columns: ScoreColumns,
+            data,
+            columns,
             initialState,
-            expandSubRows: false,
+            expandSubRows: true,
             autoResetExpanded: false,
         },
         useGlobalFilter,

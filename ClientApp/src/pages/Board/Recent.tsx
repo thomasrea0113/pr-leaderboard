@@ -5,6 +5,8 @@ import { Score } from '../../types/dotnet-types';
 import { isScore } from '../../types/guards/isScore';
 import { isArrayOf } from '../../types/guards/higherOrderGuards';
 import { useStatelessLoading } from '../../hooks/useStatelessLoading';
+import { LoadingState } from '../../hooks/useLoading';
+import { RecentsTable } from '../../Components/tables/RecentsTable';
 
 interface Props {
     initialUrl: string;
@@ -12,12 +14,7 @@ interface Props {
     refreshEvery: number;
 }
 
-interface State {
-    /**
-     * indiciates that the component has performed the initial load. Will be set after the first call to laodAsync
-     */
-    isLoaded: boolean;
-    isLoading: boolean;
+interface State extends LoadingState {
     data: Score[];
     lastQuery: string;
 }
@@ -33,9 +30,7 @@ const RecentComponent: React.FC<Props> = ({
         guard,
     });
 
-    const [{ data, lastQuery, isLoaded, isLoading }, setState] = useState<
-        State
-    >({
+    const [{ data, lastQuery, isLoaded }, setState] = useState<State>({
         data: [],
         lastQuery: '',
         isLoaded: false,
@@ -119,10 +114,10 @@ const RecentComponent: React.FC<Props> = ({
     }, [lastQuery]);
 
     return (
-        <div>
-            Recent Updates
-            {isLoaded && !isLoading ? <>Loaded</> : null}
-        </div>
+        <>
+            <h2>Recents PRs</h2>
+            <RecentsTable data={data} />
+        </>
     );
 };
 
