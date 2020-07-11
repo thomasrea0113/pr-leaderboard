@@ -33,6 +33,7 @@
 		]
 	},
 	"settings": {
+		"debug.javascript.usePreview": false,
 		"jest.disabledWorkspaceFolders": [
 			"Solution",
 			"Leaderboard",
