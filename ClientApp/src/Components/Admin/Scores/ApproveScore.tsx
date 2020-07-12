@@ -2,7 +2,6 @@ import React, { useMemo, useEffect, useState } from 'react';
 
 import {
     TableState,
-    useTable,
     useGlobalFilter,
     useGroupBy,
     useSortBy,
@@ -18,6 +17,7 @@ import { HttpMethodsEnum } from '../../../types/types';
 import { isValidationErrorResponseData } from '../../../types/ValidationErrorResponse';
 import { isArrayOf } from '../../../types/guards/higherOrderGuards';
 import { isScore } from '../../../types/guards/isScore';
+import { useDefaultTable } from '../../tables/useDefaultTable';
 
 interface ApproveScore {
     ids: string[];
@@ -132,7 +132,7 @@ export const ApproveScoreComponent: React.FC<{}> = () => {
         headerGroups,
         rows,
         prepareRow,
-    } = useTable(
+    } = useDefaultTable(
         {
             data,
             columns: approveColumns,

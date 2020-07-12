@@ -9,6 +9,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Leaderboard.Areas.Identity
 {
+    public class UsersQuery
+    {
+        public bool? IsAdmin { get; set; }
+        public bool? IsActive { get; set; }
+    }
+
     [ApiController]
     [Authorize]
     [Route("api/[controller]")]
@@ -38,8 +44,25 @@ namespace Leaderboard.Areas.Identity
         [HttpGet]
         [Route("")]
         [Authorize(Policy = "AppAdmin")]
-        public IEnumerable<UserViewModel> Get(bool? isAdmin = null, bool? isActive = null)
+        public async Task<IActionResult> Get([FromQuery] UsersQuery query)
         {
+            // only admin users can request inactive users, or information about admin users
+            // TODO restrict the returns object array to not include active/admin booleans
+            if (query?.IsActive != true || query?.IsAdmin != null)
+            {
+                var isAdmin = await _auth.AuthorizeAsync(User, "AppAdmin").ConfigureAwait(false);
+                if (!isAdmin.Succeeded)
+                    return Unauthorized();
+            }
+
+            return Ok(GetUsers(query));
+        }
+
+        public IEnumerable<UserViewModel> GetUsers(UsersQuery query = null)
+        {
+            var isActive = query?.IsActive;
+            var isAdmin = query?.IsAdmin;
+
             var adminUserIds = _userManager.Users.Where(u =>
                 u.UserRoles.Any(ur => ur.Role.NormalizedName == "ADMIN"))
                 .Select(u => u.Id)
@@ -47,8 +70,8 @@ namespace Leaderboard.Areas.Identity
 
             var users = _mapper.ProjectTo<UserViewModel>(_userManager.Users);
 
-            if (isActive != null)
-                users = users.Where(u => u.IsActive == isActive);
+            if (isActive is bool active)
+                users = users.Where(u => u.IsActive == active);
 
             foreach (var user in users)
             {

@@ -3,11 +3,13 @@ import { useLoading } from '../../../hooks/useLoading';
 import { User } from '../../../types/dotnet-types';
 import { isUser } from '../../../types/guards/isUser';
 import { isArrayOf } from '../../../types/guards/higherOrderGuards';
-import { isValidationErrorResponseData } from '../../../types/ValidationErrorResponse';
+import { UsersTable } from '../../tables/UsersTable';
+
+const guard = isArrayOf(isUser);
 
 export const ViewUsersComponent: React.FC<{}> = () => {
     const { response, loadAsync } = useLoading<User[]>({
-        guard: isArrayOf(isUser),
+        guard,
     });
 
     const getUsersAsync = () => {
@@ -16,9 +18,8 @@ export const ViewUsersComponent: React.FC<{}> = () => {
 
     useEffect(getUsersAsync, []);
 
-    const data = isValidationErrorResponseData(response?.data)
-        ? []
-        : response?.data ?? [];
+    const data =
+        response?.data != null && guard(response.data) ? response.data : [];
 
-    return <>All Users</>;
+    return <UsersTable users={data} />;
 };

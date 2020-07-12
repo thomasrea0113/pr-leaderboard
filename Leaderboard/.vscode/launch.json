@@ -5,10 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "chrome",
+            "type": "pwa-chrome",
             "request": "launch",
             "name": "Launch Chrome",
-            "url": "http://localhost:5000/Leaderboards/Recents",
+            "url": "http://localhost:5000/Admin?orderBy=score&orderBy=-user#!/Scores/Approve",
             "webRoot": "${workspaceFolder}/wwwroot",
 			"runtimeArgs": [
 				"--auto-open-devtools-for-tabs"

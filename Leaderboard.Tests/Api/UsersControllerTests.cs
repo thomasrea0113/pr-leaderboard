@@ -57,7 +57,7 @@ namespace Leaderboard.Tests.Api
                 .ProjectTo<UserViewModel>(mapper.ConfigurationProvider, new { IsAdmin = true })
                 .ToList();
 
-            var allActiveUsers = users.Get(isActive: true)
+            var allActiveUsers = users.GetUsers(new UsersQuery { IsActive = true })
                 .OrderBy(u => u.UserName)
                 .ToList();
 

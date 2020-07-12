@@ -1,29 +1,26 @@
-import React, { Fragment, useMemo } from 'react';
+import React, { useMemo, Fragment } from 'react';
 import {
+    TableState,
+    useTable,
     useGlobalFilter,
     useGroupBy,
+    useSortBy,
     useExpanded,
     Row,
-    useSortBy,
-    TableState,
 } from 'react-table';
 import omit from 'lodash/fp/omit';
-import { ScoreColumns } from './columns/score-columns';
-import { Score } from '../../types/dotnet-types';
+import { User } from '../../types/dotnet-types';
+import { UsersColumns as columns } from './columns/users-columns';
 import { renderCell, renderHeader } from './render-utilities';
-import { useDefaultTable } from './useDefaultTable';
 
-interface LocalProps {
-    reloadAsync?: () => Promise<void>;
-    icon: string;
-    scores: Score[];
-    unit: string;
+export interface UsersTableProps {
+    users: User[];
 }
 
-export const ScoreTable: React.FC<LocalProps> = ({ scores }) => {
-    const initialState: Partial<TableState<Score>> = useMemo(
+export const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
+    const initialState: Partial<TableState<User>> = useMemo(
         () => ({
-            sortBy: [{ id: 'score', desc: true }],
+            sortBy: [{ id: 'user', desc: true }],
         }),
         []
     );
@@ -34,10 +31,10 @@ export const ScoreTable: React.FC<LocalProps> = ({ scores }) => {
         headerGroups,
         rows,
         prepareRow,
-    } = useDefaultTable(
+    } = useTable(
         {
-            data: scores,
-            columns: ScoreColumns,
+            data: users,
+            columns,
             initialState,
             expandSubRows: false,
             autoResetExpanded: false,
@@ -48,7 +45,7 @@ export const ScoreTable: React.FC<LocalProps> = ({ scores }) => {
         useExpanded
     );
 
-    const renderRow = (r: Row<Score>): React.ReactFragment => {
+    const renderRow = (r: Row<User>): React.ReactFragment => {
         prepareRow(r);
         const props = r.getRowProps();
         const { key } = props;
